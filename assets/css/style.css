@@ -1,0 +1,42 @@
+/* --- Estilos Globais Base --- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Estilos Específicos: Página 404 --- */
+.page-404 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.container-404 h1 {
+    font-size: 50px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.container-404 p {
+    color: #666;
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+.btn-voltar {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0056b3;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-voltar:hover {
+    background-color: #004494;
+}
