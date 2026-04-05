@@ -256,7 +256,7 @@ function handleRegisterSubmit(event) {
     const tabPane = form.closest('.tab-pane');
 
     if (!tabPane) {
-        alert('Nao foi possivel identificar o tipo de cadastro.');
+        alert('Não foi possível identificar o tipo de cadastro.');
         return;
     }
 
