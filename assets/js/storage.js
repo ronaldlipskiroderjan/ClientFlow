@@ -60,7 +60,7 @@ const StorageManager = {
 
     logout() {
         localStorage.removeItem(this.KEYS.CURRENT_USER);
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     },
 
     getAuthUser() {
