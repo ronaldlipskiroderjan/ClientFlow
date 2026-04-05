@@ -38,11 +38,21 @@ const StorageManager = {
         return this.login(userData.email, userData.password);
     },
 
+    sanitizeAuthUser(user) {
+        if (!user) {
+            return null;
+        }
+
+        const { password, ...safeUser } = user;
+        return safeUser;
+    },
+
     login(email, password) {
         const users = this.getData(this.KEYS.USERS);
         const user = users.find(u => u.email === email && u.password === password);
         if (user) {
-            localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify(user));
+            const authUser = this.sanitizeAuthUser(user);
+            localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify(authUser));
             return user;
         }
         return null;
