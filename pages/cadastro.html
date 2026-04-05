@@ -56,28 +56,28 @@
                     <div class="tab-pane fade show active" id="client" role="tabpanel" aria-labelledby="client-tab">
                         <form>
                             <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Nome Completo</label>
-                                <input type="text" name="full_name" class="form-control bg-light border-0" required>
+                                <label for="full_name" class="form-label text-muted fw-semibold">Nome Completo</label>
+                                <input id="full_name" type="text" name="full_name" class="form-control bg-light border-0" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">CPF</label>
-                                <input type="text" name="cpf" class="form-control bg-light border-0" placeholder="000.000.000-00" maxlength="14" required>
+                                <label for="cpf" class="form-label text-muted fw-semibold">CPF</label>
+                                <input id="cpf" type="text" name="cpf" class="form-control bg-light border-0" placeholder="000.000.000-00" maxlength="14" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Data de Nascimento</label>
-                                <input type="date" name="birth_date" class="form-control bg-light border-0" required>
+                                <label for="birth_date" class="form-label text-muted fw-semibold">Data de Nascimento</label>
+                                <input id="birth_date" type="date" name="birth_date" class="form-control bg-light border-0" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Número para Contato</label>
-                                <input type="tel" name="phone" class="form-control bg-light border-0" placeholder="(00) 00000-0000" maxlength="15" required>
+                                <label for="phone" class="form-label text-muted fw-semibold">Número para Contato</label>
+                                <input id="phone" type="tel" name="phone" class="form-control bg-light border-0" placeholder="(00) 00000-0000" maxlength="15" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">E-mail para Login</label>
-                                <input type="email" name="email" class="form-control bg-light border-0" required>
+                                <label for="email" class="form-label text-muted fw-semibold">E-mail para Login</label>
+                                <input id="email" type="email" name="email" class="form-control bg-light border-0" required>
                             </div>
                             <div class="mb-4">
-                                <label class="form-label text-muted fw-semibold">Senha</label>
-                                <input type="password" name="password" class="form-control bg-light border-0" minlength="6" required>
+                                <label for="password" class="form-label text-muted fw-semibold">Senha</label>
+                                <input id="password" type="password" name="password" class="form-control bg-light border-0" minlength="6" required>
                             </div>
                             <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Criar Conta Cliente</button>
                         </form>
