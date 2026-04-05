@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | ClientFlow - Gestão B2B</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Public Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+  <div class="container">
+    <!-- Navbar Toggler for mobile -->
+    <button class="navbar-toggler me-2 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPublic" aria-controls="navbarPublic" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa-solid fa-bars fs-3 text-dark"></i>
+    </button>
+    
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <i class="fa-solid fa-layer-group text-primary me-2"></i> ClientFlow</a>
+
+    <!-- Hamburger Menu items -->
+    <div class="collapse navbar-collapse" id="navbarPublic">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#features">Vantagens</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#pricing">Planos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#contact">Contato</a>
+        </li>
+      </ul>
+      
+      <!-- Right Side Actions -->
+      <div class="d-flex align-items-center gap-3">
+        <a href="pages/cadastro.html" class="btn btn-text-custom text-decoration-none">Cadastrar-se</a>
+        <a href="pages/login.html" class="btn btn-primary-custom px-4">Entrar</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="main-content">
+
+<!-- Hero Section -->
+<section class="hero-section py-5 text-center bg-white">
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold text-navy-blue mb-4">Centralize Documentos, <br><span class="text-primary">Escale sua Produtividade</span></h1>
+        <p class="lead text-muted mb-5 mx-auto hero-lead">
+            A plataforma definitiva para Agências e Freelancers gerenciarem fluxos de Onboarding B2B. Diga adeus aos anexos espalhados no WhatsApp e e-mails perdidos.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="pages/cadastro.html" class="btn btn-primary-custom btn-lg px-5">Começar Agora</a>
+            <a href="#features" class="btn btn-outline-custom btn-lg px-5">Saber mais</a>
+        </div>
+    </div>
+</section>
+
+<!-- Advantages / Features -->
+<section id="features" class="py-5 bg-arctic-gray">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-navy-blue">Por que escolher o ClientFlow?</h2>
+            <p class="text-muted">Ferramentas projetadas para eliminar atritos no recolhimento de material.</p>
+        </div>
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4 border-0 text-center">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-folder-open fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold">Fim da Perda de Arquivos</h5>
+                    <p class="text-muted mb-0">Centralize todos os logos, contratos e senhas do cliente em um único Painel organizado.</p>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4 border-0 text-center">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-shield-halved fs-1 text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">Validação Automática</h5>
+                    <p class="text-muted mb-0">Nosso Form Builder bloqueia envios que saem da regra (ex: Exige só PDF, peso máx de 5MB).</p>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4 border-0 text-center">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-comments fs-1 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold">Chat Integrado</h5>
+                    <p class="text-muted mb-0">Histórico de aprovações/reprovações documentado, melhorando a segurança jurídica.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="py-5 bg-white">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-navy-blue">Planos Transparentes</h2>
+            <p class="text-muted">Cresça sem se preocupar com limites surpresa.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <!-- Gold -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-custom h-100 p-4 border-0">
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold text-muted">Gold</h4>
+                        <h2 class="display-5 fw-bold text-navy-blue">R$ 49<span class="fs-5 text-muted">/mês</span></h2>
+                    </div>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Até 10 Clientes Ativos</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> 5GB de Armazenamento</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Suporte por E-mail</li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a href="pages/cadastro.html" class="btn btn-outline-custom w-100">Assinar Gold</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Platinum -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-custom h-100 p-4 shadow-lg border-primary pricing-featured">
+                    <!-- Badge destaque -->
+                    <div class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-primary px-3 py-2">
+                        Mais Popular
+                    </div>
+                    <div class="text-center mb-4 mt-2">
+                        <h4 class="fw-bold text-primary">Platinum</h4>
+                        <h2 class="display-5 fw-bold text-navy-blue">R$ 99<span class="fs-5 text-muted">/mês</span></h2>
+                    </div>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Até 50 Clientes Ativos</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> 20GB de Armazenamento</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Exportação em Lote (.zip)</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Suporte Prioritário</li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a href="pages/cadastro.html" class="btn btn-primary-custom w-100">Assinar Platinum</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Diamond -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-custom h-100 p-4 border-0">
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold text-dark">Diamond</h4>
+                        <h2 class="display-5 fw-bold text-navy-blue">R$ 199<span class="fs-5 text-muted">/mês</span></h2>
+                    </div>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Clientes Ilimitados</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> 100GB de Armazenamento</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Exportação Integrada</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Atendimento 24/7</li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a href="pages/cadastro.html" class="btn btn-outline-custom w-100">Assinar Diamond</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About & Contact Section -->
+<section id="contact" class="py-5 bg-navy-blue text-white">
+    <div class="container py-5 text-white">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <h2 class="fw-bold mb-4">Sobre Nós</h2>
+                <p class="lead mb-4 contact-description">
+                    Nascemos da dor real de designers, agências e freelancers que gastam horas intermináveis cobrando clientes por ativos corretos. Nosso objetivo é automatizar esse atrito para que você foque no trabalho que importa.
+                </p>
+                <div class="d-flex gap-3">
+                    <div>
+                        <h4 class="fw-bold text-primary">5k+</h4>
+                        <span class="text-sm contact-stat-label">Agências</span>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold text-primary">1M+</h4>
+                        <span class="text-sm contact-stat-label">Uploads</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 offset-lg-1">
+                <div class="card card-custom p-4 bg-white text-dark">
+                    <h4 class="fw-bold mb-3 text-navy-blue">Entre em contato</h4>
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nome</label>
+                            <input type="text" class="form-control mb-2" placeholder="Seu nome">
+                            <label class="form-label text-muted">E-mail</label>
+                            <input type="email" class="form-control mb-2" placeholder="contato@empresa.com">
+                            <label class="form-label text-muted">Mensagem</label>
+                            <textarea class="form-control mb-3" rows="3" placeholder="Como podemos ajudar?"></textarea>
+                            <button type="button" class="btn btn-primary-custom w-100">Enviar Mensagem</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div> 
+
+<!-- Public Footer -->
+<footer class="footer text-center mt-auto py-4 footer-soft-bg">
+  <div class="container">
+    <div class="row align-items-center mb-3">
+        <div class="col-md-6 text-md-start mb-3 mb-md-0">
+            <h5 class="fw-bold mb-0 text-navy-blue"><i class="fa-solid fa-layer-group text-primary me-2"></i> ClientFlow</h5>
+            <small class="text-muted">A plataforma definitiva para agências e freelancers gerarem checklists de onboarding B2B.</small>
+        </div>
+        <div class="col-md-6 text-md-end text-muted">
+            <a href="#" class="text-muted me-3 fs-5"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="text-muted me-3 fs-5"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="#" class="text-muted fs-5"><i class="fa-brands fa-twitter"></i></a>
+        </div>
+    </div>
+    <div class="border-top pt-3 text-muted text-sm border-arctic-gray-dark">
+        &copy; 2026 ClientFlow. Todos os direitos reservados.
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
