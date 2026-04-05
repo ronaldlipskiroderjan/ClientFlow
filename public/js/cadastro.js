@@ -254,33 +254,66 @@ async function handleRegisterSubmit(event) {
 
     const form = event.currentTarget;
     const tabPane = form.closest('.tab-pane');
-    const tabId = tabPane.id;
-    const rawData = formToObject(form);
 
-    if (!validateFormByTab(tabId, rawData)) return;
-
-    const userData = buildRegisterData(tabId, rawData);
-    let endpoint = '';
-
-    if (tabId === 'client') {
-        endpoint = 'cliente/cadastrar.php';
-    } else if (tabId === 'pj') {
-        endpoint = 'gestor/cadastrar.php';
-    } else {
-        endpoint = 'admin/cadastrar.php';
+    if (!tabPane) {
+        alert('Nao foi possivel identificar o tipo de cadastro.');
+        return;
     }
 
-    try {
-        const resultado = await apiRequest(endpoint, 'POST', userData);
+    const tabId = tabPane.id;
+    const rawData = formToObject(form);
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
 
-        if (resultado.status === 'success') {
-            alert(resultado.message);
-            window.location.href = 'login.html';
-        } else {
-            alert(resultado.message);
+    if (!validateFormByTab(tabId, rawData)) {
+        return;
+    }
+
+    const userData = buildRegisterData(tabId, rawData);
+
+    try {
+        const retorno = await ApiClientFlow.post('usuario_cadastrar.php', {
+            nome: userData.name,
+            email: userData.email,
+            senha: userData.password,
+            tipo: userData.role,
+            telefone: userData.phone,
+            documento: userData.cpf_cnpj,
+            data_nascimento: userData.birth_date || '',
+            nome_empresa: userData.corporate_name || '',
+            nome_responsavel: userData.legal_contact || ''
+        });
+
+        if (retorno.status !== 'ok') {
+            alert(retorno.mensagem || 'Erro ao criar conta.');
+            return;
         }
+
+        if (userData.role === 'client') {
+            const loginRetorno = await ApiClientFlow.post('usuario_login.php', {
+                email: userData.email,
+                senha: userData.password
+            });
+
+            if (loginRetorno.status !== 'ok') {
+                alert(loginRetorno.mensagem || 'Cadastro realizado, mas falhou o login automatico.');
+                window.location.href = 'login.html' + (token ? ('?token=' + encodeURIComponent(token)) : '');
+                return;
+            }
+
+            if (token) {
+                const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
+                if (vinculo.status !== 'ok') {
+                    alert(vinculo.mensagem || 'Cadastro realizado, mas nao foi possivel vincular o formulario.');
+                    return;
+                }
+            }
+        }
+
+        alert('Cadastro realizado com sucesso.');
+        window.location.href = getRedirectByRole(userData.role);
     } catch (error) {
-        console.error("Erro na comunicação com a API:", error);
+        alert('Erro ao conectar com o servidor. Tente novamente.');
     }
 }
 

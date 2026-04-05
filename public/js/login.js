@@ -1,12 +1,12 @@
 function getDashboardByRole(role) {
     if (role === 'client') {
-        return '../dashboard_client.html';
+        return 'dashboard_client.html';
     }
 
-    return '../dashboard_agency.html';
+    return 'dashboard_agency.html';
 }
 
-function handleLoginSubmit(event) {
+async function handleLoginSubmit(event) {
     event.preventDefault();
 
     const emailInput = document.getElementById('email');
@@ -14,15 +14,49 @@ function handleLoginSubmit(event) {
 
     const email = emailInput.value.trim();
     const password = passwordInput.value;
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
 
-    const user = StorageManager.login(email, password);
+    try {
+        const retorno = await ApiClientFlow.post('usuario_login.php', {
+            email,
+            senha: password
+        });
 
-    if (!user) {
-        alert('E-mail ou senha incorretos.');
-        return;
+        if (retorno.status !== 'ok') {
+            alert(retorno.mensagem || 'E-mail ou senha incorretos.');
+            return;
+        }
+
+        const tipo = retorno.data && retorno.data.tipo ? retorno.data.tipo : null;
+
+        if (!tipo) {
+            alert('Nao foi possivel identificar o perfil do usuario.');
+            return;
+        }
+
+        if (tipo !== 'client') {
+            alert('Esta entrega aceita apenas login de cliente.');
+            return;
+        }
+
+        if (token) {
+            if (tipo !== 'client') {
+                alert('Este link de formulario exige login de cliente.');
+                return;
+            }
+
+            const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
+            if (vinculo.status !== 'ok') {
+                alert(vinculo.mensagem || 'Nao foi possivel vincular o formulario.');
+                return;
+            }
+        }
+
+        window.location.href = getDashboardByRole(tipo);
+    } catch (error) {
+        alert('Erro ao conectar com o servidor. Tente novamente.');
     }
-
-    window.location.href = getDashboardByRole(user.role);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
