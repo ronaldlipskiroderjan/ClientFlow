@@ -1,9 +1,9 @@
 function getDashboardByRole(role) {
     if (role === 'client') {
-        return 'dashboard_client.html';
+        return '../dashboard_client.html';
     }
 
-    return 'dashboard_agency.html';
+    return '../dashboard_agency.html';
 }
 
 function handleLoginSubmit(event) {
