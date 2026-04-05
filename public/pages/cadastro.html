@@ -10,8 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
-    <link href="../assets/css/style.css" rel="stylesheet">
-    <script src="../assets/js/storage.js"></script>
+    <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
 
@@ -35,12 +34,7 @@
                 <!-- Nav Tabs -->
                 <ul class="nav nav-pills nav-justified mb-4" id="registerTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold" id="client-tab" data-bs-toggle="pill" data-bs-target="#client" type="button" role="tab" aria-controls="client" aria-selected="true">
-                            <i class="fa-solid fa-user me-2"></i> Cliente (PF)
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fw-bold" id="freelancer-pf-tab" data-bs-toggle="pill" data-bs-target="#freelancer-pf" type="button" role="tab" aria-controls="freelancer-pf" aria-selected="false">
+                        <button class="nav-link active fw-bold" id="freelancer-pf-tab" data-bs-toggle="pill" data-bs-target="#freelancer-pf" type="button" role="tab" aria-controls="freelancer-pf" aria-selected="true">
                             <i class="fa-solid fa-briefcase me-2"></i> Freelancer (PF)
                         </button>
                     </li>
@@ -52,39 +46,8 @@
                 </ul>
 
                 <div class="tab-content" id="registerTabsContent">
-                    <!-- Cliente PF -->
-                    <div class="tab-pane fade show active" id="client" role="tabpanel" aria-labelledby="client-tab">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Nome Completo</label>
-                                <input type="text" name="full_name" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">CPF</label>
-                                <input type="text" name="cpf" class="form-control bg-light border-0" placeholder="000.000.000-00" maxlength="14" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Data de Nascimento</label>
-                                <input type="date" name="birth_date" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Número para Contato</label>
-                                <input type="tel" name="phone" class="form-control bg-light border-0" placeholder="(00) 00000-0000" maxlength="15" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">E-mail para Login</label>
-                                <input type="email" name="email" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label text-muted fw-semibold">Senha</label>
-                                <input type="password" name="password" class="form-control bg-light border-0" minlength="6" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Criar Conta Cliente</button>
-                        </form>
-                    </div>
-
                     <!-- Freelancer PF (B2B) -->
-                    <div class="tab-pane fade" id="freelancer-pf" role="tabpanel" aria-labelledby="freelancer-pf-tab">
+                    <div class="tab-pane fade show active" id="freelancer-pf" role="tabpanel" aria-labelledby="freelancer-pf-tab">
                         <form>
                             <div class="mb-3">
                                 <label class="form-label text-muted fw-semibold">Nome Completo</label>
@@ -165,7 +128,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/js/main.js"></script>
-<script src="../assets/js/cadastro.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/cadastro.js"></script>
 </body>
 </html>

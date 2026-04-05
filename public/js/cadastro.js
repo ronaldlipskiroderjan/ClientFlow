@@ -249,7 +249,7 @@ function formToObject(form) {
     return data;
 }
 
-function handleRegisterSubmit(event) {
+async function handleRegisterSubmit(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
@@ -262,20 +262,59 @@ function handleRegisterSubmit(event) {
 
     const tabId = tabPane.id;
     const rawData = formToObject(form);
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
 
     if (!validateFormByTab(tabId, rawData)) {
         return;
     }
 
     const userData = buildRegisterData(tabId, rawData);
-    const createdUser = StorageManager.register(userData);
 
-    if (!createdUser) {
-        alert('Erro ao criar conta.');
-        return;
+    try {
+        const retorno = await ApiClientFlow.post('usuario_cadastrar.php', {
+            nome: userData.name,
+            email: userData.email,
+            senha: userData.password,
+            tipo: userData.role,
+            telefone: userData.phone,
+            documento: userData.cpf_cnpj,
+            data_nascimento: userData.birth_date || '',
+            nome_empresa: userData.corporate_name || '',
+            nome_responsavel: userData.legal_contact || ''
+        });
+
+        if (retorno.status !== 'ok') {
+            alert(retorno.mensagem || 'Erro ao criar conta.');
+            return;
+        }
+
+        if (userData.role === 'client') {
+            const loginRetorno = await ApiClientFlow.post('usuario_login.php', {
+                email: userData.email,
+                senha: userData.password
+            });
+
+            if (loginRetorno.status !== 'ok') {
+                alert(loginRetorno.mensagem || 'Cadastro realizado, mas falhou o login automatico.');
+                window.location.href = 'login.html' + (token ? ('?token=' + encodeURIComponent(token)) : '');
+                return;
+            }
+
+            if (token) {
+                const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
+                if (vinculo.status !== 'ok') {
+                    alert(vinculo.mensagem || 'Cadastro realizado, mas nao foi possivel vincular o formulario.');
+                    return;
+                }
+            }
+        }
+
+        alert('Cadastro realizado com sucesso.');
+        window.location.href = getRedirectByRole(userData.role);
+    } catch (error) {
+        alert('Erro ao conectar com o servidor. Tente novamente.');
     }
-
-    window.location.href = getRedirectByRole(userData.role);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
