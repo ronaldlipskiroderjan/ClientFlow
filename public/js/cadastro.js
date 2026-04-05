@@ -249,33 +249,39 @@ function formToObject(form) {
     return data;
 }
 
-function handleRegisterSubmit(event) {
+async function handleRegisterSubmit(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
     const tabPane = form.closest('.tab-pane');
-
-    if (!tabPane) {
-        alert('Não foi possível identificar o tipo de cadastro.');
-        return;
-    }
-
     const tabId = tabPane.id;
     const rawData = formToObject(form);
 
-    if (!validateFormByTab(tabId, rawData)) {
-        return;
-    }
+    if (!validateFormByTab(tabId, rawData)) return;
 
     const userData = buildRegisterData(tabId, rawData);
-    const createdUser = StorageManager.register(userData);
+    let endpoint = '';
 
-    if (!createdUser) {
-        alert('Erro ao criar conta.');
-        return;
+    if (tabId === 'client') {
+        endpoint = 'cliente/cadastrar.php';
+    } else if (tabId === 'pj') {
+        endpoint = 'gestor/cadastrar.php';
+    } else {
+        endpoint = 'admin/cadastrar.php';
     }
 
-    window.location.href = getRedirectByRole(userData.role);
+    try {
+        const resultado = await apiRequest(endpoint, 'POST', userData);
+
+        if (resultado.status === 'success') {
+            alert(resultado.message);
+            window.location.href = 'login.html';
+        } else {
+            alert(resultado.message);
+        }
+    } catch (error) {
+        console.error("Erro na comunicação com a API:", error);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
