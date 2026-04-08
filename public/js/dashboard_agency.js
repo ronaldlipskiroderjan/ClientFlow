@@ -11,22 +11,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const nomeUsuario = sessao.data && sessao.data.nome ? sessao.data.nome : "Usuário";
-
-        document.querySelectorAll(".text-navy-blue.fw-bold").forEach((el) => {
-            if (el.textContent.includes("Olá,")) {
-                el.innerHTML = `Olá, <span class="fw-bold text-navy-blue">${nomeUsuario}</span>`;
-            }
-        });
-
-        const nomeSidebar = document.querySelector(".dropdown strong");
-        if (nomeSidebar) {
-            nomeSidebar.textContent = nomeUsuario;
-        }
-
-        const avatar = document.querySelector(".dropdown img");
-        if (avatar) {
-            avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeUsuario)}&background=0D8ABC&color=fff`;
+        if (window.ClientFlowIdentity) {
+            window.ClientFlowIdentity.apply(sessao.data, {
+                avatarBackground: "0D8ABC"
+            });
         }
 
         const resumo = await ApiClientFlow.get("dashboard_agencia_resumo.php");
@@ -70,12 +58,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        document.querySelector(".dropdown-item.text-danger").addEventListener("click", async (event) => {
-            event.preventDefault();
+        const logoutLink = document.querySelector(".js-logout-link");
+        if (logoutLink) {
+            logoutLink.addEventListener("click", async (event) => {
+                event.preventDefault();
 
-            await ApiClientFlow.post("usuario_logoff.php");
-            window.location.href = "../../index.html";
-        });
+                await ApiClientFlow.post("usuario_logoff.php");
+                window.location.href = "../../index.html";
+            });
+        }
     } catch (error) {
         window.location.href = "login.html";
     }
