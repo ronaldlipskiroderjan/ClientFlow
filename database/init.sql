@@ -66,6 +66,14 @@ CREATE TABLE IF NOT EXISTS itens_checklist (
     nome_item VARCHAR(150) NOT NULL,
     descricao_item TEXT NULL,
     formato_esperado VARCHAR(50) DEFAULT 'text',
+    min_chars INT NULL,
+    max_chars INT NULL,
+    allowed_extensions VARCHAR(255) NULL,
+    max_file_size_kb INT NULL,
+    min_width INT NULL,
+    max_width INT NULL,
+    min_height INT NULL,
+    max_height INT NULL,
     status ENUM('pending', 'review', 'approved', 'rejected') DEFAULT 'pending',
     resposta_texto TEXT NULL,
     arquivo_path VARCHAR(255) NULL,
@@ -73,3 +81,12 @@ CREATE TABLE IF NOT EXISTS itens_checklist (
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE CASCADE
 );
+
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS min_chars INT NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_chars INT NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS allowed_extensions VARCHAR(255) NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_file_size_kb INT NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS min_width INT NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_width INT NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS min_height INT NULL;
+ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_height INT NULL;

@@ -8,48 +8,33 @@ $retorno = [
     "data" => []
 ];
 
-$usuario_id = $_SESSION['usuario_id'] ?? null;
-$usuario_email = $_SESSION['usuario_email'] ?? null;
+$agencia_usuario_id = $_SESSION['usuario_id'] ?? null;
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? null;
+$checklist_id = intval($_GET['checklist_id'] ?? 0);
 
-if (empty($usuario_id)) {
+if (empty($agencia_usuario_id)) {
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
 }
 
-if ($usuario_tipo !== "client") {
-    $retorno["mensagem"] = "Perfil sem permissão para acessar tarefas do cliente.";
+if ($usuario_tipo === "client") {
+    $retorno["mensagem"] = "Perfil sem permissão para revisar itens.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
 }
 
-$stmt_cliente = $conexao->prepare(
-    "SELECT id FROM clientes WHERE usuario_id = ? OR email = ? LIMIT 1"
-);
-$stmt_cliente->bind_param("is", $usuario_id, $usuario_email);
-$stmt_cliente->execute();
-$res_cliente = $stmt_cliente->get_result();
-
-if ($res_cliente->num_rows !== 1) {
-    $retorno["status"] = "ok";
-    $retorno["mensagem"] = "Nenhuma tarefa encontrada.";
+if ($checklist_id <= 0) {
+    $retorno["mensagem"] = "Checklist inválido.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
-    $stmt_cliente->close();
-    $conexao->close();
     exit();
 }
 
-$cliente = $res_cliente->fetch_assoc();
-$cliente_id = intval($cliente['id']);
-$stmt_cliente->close();
-
-$stmt_tarefas = $conexao->prepare(
+$stmt = $conexao->prepare(
     "SELECT
         i.id,
-        i.checklist_id,
         i.nome_item,
         i.descricao_item,
         i.formato_esperado,
@@ -65,29 +50,31 @@ $stmt_tarefas = $conexao->prepare(
         i.resposta_texto,
         i.arquivo_path,
         i.motivo_rejeicao,
-        c.titulo AS checklist_nome
+        c.id AS checklist_id,
+        c.titulo AS checklist_titulo,
+        cl.nome AS cliente_nome,
+        cl.email AS cliente_email
      FROM itens_checklist i
      INNER JOIN checklists c ON c.id = i.checklist_id
-     WHERE c.cliente_id = ?
-     ORDER BY i.id DESC"
+     LEFT JOIN clientes cl ON cl.id = c.cliente_id
+     WHERE i.checklist_id = ? AND c.agencia_usuario_id = ?
+     ORDER BY i.id ASC"
 );
-$stmt_tarefas->bind_param("i", $cliente_id);
-$stmt_tarefas->execute();
-$res_tarefas = $stmt_tarefas->get_result();
+$stmt->bind_param("ii", $checklist_id, $agencia_usuario_id);
+$stmt->execute();
+$resultado = $stmt->get_result();
 
-$tarefas = [];
-while ($linha = $res_tarefas->fetch_assoc()) {
-    $valor = $linha['resposta_texto'];
-    if (empty($valor) && !empty($linha['arquivo_path'])) {
-        $valor = $linha['arquivo_path'];
-    }
-
-    $tarefas[] = [
+$itens = [];
+while ($linha = $resultado->fetch_assoc()) {
+    $itens[] = [
         "id" => intval($linha['id']),
         "checklist_id" => intval($linha['checklist_id']),
-        "title" => $linha['nome_item'],
-        "description" => $linha['descricao_item'],
-        "type" => $linha['formato_esperado'] ?: "text",
+        "checklist_titulo" => $linha['checklist_titulo'],
+        "cliente_nome" => $linha['cliente_nome'],
+        "cliente_email" => $linha['cliente_email'],
+        "nome_item" => $linha['nome_item'],
+        "descricao_item" => $linha['descricao_item'],
+        "formato_esperado" => $linha['formato_esperado'],
         "min_chars" => $linha['min_chars'] !== null ? intval($linha['min_chars']) : null,
         "max_chars" => $linha['max_chars'] !== null ? intval($linha['max_chars']) : null,
         "allowed_extensions" => $linha['allowed_extensions'],
@@ -96,18 +83,18 @@ while ($linha = $res_tarefas->fetch_assoc()) {
         "max_width" => $linha['max_width'] !== null ? intval($linha['max_width']) : null,
         "min_height" => $linha['min_height'] !== null ? intval($linha['min_height']) : null,
         "max_height" => $linha['max_height'] !== null ? intval($linha['max_height']) : null,
-        "status" => $linha['status'] ?: "pending",
-        "value" => $valor,
-        "feedback" => $linha['motivo_rejeicao'],
-        "checklist_name" => $linha['checklist_nome']
+        "status" => $linha['status'],
+        "resposta_texto" => $linha['resposta_texto'],
+        "arquivo_path" => $linha['arquivo_path'],
+        "motivo_rejeicao" => $linha['motivo_rejeicao']
     ];
 }
 
 $retorno["status"] = "ok";
-$retorno["mensagem"] = "Tarefas carregadas com sucesso.";
-$retorno["data"] = $tarefas;
+$retorno["mensagem"] = "Itens carregados com sucesso.";
+$retorno["data"] = $itens;
 
-$stmt_tarefas->close();
+$stmt->close();
 $conexao->close();
 
 header("Content-type: application/json;charset:utf-8");

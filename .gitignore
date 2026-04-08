@@ -3,4 +3,5 @@
 .idea/
 *.log
 setup-localhost.sh
+uploads/
 sync-xampp.sh

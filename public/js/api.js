@@ -29,5 +29,15 @@ const ApiClientFlow = {
         });
 
         return resposta.json();
+    },
+
+    async postForm(endpoint, formData) {
+        const resposta = await fetch(this.BASE_URL + endpoint, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        });
+
+        return resposta.json();
     }
 };

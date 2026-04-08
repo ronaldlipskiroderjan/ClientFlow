@@ -17,6 +17,39 @@ $data_nascimento = trim($_POST['data_nascimento'] ?? '');
 $nome_empresa = trim($_POST['nome_empresa'] ?? '');
 $nome_responsavel = trim($_POST['nome_responsavel'] ?? '');
 
+function normalizar_data_para_iso($valor) {
+    $valor = trim($valor);
+    if ($valor === '') {
+        return null;
+    }
+
+    if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $valor, $partes)) {
+        $dia = (int)$partes[1];
+        $mes = (int)$partes[2];
+        $ano = (int)$partes[3];
+
+        if (!checkdate($mes, $dia, $ano)) {
+            return false;
+        }
+
+        return sprintf('%04d-%02d-%02d', $ano, $mes, $dia);
+    }
+
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $valor, $partes)) {
+        $ano = (int)$partes[1];
+        $mes = (int)$partes[2];
+        $dia = (int)$partes[3];
+
+        if (!checkdate($mes, $dia, $ano)) {
+            return false;
+        }
+
+        return sprintf('%04d-%02d-%02d', $ano, $mes, $dia);
+    }
+
+    return false;
+}
+
 $tipos_permitidos = ["client", "freelancer", "agency", "admin"];
 
 if (empty($nome) || empty($email) || empty($senha) || empty($tipo)) {
@@ -42,8 +75,12 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
-if ($data_nascimento === '') {
-    $data_nascimento = null;
+$data_nascimento = normalizar_data_para_iso($data_nascimento);
+if ($data_nascimento === false) {
+    $retorno["mensagem"] = "Data de nascimento inválida.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
 }
 
 $stmt = $conexao->prepare(

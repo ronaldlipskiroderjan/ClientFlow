@@ -35,26 +35,29 @@
                 <!-- Nav Tabs -->
                 <ul class="nav nav-pills nav-justified mb-4" id="registerTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold" id="client-tab" data-bs-toggle="pill" data-bs-target="#client" type="button" role="tab" aria-controls="client" aria-selected="true">
-                            <i class="fa-solid fa-user me-2"></i> Cliente (PF)
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fw-bold" id="freelancer-pf-tab" data-bs-toggle="pill" data-bs-target="#freelancer-pf" type="button" role="tab" aria-controls="freelancer-pf" aria-selected="false">
-                            <i class="fa-solid fa-briefcase me-2"></i> Freelancer (PF)
+                        <button class="nav-link active fw-bold" id="pf-tab" data-bs-toggle="pill" data-bs-target="#pf" type="button" role="tab" aria-controls="pf" aria-selected="true">
+                            <i class="fa-solid fa-user me-2"></i> Pessoa Física (PF)
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link fw-bold" id="pj-tab" data-bs-toggle="pill" data-bs-target="#pj" type="button" role="tab" aria-controls="pj" aria-selected="false">
-                            <i class="fa-solid fa-building me-2"></i> Agência/Freelancer (PJ)
+                            <i class="fa-solid fa-building me-2"></i> Pessoa Jurídica (PJ)
                         </button>
                     </li>
                 </ul>
 
                 <div class="tab-content" id="registerTabsContent">
-                    <!-- Cliente PF -->
-                    <div class="tab-pane fade show active" id="client" role="tabpanel" aria-labelledby="client-tab">
+                    <!-- Pessoa Física -->
+                    <div class="tab-pane fade show active" id="pf" role="tabpanel" aria-labelledby="pf-tab">
                         <form>
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-semibold">Perfil</label>
+                                <select name="role" class="form-select bg-light border-0" required>
+                                    <option value="client">Cliente</option>
+                                    <option value="freelancer">Freelancer</option>
+                                    <option value="agency">Agência</option>
+                                </select>
+                            </div>
                             <div class="mb-3">
                                 <label for="full_name" class="form-label text-muted fw-semibold">Nome Completo</label>
                                 <input id="full_name" type="text" name="full_name" class="form-control bg-light border-0" required>
@@ -65,7 +68,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="birth_date" class="form-label text-muted fw-semibold">Data de Nascimento</label>
-                                <input id="birth_date" type="date" name="birth_date" class="form-control bg-light border-0" required>
+                                <input id="birth_date" type="text" name="birth_date" class="form-control bg-light border-0" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" required>
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label text-muted fw-semibold">Número para Contato</label>
@@ -79,44 +82,21 @@
                                 <label for="password" class="form-label text-muted fw-semibold">Senha</label>
                                 <input id="password" type="password" name="password" class="form-control bg-light border-0" minlength="6" required>
                             </div>
-                            <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Criar Conta Cliente</button>
+                            <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Criar Conta PF</button>
                         </form>
                     </div>
 
-                    <!-- Freelancer PF (B2B) -->
-                    <div class="tab-pane fade" id="freelancer-pf" role="tabpanel" aria-labelledby="freelancer-pf-tab">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Nome Completo</label>
-                                <input type="text" name="full_name" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">CPF</label>
-                                <input type="text" name="cpf" class="form-control bg-light border-0" placeholder="000.000.000-00" maxlength="14" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Data de Nascimento</label>
-                                <input type="date" name="birth_date" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">Número para Contato</label>
-                                <input type="tel" name="phone" class="form-control bg-light border-0" placeholder="(00) 00000-0000" maxlength="15" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted fw-semibold">E-mail para Login</label>
-                                <input type="email" name="email" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label text-muted fw-semibold">Senha</label>
-                                <input type="password" name="password" class="form-control bg-light border-0" minlength="6" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Criar Conta Freelancer PF</button>
-                        </form>
-                    </div>
-
-                    <!-- Agência/Freelancer PJ -->
+                    <!-- Pessoa Jurídica -->
                     <div class="tab-pane fade" id="pj" role="tabpanel" aria-labelledby="pj-tab">
                         <form>
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-semibold">Perfil</label>
+                                <select name="role" class="form-select bg-light border-0" required>
+                                    <option value="client">Cliente</option>
+                                    <option value="freelancer">Freelancer</option>
+                                    <option value="agency">Agência</option>
+                                </select>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label text-muted fw-semibold">Razão Social</label>
                                 <input type="text" name="corporate_name" class="form-control bg-light border-0" required>

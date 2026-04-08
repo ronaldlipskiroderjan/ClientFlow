@@ -27,13 +27,54 @@ if ($usuario_tipo !== "client") {
 
 $item_id = intval($_POST['item_id'] ?? 0);
 $valor = trim($_POST['valor'] ?? '');
-$tipo_envio = trim($_POST['tipo_envio'] ?? 'texto');
 
-if ($item_id <= 0 || empty($valor)) {
-    $retorno["mensagem"] = "Item e valor são obrigatórios.";
+if ($item_id <= 0) {
+    $retorno["mensagem"] = "Item é obrigatório.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
+}
+
+function fail_json($mensagem) {
+    echo json_encode([
+        "status" => "nok",
+        "mensagem" => $mensagem,
+        "data" => null
+    ]);
+    exit();
+}
+
+function normalize_extensions($value) {
+    $parts = explode(',', strtolower((string)$value));
+    $normalized = [];
+
+    foreach ($parts as $part) {
+        $clean = preg_replace('/[^a-z0-9]/', '', trim($part));
+        if ($clean !== '' && !in_array($clean, $normalized, true)) {
+            $normalized[] = $clean;
+        }
+    }
+
+    return $normalized;
+}
+
+function default_extensions_for_type($tipo) {
+    if ($tipo === 'image') {
+        return [
+            'png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'tif', 'tiff', 'svg', 'avif', 'heic', 'heif'
+        ];
+    }
+
+    return [
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'zip', 'rar', '7z',
+        'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'
+    ];
+}
+
+function ensure_dir($path) {
+    if (!is_dir($path)) {
+        mkdir($path, 0775, true);
+    }
 }
 
 $stmt_cliente = $conexao->prepare(
@@ -57,7 +98,19 @@ $cliente_id = intval($cliente['id']);
 $stmt_cliente->close();
 
 $stmt_check_item = $conexao->prepare(
-    "SELECT i.id
+    "SELECT
+        i.id,
+        i.checklist_id,
+        i.formato_esperado,
+        i.status,
+        i.min_chars,
+        i.max_chars,
+        i.allowed_extensions,
+        i.max_file_size_kb,
+        i.min_width,
+        i.max_width,
+        i.min_height,
+        i.max_height
      FROM itens_checklist i
      INNER JOIN checklists c ON c.id = i.checklist_id
      WHERE i.id = ? AND c.cliente_id = ?"
@@ -75,14 +128,143 @@ if ($res_check_item->num_rows !== 1) {
     exit();
 }
 
+$item = $res_check_item->fetch_assoc();
+
+if ($item['status'] === 'approved' || $item['status'] === 'review') {
+    $stmt_check_item->close();
+    $conexao->close();
+    header("Content-type: application/json;charset:utf-8");
+    fail_json("Este item está bloqueado no momento.");
+}
+
 $stmt_check_item->close();
 
-$arquivo_path = null;
-$resposta_texto = $valor;
+$tipo_item = $item['formato_esperado'] ?: 'text';
+$checklist_id = intval($item['checklist_id']);
+$min_chars = $item['min_chars'] !== null ? intval($item['min_chars']) : null;
+$max_chars = $item['max_chars'] !== null ? intval($item['max_chars']) : null;
+$max_file_size_kb = $item['max_file_size_kb'] !== null ? intval($item['max_file_size_kb']) : null;
+$min_width = $item['min_width'] !== null ? intval($item['min_width']) : null;
+$max_width = $item['max_width'] !== null ? intval($item['max_width']) : null;
+$min_height = $item['min_height'] !== null ? intval($item['min_height']) : null;
+$max_height = $item['max_height'] !== null ? intval($item['max_height']) : null;
 
-if ($tipo_envio === 'arquivo') {
-    $arquivo_path = $valor;
+$allowed_extensions = normalize_extensions($item['allowed_extensions'] ?? '');
+if (!count($allowed_extensions)) {
+    $allowed_extensions = default_extensions_for_type($tipo_item);
+}
+
+$base_dir = realpath(__DIR__ . '/../');
+$client_dir = $base_dir . '/uploads/clientes/cliente_' . $cliente_id . '/checklist_' . $checklist_id . '/item_' . $item_id;
+ensure_dir($client_dir);
+
+$arquivo_path = null;
+$resposta_texto = null;
+
+if ($tipo_item === 'file' || $tipo_item === 'image') {
+    if (!isset($_FILES['arquivo']) || !is_array($_FILES['arquivo']) || $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Envie um arquivo válido para este item.");
+    }
+
+    $upload = $_FILES['arquivo'];
+    $nome_original = $upload['name'] ?? '';
+    $tmp_name = $upload['tmp_name'] ?? '';
+    $size = intval($upload['size'] ?? 0);
+    $ext = strtolower(pathinfo($nome_original, PATHINFO_EXTENSION));
+
+    if ($ext === '' || !in_array($ext, $allowed_extensions, true)) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Formato de arquivo não permitido para este item.");
+    }
+
+    if ($max_file_size_kb !== null && $size > ($max_file_size_kb * 1024)) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Arquivo excede o limite de tamanho definido pela agência.");
+    }
+
+    if ($tipo_item === 'image') {
+        $image_size = @getimagesize($tmp_name);
+        if ($image_size === false) {
+            $conexao->close();
+            header("Content-type: application/json;charset:utf-8");
+            fail_json("Arquivo enviado não é uma imagem válida.");
+        }
+
+        $width = intval($image_size[0]);
+        $height = intval($image_size[1]);
+
+        if ($min_width !== null && $width < $min_width) {
+            $conexao->close();
+            header("Content-type: application/json;charset:utf-8");
+            fail_json("A largura da imagem é menor que o mínimo permitido.");
+        }
+
+        if ($max_width !== null && $width > $max_width) {
+            $conexao->close();
+            header("Content-type: application/json;charset:utf-8");
+            fail_json("A largura da imagem é maior que o máximo permitido.");
+        }
+
+        if ($min_height !== null && $height < $min_height) {
+            $conexao->close();
+            header("Content-type: application/json;charset:utf-8");
+            fail_json("A altura da imagem é menor que o mínimo permitido.");
+        }
+
+        if ($max_height !== null && $height > $max_height) {
+            $conexao->close();
+            header("Content-type: application/json;charset:utf-8");
+            fail_json("A altura da imagem é maior que o máximo permitido.");
+        }
+    }
+
+    $safe_name = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($nome_original));
+    $final_name = date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '_' . $safe_name;
+    $final_path = $client_dir . '/' . $final_name;
+
+    if (!move_uploaded_file($tmp_name, $final_path)) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Não foi possível salvar o arquivo no servidor.");
+    }
+
+    $arquivo_path = 'uploads/clientes/cliente_' . $cliente_id . '/checklist_' . $checklist_id . '/item_' . $item_id . '/' . $final_name;
     $resposta_texto = null;
+} else {
+    if ($valor === '') {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Preencha o valor deste item antes de enviar.");
+    }
+
+    $length = mb_strlen($valor);
+    if ($min_chars !== null && $length < $min_chars) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Texto menor que o mínimo de caracteres permitido.");
+    }
+
+    if ($max_chars !== null && $length > $max_chars) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("Texto maior que o máximo de caracteres permitido.");
+    }
+
+    if ($tipo_item === 'url' && !filter_var($valor, FILTER_VALIDATE_URL)) {
+        $conexao->close();
+        header("Content-type: application/json;charset:utf-8");
+        fail_json("URL inválida para este item.");
+    }
+
+    $resposta_texto = $valor;
+
+    // Gera um histórico em arquivo por cliente/checklist/item mesmo para respostas textuais.
+    $text_file = $client_dir . '/resposta_' . date('Ymd_His') . '.txt';
+    file_put_contents($text_file, $valor);
 }
 
 $stmt_update = $conexao->prepare(

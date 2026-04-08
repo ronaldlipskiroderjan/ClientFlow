@@ -37,6 +37,15 @@ function formatPhone(value) {
     return '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 7) + '-' + digits.slice(7);
 }
 
+function formatDateBR(value) {
+    const digits = onlyDigits(value).slice(0, 8);
+
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return digits.slice(0, 2) + '/' + digits.slice(2);
+
+    return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+}
+
 function isValidCPF(value) {
     const cpf = onlyDigits(value);
 
@@ -96,15 +105,23 @@ function isValidPhone(value) {
 function isAdultBirthDate(value) {
     if (!value) return false;
 
-    const parts = value.split('-');
+    const parts = value.split('/');
     if (parts.length !== 3) return false;
 
-    const year = Number(parts[0]);
+    const day = Number(parts[0]);
     const month = Number(parts[1]);
-    const day = Number(parts[2]);
+    const year = Number(parts[2]);
+
+    if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) {
+        return false;
+    }
 
     const birthDate = new Date(year, month - 1, day);
     if (Number.isNaN(birthDate.getTime())) return false;
+
+    if (birthDate.getDate() !== day || birthDate.getMonth() !== (month - 1) || birthDate.getFullYear() !== year) {
+        return false;
+    }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -122,17 +139,24 @@ function isAdultBirthDate(value) {
     return age >= 18;
 }
 
-function formatDateForInput(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+function toISODateFromBR(value) {
+    if (!value) return '';
 
-    return year + '-' + month + '-' + day;
+    const parts = value.split('/');
+    if (parts.length !== 3) return '';
+
+    const day = String(parts[0]).padStart(2, '0');
+    const month = String(parts[1]).padStart(2, '0');
+    const year = String(parts[2]);
+
+    return `${year}-${month}-${day}`;
 }
 
 function setupInputMasks() {
     document.querySelectorAll('input[name="birth_date"]').forEach((input) => {
-        input.max = formatDateForInput(new Date());
+        input.addEventListener('input', () => {
+            input.value = formatDateBR(input.value);
+        });
     });
 
     document.querySelectorAll('input[name="cpf"]').forEach((input) => {
@@ -155,7 +179,7 @@ function setupInputMasks() {
 }
 
 function buildRegisterData(tabId, raw) {
-    if (tabId === 'client') {
+    if (tabId === 'pf') {
         return {
             name: raw.full_name,
             full_name: raw.full_name,
@@ -165,23 +189,7 @@ function buildRegisterData(tabId, raw) {
             phone: raw.phone,
             email: raw.email,
             password: raw.password,
-            business_model: 'b2c',
-            role: 'client'
-        };
-    }
-
-    if (tabId === 'freelancer-pf') {
-        return {
-            name: raw.full_name,
-            full_name: raw.full_name,
-            cpf: raw.cpf,
-            cpf_cnpj: onlyDigits(raw.cpf),
-            birth_date: raw.birth_date,
-            phone: raw.phone,
-            email: raw.email,
-            password: raw.password,
-            business_model: 'b2b',
-            role: 'freelancer'
+            role: raw.role
         };
     }
 
@@ -194,25 +202,19 @@ function buildRegisterData(tabId, raw) {
         phone: raw.phone,
         email: raw.email,
         password: raw.password,
-        business_model: 'b2b',
-        role: 'agency'
+        role: raw.role
     };
 }
 
 function validateFormByTab(tabId, raw) {
-    const isPersonTab = tabId === 'client' || tabId === 'freelancer-pf';
+    const isPersonTab = tabId === 'pf';
 
     if (isPersonTab && !isValidCPF(raw.cpf)) {
         alert('CPF invalido. Verifique e tente novamente.');
         return false;
     }
 
-    if (isPersonTab && !isValidPhone(raw.phone)) {
-        alert('Telefone invalido. Use DDD + numero (10 ou 11 digitos).');
-        return false;
-    }
-
-    if (tabId === 'pj' && !isValidPhone(raw.phone)) {
+    if (!isValidPhone(raw.phone)) {
         alert('Telefone invalido. Use DDD + numero (10 ou 11 digitos).');
         return false;
     }
@@ -224,6 +226,11 @@ function validateFormByTab(tabId, raw) {
 
     if (tabId === 'pj' && !isValidCNPJ(raw.cpf_cnpj)) {
         alert('CNPJ invalido. Verifique e tente novamente.');
+        return false;
+    }
+
+    if (!raw.role || !['client', 'freelancer', 'agency'].includes(raw.role)) {
+        alert('Perfil de cadastro invalido.');
         return false;
     }
 
@@ -271,7 +278,7 @@ async function handleRegisterSubmit(event) {
             tipo: userData.role,
             telefone: userData.phone,
             documento: userData.cpf_cnpj,
-            data_nascimento: userData.birth_date || '',
+            data_nascimento: toISODateFromBR(userData.birth_date || ''),
             nome_empresa: userData.corporate_name || '',
             nome_responsavel: userData.legal_contact || ''
         });
