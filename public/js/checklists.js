@@ -42,3 +42,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         tableBody.appendChild(tr);
     });
 });
+
+function gerarLink() {
+    fetch('../../api/gerar_link.php')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("linkGerado").innerText = data.link;
+        });
+}
+
+function copiarLink() {
+    const link = document.getElementById("linkGerado").innerText;
+    navigator.clipboard.writeText(link);
+    alert("Link copiado!");
+}

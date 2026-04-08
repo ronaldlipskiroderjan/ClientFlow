@@ -62,6 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            if (window.ClientFlowIdentity) {
+                window.ClientFlowIdentity.apply(sessao.data, {
+                    avatarBackground: "0D8ABC"
+                });
+            }
+
             const retorno = await ApiClientFlow.get("cliente_listar.php");
             if (retorno.status !== "ok") {
                 tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</td></tr>';
@@ -79,6 +85,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             bindDeleteEvents();
+
+            const logoutLink = document.querySelector(".js-logout-link");
+            if (logoutLink) {
+                logoutLink.addEventListener("click", async (event) => {
+                    event.preventDefault();
+                    await ApiClientFlow.post("usuario_logoff.php");
+                    window.location.href = "../../index.html";
+                });
+            }
         } catch (error) {
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Erro ao carregar clientes.</td></tr>';
         }
