@@ -55,13 +55,13 @@
     <hr class="border-secondary">
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="https://ui-avatars.com/api/?name=Agencia+Demo&background=0D8ABC&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
-        <strong>Agência Demo</strong>
+        <img data-user-avatar src="https://ui-avatars.com/api/?name=ClientFlow&background=0D8ABC&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
+        <strong data-user-display-name></strong>
       </a>
       <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
         <li><a class="dropdown-item" href="#">Configurações</a></li>
         <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item text-danger" href="../../index.html">Sair</a></li>
+        <li><a class="dropdown-item text-danger js-logout-link" href="../../index.html">Sair</a></li>
       </ul>
     </div>
   </div>
@@ -82,7 +82,7 @@
                     <span class="visually-hidden">Novos alertas</span>
                 </span>
             </button>
-            <span class="text-muted d-none d-sm-block">Olá, <span class="fw-bold text-navy-blue">Agência Demo</span></span>
+            <span class="text-muted d-none d-sm-block" data-user-greeting>Olá, <span class="fw-bold text-navy-blue"></span></span>
         </div>
     </div>
 </nav>
@@ -145,7 +145,10 @@
         <div class="col-lg-4">
             <div class="card card-custom p-4 border-0 h-100">
                 <h5 class="fw-bold text-navy-blue mb-4">Ações Rápidas</h5>
-                <div class="d-grid gap-3">
+                <div class="d-grid gap-4">
+                     <a href="dashboard_agency_create.html" class="btn btn-success text-start py-3 shadow-sm">
+                          <i class="fa-solid fa-list-check me-2"></i> Criar Checklist
+                    </a>
                     <a href="form_builder.html" class="btn btn-primary-custom text-start py-3 shadow-sm">
                         <i class="fa-solid fa-plus me-2"></i> Criar Formulário
                     </a>
