@@ -145,8 +145,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             const item = {
-                nome,
-                tipo,
+                nome: row.querySelector(".field-name").value,
+                tipo: row.querySelector(".field-type").value,
                 descricao: descricaoItem,
                 min_chars: row.querySelector(".min-chars")?.value || "",
                 max_chars: row.querySelector(".max-chars")?.value || "",
@@ -155,8 +155,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 min_width: row.querySelector(".min-width")?.value || "",
                 max_width: row.querySelector(".max-width")?.value || "",
                 min_height: row.querySelector(".min-height")?.value || "",
-                max_height: row.querySelector(".max-height")?.value || ""
+                max_height: row.querySelector(".max-height")?.value || "",
+                finalidade_lgpd: row.querySelector(".field-lgpd").value,
             };
+
+            row.querySelector(".field-type").addEventListener("change", (e) => {
+                const tipo = e.target.value;
+                const campoTexto = row.querySelector(".constraint-text"); 
+                const campoArquivo = row.querySelector(".constraint-file"); 
+
+                if (tipo === 'file' || tipo === 'image') {
+                    campoTexto.classList.add("d-none");
+                    campoArquivo.classList.remove("d-none");
+                } else {
+                    campoTexto.classList.remove("d-none");
+                    campoArquivo.classList.add("d-none");
+                }
+            });
 
             itens.push(item);
         });
