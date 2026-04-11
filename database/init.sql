@@ -90,3 +90,13 @@ ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS min_width INT NULL;
 ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_width INT NULL;
 ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS min_height INT NULL;
 ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_height INT NULL;
+
+CREATE TABLE IF NOT EXISTS mensagens_checklist (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    checklist_id INT NOT NULL,
+    remetente_usuario_id INT NOT NULL,
+    mensagem TEXT NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE CASCADE,
+    FOREIGN KEY (remetente_usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);

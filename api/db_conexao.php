@@ -1,6 +1,6 @@
 <?php
 
-$servidor = "localhost:3306";
+$servidor = "127.0.0.1:3306";
 $usuario  = "root";
 $senha    = "";
 $nome_banco = "clientflow";
