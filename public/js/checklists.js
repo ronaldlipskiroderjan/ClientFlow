@@ -167,12 +167,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <input class="form-control form-control-sm mb-2" value="${link}" readonly>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-outline-primary btn-sm js-open-review">Revisar itens</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm js-open-review w-100 mb-1"><i class="fa-solid fa-list-check"></i> Revisar itens</button>
+                    <button type="button" class="btn btn-outline-info btn-sm js-open-chat w-100"><i class="fa-regular fa-comment"></i> Mensagens</button>
                 </td>
             `;
 
             tr.querySelector(".js-open-review").addEventListener("click", async () => {
                 await abrirRevisaoChecklist(item.id);
+            });
+            tr.querySelector(".js-open-chat").addEventListener("click", () => {
+                abrirChatProjeto(item.id, item.titulo, item.cliente_nome);
             });
 
             tableBody.appendChild(tr);
@@ -180,4 +184,122 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     await carregarListaChecklists();
+
+    // Widget Chat Logic
+    let activeChatChecklistId = null;
+    let chatRefreshInterval = null;
+    let chatAutoScroll = true;
+
+    const widgetEl = document.getElementById('floatingChatWidget');
+    if (widgetEl) {
+        const closeWidgetBtn = document.getElementById('closeFloatingChat');
+        const widgetTitle = document.getElementById('widgetChatTitle');
+        const widgetClient = document.getElementById('widgetChatClient');
+        const widgetChatBox = document.getElementById('widgetChatBox');
+        const widgetForm = document.getElementById('widgetMessageForm');
+        const widgetInput = document.getElementById('widgetMessageInput');
+        const widgetBtnSend = document.getElementById('widgetBtnSend');
+
+        closeWidgetBtn.addEventListener('click', () => {
+            widgetEl.classList.add('d-none');
+            activeChatChecklistId = null;
+            if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+        });
+
+        const loadWidgetMessages = async () => {
+            if (!activeChatChecklistId) return;
+            try {
+                const retorno = await ApiClientFlow.get(`mensagem_listar.php?checklist_id=${activeChatChecklistId}`);
+                if (retorno.status === 'ok') {
+                    const isScrolledToBottom = widgetChatBox.scrollHeight - widgetChatBox.clientHeight <= widgetChatBox.scrollTop + 30;
+
+                    widgetChatBox.innerHTML = '';
+                    if(retorno.data.length === 0) {
+                        widgetChatBox.innerHTML = `
+                            <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted">
+                                <i class="fa-regular fa-comments fs-3 mb-2 opacity-50"></i>
+                                <p class="small text-center opacity-75">Nenhuma mensagem encontrada.<br>Inicie o contato!</p>
+                            </div>
+                        `;
+                    } else {
+                        let lastDate = null;
+                        retorno.data.forEach(msg => {
+                            const isMine = msg.remetente_usuario_id == sessao.data.id;
+                            const dateObj = new Date(msg.criado_em.replace(' ', 'T'));
+                            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            const dateStr = dateObj.toLocaleDateString();
+
+                            if (lastDate !== dateStr) {
+                                widgetChatBox.innerHTML += `<div class="text-center my-2"><span class="badge bg-white text-muted border px-2 py-1" style="font-size:0.65rem;">${dateStr}</span></div>`;
+                                lastDate = dateStr;
+                            }
+
+                            const nameLabel = !isMine ? `<small class="d-block text-muted mb-1 fw-bold" style="font-size: 0.65rem; margin-left: 2px;">${msg.remetente_nome}</small>` : '';
+
+                            widgetChatBox.innerHTML += `
+                                <div class="d-flex flex-column mb-2 ${isMine ? 'align-items-end' : 'align-items-start'}">
+                                    ${nameLabel}
+                                    <div class="message-bubble ${isMine ? 'message-sent' : 'message-received'} shadow-sm">
+                                        <div>${msg.mensagem}</div>
+                                        <div class="text-end opacity-75 mt-1" style="font-size: 0.6rem;">${timeStr}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    if (chatAutoScroll || isScrolledToBottom) {
+                        widgetChatBox.scrollTop = widgetChatBox.scrollHeight;
+                        chatAutoScroll = false;
+                    }
+                }
+            } catch(e) {}
+        };
+
+        window.abrirChatProjeto = function(id, title, clientName) {
+            activeChatChecklistId = id;
+            widgetTitle.textContent = title;
+            widgetClient.innerHTML = clientName ? `<i class="fa-regular fa-user"></i> ${clientName}` : 'Sem cliente vinculado';
+            
+            widgetEl.classList.remove('d-none');
+            widgetChatBox.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+            
+            chatAutoScroll = true;
+            loadWidgetMessages();
+            
+            if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+            chatRefreshInterval = setInterval(loadWidgetMessages, 3000);
+        };
+
+        widgetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = widgetInput.value.trim();
+            if (!text || !activeChatChecklistId) return;
+
+            widgetInput.disabled = true;
+            widgetBtnSend.disabled = true;
+
+            try {
+                const retorno = await ApiClientFlow.post('mensagem_enviar.php', {
+                    checklist_id: activeChatChecklistId,
+                    mensagem: text
+                });
+
+                if (retorno.status === 'ok') {
+                    widgetInput.value = '';
+                    chatAutoScroll = true;
+                    await loadWidgetMessages();
+                } else {
+                    alert(retorno.mensagem || 'Erro ao enviar.');
+                }
+            } catch (error) {
+                alert('Erro de conexão ao enviar.');
+            }
+
+            widgetInput.disabled = false;
+            widgetBtnSend.disabled = false;
+            widgetInput.focus();
+        });
+    }
+
 });

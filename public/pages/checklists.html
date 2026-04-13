@@ -57,6 +57,32 @@
     </div>
 </div>
 
+<!-- Floating Chat Widget -->
+<div class="floating-chat-widget d-none shadow-lg" id="floatingChatWidget">
+    <div class="floating-chat-header text-white p-3 d-flex justify-content-between align-items-center rounded-top-custom">
+        <div>
+            <h6 class="mb-0 fw-bold" id="widgetChatTitle">Mensagens</h6>
+            <small class="opacity-75 d-block" id="widgetChatClient" style="font-size: 0.75rem;">Selecione o chat</small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" id="closeFloatingChat" aria-label="Close"></button>
+    </div>
+    
+    <div class="chat-box p-3" id="widgetChatBox">
+        <div class="d-flex h-100 align-items-center justify-content-center text-center px-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+        </div>
+    </div>
+    
+    <div class="chat-input-area p-2 rounded-bottom-custom">
+        <form id="widgetMessageForm" class="d-flex gap-2 m-0 h-100 align-items-center">
+            <input type="text" id="widgetMessageInput" class="form-control bg-light border-0 px-3 h-100" placeholder="Digite sua mensagem..." required autocomplete="off" style="font-size: 0.95rem;">
+            <button type="submit" class="btn btn-primary-custom rounded d-flex align-items-center justify-content-center px-3 h-100" id="widgetBtnSend">
+                <i class="fa-solid fa-paper-plane ms-reverse-1"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/api.js"></script>

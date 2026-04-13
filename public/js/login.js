@@ -58,6 +58,14 @@ async function handleLoginSubmit(event) {
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
 
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+        document.querySelectorAll('a[href="cadastro.html"]').forEach(a => {
+            a.href = `cadastro.html?token=${encodeURIComponent(token)}`;
+        });
+    }
+
     if (!loginForm) {
         return;
     }

@@ -82,6 +82,8 @@ CREATE TABLE IF NOT EXISTS itens_checklist (
     FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE CASCADE
 );
 
+// Adicinar colunas e tabela no PhpMyAdmin
+
 ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS min_chars INT NULL;
 ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS max_chars INT NULL;
 ALTER TABLE itens_checklist ADD COLUMN IF NOT EXISTS allowed_extensions VARCHAR(255) NULL;

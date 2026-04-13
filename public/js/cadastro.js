@@ -324,4 +324,12 @@ document.addEventListener('DOMContentLoaded', () => {
     forms.forEach((form) => {
         form.addEventListener('submit', handleRegisterSubmit);
     });
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+        document.querySelectorAll('a[href="login.html"]').forEach(a => {
+            a.href = `login.html?token=${encodeURIComponent(token)}`;
+        });
+    }
 });

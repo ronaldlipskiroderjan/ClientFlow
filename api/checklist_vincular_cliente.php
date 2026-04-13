@@ -93,7 +93,9 @@ try {
             $senha_hash,
             $empresa
         );
-        $stmt_insert_cliente->execute();
+        if (!$stmt_insert_cliente->execute()) {
+            throw new Exception("Falha ao registrar vínculo interno do cliente: " . $stmt_insert_cliente->error);
+        }
         $cliente_id = $conexao->insert_id;
         $stmt_insert_cliente->close();
     }
