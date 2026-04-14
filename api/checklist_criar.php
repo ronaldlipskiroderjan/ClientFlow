@@ -81,7 +81,7 @@ $conexao->begin_transaction();
 try {
     $stmt_checklist = $conexao->prepare(
         "INSERT INTO checklists (agencia_usuario_id, titulo, descricao, link_hash, status)
-         VALUES (?, ?, ?, ?, 'Aberto')"
+         VALUES (?, ?, ?, ?, 'pending')"
     );
     $stmt_checklist->bind_param("isss", $agencia_usuario_id, $titulo, $descricao, $link_hash);
     $stmt_checklist->execute();

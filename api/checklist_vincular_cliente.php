@@ -58,9 +58,9 @@ try {
     $stmt_form->close();
 
     $stmt_cliente = $conexao->prepare(
-        "SELECT id FROM clientes WHERE usuario_id = ? LIMIT 1"
+        "SELECT id FROM clientes WHERE usuario_id = ? AND agencia_usuario_id = ? LIMIT 1"
     );
-    $stmt_cliente->bind_param("i", $usuario_id);
+    $stmt_cliente->bind_param("ii", $usuario_id, $agencia_usuario_id);
     $stmt_cliente->execute();
     $res_cliente = $stmt_cliente->get_result();
 

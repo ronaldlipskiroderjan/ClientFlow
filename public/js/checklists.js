@@ -68,10 +68,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             regras.push(`Resolução: ${item.min_width || 0}-${item.max_width || "inf"} x ${item.min_height || 0}-${item.max_height || "inf"}`);
         }
 
+        const itemStatusMap = {
+            "pending": '<span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Aguardando Envio</span>',
+            "review": '<span class="badge bg-primary"><i class="fa-solid fa-eye me-1"></i> Em Revisão</span>',
+            "approved": '<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Aprovado</span>',
+            "rejected": '<span class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i> Rejeitado</span>'
+        };
+        const statusItemBdg = itemStatusMap[item.status] || `<span class="badge bg-secondary">${item.status}</span>`;
+
         wrapper.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="mb-0">${item.nome_item}</h6>
-                <span class="badge bg-secondary">${item.status}</span>
+                ${statusItemBdg}
             </div>
             ${item.descricao_item ? `<p class="text-muted mb-2">${item.descricao_item}</p>` : ""}
             ${regras.length ? `<div class="small text-muted mb-2">${regras.join(" | ")}</div>` : ""}
@@ -85,11 +93,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const approveBtn = wrapper.querySelector(".js-approve");
         const rejectBtn = wrapper.querySelector(".js-reject");
-
-        if (item.status !== "review") {
-            approveBtn.disabled = true;
-            rejectBtn.disabled = true;
-        }
 
         approveBtn.addEventListener("click", async () => {
             await revisarItem(item.id, true);
@@ -153,7 +156,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         tableBody.innerHTML = "";
 
         lista.forEach((item) => {
-            const link = `${window.location.origin}/ClientFlow/public/pages/cadastro.html?token=${encodeURIComponent(item.link_hash)}`;
+            const statusMap = {
+                "pending": '<span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Pendente</span>',
+                "review": '<span class="badge bg-primary"><i class="fa-solid fa-eye me-1"></i> Em Revisão</span>',
+                "approved": '<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Concluído</span>',
+                "completed": '<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Concluído</span>'
+            };
+            const bdg = statusMap[item.status] || `<span class="badge bg-secondary">${item.status}</span>`;
+
+            const link = `${window.location.origin}/ClientFlow/public/pages/login.html?token=${encodeURIComponent(item.link_hash)}`;
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>
@@ -162,7 +173,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </td>
                 <td>${item.cliente_nome ? `${item.cliente_nome} (${item.cliente_email || ""})` : "Aguardando vínculo"}</td>
                 <td>${item.total_itens}</td>
-                <td>${item.status}</td>
+                <td>${bdg}</td>
                 <td>
                     <input class="form-control form-control-sm mb-2" value="${link}" readonly>
                 </td>
@@ -214,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const isScrolledToBottom = widgetChatBox.scrollHeight - widgetChatBox.clientHeight <= widgetChatBox.scrollTop + 30;
 
                     widgetChatBox.innerHTML = '';
-                    if(retorno.data.length === 0) {
+                    if (retorno.data.length === 0) {
                         widgetChatBox.innerHTML = `
                             <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted">
                                 <i class="fa-regular fa-comments fs-3 mb-2 opacity-50"></i>
@@ -226,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         retorno.data.forEach(msg => {
                             const isMine = msg.remetente_usuario_id == sessao.data.id;
                             const dateObj = new Date(msg.criado_em.replace(' ', 'T'));
-                            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                             const dateStr = dateObj.toLocaleDateString();
 
                             if (lastDate !== dateStr) {
@@ -253,20 +264,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                         chatAutoScroll = false;
                     }
                 }
-            } catch(e) {}
+            } catch (e) { }
         };
 
-        window.abrirChatProjeto = function(id, title, clientName) {
+        window.abrirChatProjeto = function (id, title, clientName) {
             activeChatChecklistId = id;
             widgetTitle.textContent = title;
             widgetClient.innerHTML = clientName ? `<i class="fa-regular fa-user"></i> ${clientName}` : 'Sem cliente vinculado';
-            
+
             widgetEl.classList.remove('d-none');
             widgetChatBox.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
-            
+
             chatAutoScroll = true;
             loadWidgetMessages();
-            
+
             if (chatRefreshInterval) clearInterval(chatRefreshInterval);
             chatRefreshInterval = setInterval(loadWidgetMessages, 3000);
         };
