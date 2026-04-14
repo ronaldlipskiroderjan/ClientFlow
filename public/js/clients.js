@@ -1,23 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("clientsTableBody");
 
-    function montarLinhaCliente(cliente) {
-        const row = document.createElement("tr");
-        const dataCadastro = cliente.criado_em ? new Date(cliente.criado_em).toLocaleDateString() : "-";
-
-        row.innerHTML = `
-            <td class="fw-bold">${cliente.nome}</td>
-            <td>${cliente.empresa || "-"}</td>
-            <td>${cliente.email}</td>
-            <td>${dataCadastro}</td>
-            <td class="text-end">
-                <a href="#" class="btn btn-sm btn-outline-custom p-1 px-2" title="Projetos do Cliente"><i class="fa-solid fa-folder-open"></i></a>
-                <button type="button" class="btn btn-sm btn-outline-danger p-1 px-2 js-delete-client" data-id="${cliente.id}"><i class="fa-solid fa-trash"></i></button>
-            </td>
-        `;
-
-        return row;
-    }
 
     function bindDeleteEvents() {
         document.querySelectorAll(".js-delete-client").forEach((button) => {
@@ -53,6 +36,23 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const sessao = await ApiClientFlow.get("valida_sessao_logado.php");
             if (sessao.status !== "ok") {
+    function montarLinhaCliente(cliente) {
+        const row = document.createElement("tr");
+        const dataCadastro = cliente.criado_em ? new Date(cliente.criado_em).toLocaleDateString() : "-";
+
+        row.innerHTML = `
+            <td class="fw-bold">${cliente.nome}</td>
+            <td>${cliente.empresa || "-"}</td>
+            <td>${cliente.email}</td>
+            <td>${dataCadastro}</td>
+            <td class="text-end">
+                <a href="#" class="btn btn-sm btn-outline-custom p-1 px-2" title="Projetos do Cliente"><i class="fa-solid fa-folder-open"></i></a>
+                <button type="button" class="btn btn-sm btn-outline-danger p-1 px-2 js-delete-client" data-id="${cliente.id}"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        `;
+
+        return row;
+    }
                 window.location.href = "login.html";
                 return;
             }

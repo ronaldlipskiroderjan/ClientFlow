@@ -275,6 +275,7 @@ $stmt_update = $conexao->prepare(
 $stmt_update->bind_param("ssi", $resposta_texto, $arquivo_path, $item_id);
 
 if ($stmt_update->execute()) {
+    atualizar_status_checklist($conexao, $checklist_id);
     $retorno["status"] = "ok";
     $retorno["mensagem"] = "Item enviado com sucesso.";
     $retorno["data"] = ["item_id" => $item_id, "status" => "review"];

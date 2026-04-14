@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Projetos | ClientFlow</title>
+    <title>Detalhes do Projeto | ClientFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
   <div class="offcanvas-body d-flex flex-column">
     <ul class="nav flex-column mb-auto">
       <li class="nav-item">
-        <a href="dashboard_client.html" class="nav-link active">
+        <a href="dashboard_client.html" class="nav-link">
           <i class="fa-solid fa-folder-open me-2"></i> Meus Projetos
         </a>
       </li>
@@ -48,7 +48,10 @@
         <button class="btn btn-text-custom me-3 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#clientSidebar">
             <i class="fa-solid fa-bars fs-4 text-navy-blue"></i>
         </button>
-        <span class="navbar-brand mb-0 h1 fw-bold text-navy-blue">Meus Projetos</span>
+        <a href="dashboard_client.html" class="btn btn-sm btn-outline-secondary me-3">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <span class="navbar-brand mb-0 h1 fw-bold text-navy-blue" id="nav-project-title">Carregando...</span>
         <div class="ms-auto">
             <span class="text-muted d-none d-sm-block" data-user-greeting>Olá, <span class="fw-bold text-navy-blue"></span></span>
         </div>
@@ -56,13 +59,43 @@
 </nav>
 
 <div class="container py-5">
-    <div id="projects-grid" class="row g-4">
-        <!-- Cards injected here -->
-    </div>
+    <!-- Items injected here -->
+    <div id="items-container"></div>
     <div id="empty-state" class="text-center py-5 text-muted d-none">
-        <i class="fa-solid fa-folder-open fs-1 mb-3 opacity-25"></i>
-        <h5>Nenhum projeto encontrado</h5>
-        <p>Você ainda não tem projetos vinculados à sua conta.</p>
+        <i class="fa-solid fa-box-open fs-1 mb-3 opacity-25"></i>
+        <h5>Nenhum item encontrado</h5>
+        <p>Este projeto não tem itens cadastrados ainda.</p>
+    </div>
+</div>
+
+<!-- Floating Chat Button -->
+<button id="openChatBtn" class="btn btn-primary-custom rounded-circle position-fixed shadow-lg d-flex align-items-center justify-content-center" 
+        style="bottom: 28px; right: 28px; width: 58px; height: 58px; z-index: 1040;" title="Abrir chat com a agência">
+    <i class="fa-solid fa-comments fs-5"></i>
+</button>
+
+<!-- Floating Chat Widget -->
+<div class="floating-chat-widget d-none shadow-lg" id="floatingChatWidget" style="z-index: 1050;">
+    <div class="floating-chat-header text-white p-3 d-flex justify-content-between align-items-center rounded-top-custom">
+        <div>
+            <h6 class="mb-0 fw-bold">Chat do Projeto</h6>
+            <small class="opacity-75 d-block" id="chatAgencyName" style="font-size: 0.75rem;">Agência</small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" id="closeFloatingChat" aria-label="Close"></button>
+    </div>
+    <div class="chat-box p-3" id="widgetChatBox">
+        <div class="d-flex h-100 align-items-center justify-content-center">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+        </div>
+    </div>
+    <div class="chat-input-area p-2 rounded-bottom-custom">
+        <form id="widgetMessageForm" class="d-flex gap-2 m-0 h-100 align-items-center">
+            <input type="text" id="widgetMessageInput" class="form-control bg-light border-0 px-3 h-100" 
+                   placeholder="Sua mensagem..." required autocomplete="off" style="font-size: 0.9rem;">
+            <button type="submit" class="btn btn-primary-custom rounded d-flex align-items-center justify-content-center px-3 h-100" id="widgetBtnSend">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
     </div>
 </div>
 
@@ -77,6 +110,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/api.js?v=2"></script>
-<script src="../js/dashboard_client.js?v=2"></script>
+<script src="../js/checklist_details.js?v=2"></script>
 </body>
 </html>

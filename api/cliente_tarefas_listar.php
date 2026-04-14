@@ -25,26 +25,12 @@ if ($usuario_tipo !== "client") {
     exit();
 }
 
-$stmt_cliente = $conexao->prepare(
-    "SELECT id FROM clientes WHERE usuario_id = ? OR email = ? LIMIT 1"
-);
-$stmt_cliente->bind_param("is", $usuario_id, $usuario_email);
-$stmt_cliente->execute();
-$res_cliente = $stmt_cliente->get_result();
+$checklist_id = isset($_GET['checklist_id']) ? intval($_GET['checklist_id']) : 0;
 
-if ($res_cliente->num_rows !== 1) {
-    $retorno["status"] = "ok";
-    $retorno["mensagem"] = "Nenhuma tarefa encontrada.";
-    header("Content-type: application/json;charset:utf-8");
-    echo json_encode($retorno);
-    $stmt_cliente->close();
-    $conexao->close();
-    exit();
+$filtro_checklist = "";
+if ($checklist_id > 0) {
+    $filtro_checklist = " AND c.id = ? ";
 }
-
-$cliente = $res_cliente->fetch_assoc();
-$cliente_id = intval($cliente['id']);
-$stmt_cliente->close();
 
 $stmt_tarefas = $conexao->prepare(
     "SELECT
@@ -68,10 +54,17 @@ $stmt_tarefas = $conexao->prepare(
         c.titulo AS checklist_nome
      FROM itens_checklist i
      INNER JOIN checklists c ON c.id = i.checklist_id
-     WHERE c.cliente_id = ?
-     ORDER BY i.id DESC"
+     INNER JOIN clientes cl ON cl.id = c.cliente_id
+     WHERE (cl.usuario_id = ? OR cl.email = ?) $filtro_checklist
+     ORDER BY i.id ASC"
 );
-$stmt_tarefas->bind_param("i", $cliente_id);
+
+if ($checklist_id > 0) {
+    $stmt_tarefas->bind_param("isi", $usuario_id, $usuario_email, $checklist_id);
+} else {
+    $stmt_tarefas->bind_param("is", $usuario_id, $usuario_email);
+}
+
 $stmt_tarefas->execute();
 $res_tarefas = $stmt_tarefas->get_result();
 

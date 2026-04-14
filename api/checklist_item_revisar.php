@@ -24,9 +24,10 @@ if ($usuario_tipo === "client") {
     exit();
 }
 
-$item_id = intval($_POST['item_id'] ?? 0);
-$acao = trim($_POST['acao'] ?? '');
-$motivo = trim($_POST['motivo'] ?? '');
+$input = json_decode(file_get_contents("php://input"), true) ?: $_POST;
+$item_id = intval($input['item_id'] ?? 0);
+$acao = trim($input['acao'] ?? '');
+$motivo = trim($input['motivo'] ?? '');
 
 if ($item_id <= 0 || !in_array($acao, ["aprovar", "reprovar"], true)) {
     $retorno["mensagem"] = "Parâmetros inválidos.";
@@ -43,7 +44,7 @@ if ($acao === "reprovar" && $motivo === "") {
 }
 
 $stmt_check = $conexao->prepare(
-    "SELECT i.id
+    "SELECT i.id, i.checklist_id
      FROM itens_checklist i
      INNER JOIN checklists c ON c.id = i.checklist_id
      WHERE i.id = ? AND c.agencia_usuario_id = ?"
@@ -60,6 +61,8 @@ if ($check_result->num_rows !== 1) {
     $conexao->close();
     exit();
 }
+$item_data = $check_result->fetch_assoc();
+$checklist_id_revisar = intval($item_data['checklist_id']);
 $stmt_check->close();
 
 $novo_status = $acao === "aprovar" ? "approved" : "rejected";
@@ -73,6 +76,7 @@ $stmt_update = $conexao->prepare(
 $stmt_update->bind_param("ssi", $novo_status, $novo_motivo, $item_id);
 
 if ($stmt_update->execute()) {
+    atualizar_status_checklist($conexao, $checklist_id_revisar);
     $retorno["status"] = "ok";
     $retorno["mensagem"] = $acao === "aprovar" ? "Item aprovado." : "Item reprovado e devolvido ao cliente.";
     $retorno["data"] = [
