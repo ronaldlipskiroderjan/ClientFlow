@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Membro - ClientFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="d-flex">
+        <!-- Sidebar placeholder -->
+        <div id="sidebar-container"></div>
+
+        <div class="main-content flex-grow-1 p-4 bg-light min-vh-100">
+            <div class="container-fluid max-w-800 mx-auto" style="max-width: 800px;">
+                <div class="mb-4">
+                    <a href="agency_team.html" class="text-decoration-none text-muted mb-2 d-inline-block">
+                        <i class="fas fa-arrow-left me-1"></i> Voltar para Equipe
+                    </a>
+                    <h2 class="fw-bold mb-0">Adicionar Novo Membro</h2>
+                    <p class="text-muted">Crie uma conta para um novo colaborador da sua agência.</p>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        <form id="formNovoMembro">
+                            
+                            <h5 class="fw-bold mb-4 text-primary"><i class="fas fa-user-circle me-2"></i>Dados do Usuário</h5>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="membro_nome" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">E-mail (Login)</label>
+                                    <input type="email" class="form-control" id="membro_email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Telefone</label>
+                                    <input type="text" class="form-control" id="membro_telefone" placeholder="(11) 99999-9999" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Senha Inicial</label>
+                                    <input type="password" class="form-control" id="membro_senha" required minlength="6">
+                                    <small class="text-muted">O membro poderá alterá-la depois.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Papel (Role Principal)</label>
+                                    <select class="form-select" id="membro_papel" required>
+                                        <option value="dev" selected>Desenvolvedor / Designer</option>
+                                        <option value="gestor_cliente">Atendimento / Gestor de Cliente</option>
+                                        <option value="gerente">Gerente Geral</option>
+                                        <option value="financeiro">Financeiro / Administrativo</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-4 text-primary"><i class="fas fa-shield-alt me-2"></i>Permissões de Acesso</h5>
+                            
+                            <div class="row g-3 mb-4 bg-light p-3 rounded-3">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_ver_projetos" checked>
+                                        <label class="form-check-label fw-bold" for="perm_ver_projetos">Ver Projetos</label>
+                                        <div class="small text-muted">Acessar projetos/formulários designados a ele.</div>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_criar_projetos">
+                                        <label class="form-check-label fw-bold" for="perm_criar_projetos">Criar Projetos</label>
+                                        <div class="small text-muted">Permite criar novos formulários.</div>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_designar_projetos">
+                                        <label class="form-check-label fw-bold" for="perm_designar_projetos">Designar Projetos</label>
+                                        <div class="small text-muted">Pode atribuir projetos para a equipe.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_ver_clientes">
+                                        <label class="form-check-label fw-bold" for="perm_ver_clientes">Ver Todos os Clientes</label>
+                                        <div class="small text-muted">Se desmarcado, verá apenas clientes dos projetos designados.</div>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_criar_clientes">
+                                        <label class="form-check-label fw-bold" for="perm_criar_clientes">Cadastrar Clientes</label>
+                                        <div class="small text-muted">Permite adicionar novos clientes à base.</div>
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_financeiro">
+                                        <label class="form-check-label fw-bold" for="perm_financeiro">Acesso Financeiro</label>
+                                        <div class="small text-muted">Ver e gerenciar contratos manuais.</div>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="perm_gerenciar_membros">
+                                        <label class="form-check-label fw-bold text-danger" for="perm_gerenciar_membros">Gerenciar Membros</label>
+                                        <div class="small text-muted">Permite criar/editar regras para toda a equipe.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-3 text-primary"><i class="fas fa-folder-open me-2"></i>Atribuição Imediata (Opcional)</h5>
+                            <div class="mb-4">
+                                <label class="form-label text-muted">Selecione projetos para atribuir a este membro agora:</label>
+                                <div id="containerProjetos" class="row g-2">
+                                    <div class="col-12"><small class="text-muted">Carregando projetos...</small></div>
+                                </div>
+                            </div>
+                            
+                            <div id="alertFeedback" class="alert d-none mt-3"></div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <a href="agency_team.html" class="btn btn-light btn-lg me-3 px-4">Cancelar</a>
+                                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm" id="btnSalvar">
+                                    <i class="fas fa-save me-2"></i> Criar Membro
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/agency_member_create.js"></script>
+</body>
+</html>

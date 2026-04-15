@@ -38,7 +38,7 @@ $conexao->begin_transaction();
 
 try {
     $stmt_form = $conexao->prepare(
-        "SELECT id, cliente_id, agencia_usuario_id
+        "SELECT id, cliente_id, agencia_id
          FROM checklists
          WHERE link_hash = ?
          LIMIT 1"
@@ -54,13 +54,21 @@ try {
     $formulario = $res_form->fetch_assoc();
     $checklist_id = intval($formulario['id']);
     $cliente_atual = intval($formulario['cliente_id'] ?? 0);
-    $agencia_usuario_id = intval($formulario['agencia_usuario_id']);
+    $agencia_id = isset($formulario['agencia_id']) ? intval($formulario['agencia_id']) : null;
     $stmt_form->close();
 
-    $stmt_cliente = $conexao->prepare(
-        "SELECT id FROM clientes WHERE usuario_id = ? AND agencia_usuario_id = ? LIMIT 1"
-    );
-    $stmt_cliente->bind_param("ii", $usuario_id, $agencia_usuario_id);
+    if ($agencia_id === null) {
+        $stmt_cliente = $conexao->prepare(
+            "SELECT id FROM clientes WHERE usuario_id = ? AND agencia_id IS NULL LIMIT 1"
+        );
+        $stmt_cliente->bind_param("i", $usuario_id);
+    } else {
+        $stmt_cliente = $conexao->prepare(
+            "SELECT id FROM clientes WHERE usuario_id = ? AND agencia_id = ? LIMIT 1"
+        );
+        $stmt_cliente->bind_param("ii", $usuario_id, $agencia_id);
+    }
+    
     $stmt_cliente->execute();
     $res_cliente = $stmt_cliente->get_result();
 
@@ -80,19 +88,30 @@ try {
         $stmt_usuario->close();
 
         $empresa = "";
-        $stmt_insert_cliente = $conexao->prepare(
-            "INSERT INTO clientes (agencia_usuario_id, usuario_id, nome, email, senha, empresa)
-             VALUES (?, ?, ?, ?, ?, ?)"
-        );
-        $stmt_insert_cliente->bind_param(
-            "iissss",
-            $agencia_usuario_id,
-            $usuario_id,
-            $nome,
-            $email,
-            $senha_hash,
-            $empresa
-        );
+        
+        if ($agencia_id === null) {
+             // Provavelmente um freelancer. Assumimos inserção null na tabela.
+            $stmt_insert_cliente = $conexao->prepare(
+                "INSERT INTO clientes (usuario_id, nome, email, senha, empresa)
+                 VALUES (?, ?, ?, ?, ?)"
+            );
+            $stmt_insert_cliente->bind_param("issss", $usuario_id, $nome, $email, $senha_hash, $empresa);
+        } else {
+             $stmt_insert_cliente = $conexao->prepare(
+                "INSERT INTO clientes (agencia_id, usuario_id, nome, email, senha, empresa)
+                 VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            $stmt_insert_cliente->bind_param(
+                "iissss",
+                $agencia_id,
+                $usuario_id,
+                $nome,
+                $email,
+                $senha_hash,
+                $empresa
+            );
+        }
+
         if (!$stmt_insert_cliente->execute()) {
             throw new Exception("Falha ao registrar vínculo interno do cliente: " . $stmt_insert_cliente->error);
         }

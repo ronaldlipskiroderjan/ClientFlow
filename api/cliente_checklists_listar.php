@@ -33,13 +33,13 @@ $stmt = $conexao->prepare(
         c.descricao,
         c.status,
         c.criado_em,
-        ag.nome AS agencia_nome_contato,
-        ag.nome_empresa AS agencia_empresa,
+         ag.nome_contato_juridico AS agencia_nome_contato,
+         ag.nome_empresa AS agencia_empresa,
         COUNT(i.id) AS total_itens,
         SUM(CASE WHEN i.status IN ('review', 'approved') THEN 1 ELSE 0 END) AS itens_concluidos
      FROM checklists c
      INNER JOIN clientes cl ON cl.id = c.cliente_id
-     LEFT JOIN usuarios ag ON ag.id = c.agencia_usuario_id
+     LEFT JOIN agencias ag ON ag.id = c.agencia_id
      LEFT JOIN itens_checklist i ON i.checklist_id = c.id
      WHERE (cl.usuario_id = ? OR cl.email = ?)
      GROUP BY c.id

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Contrato - ClientFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="navbar-container"></div>
+<div class="d-flex">
+    <!-- Sidebar placeholder -->
+    <div id="sidebar-container"></div>
+
+        <div class="main-content flex-grow-1 p-4 bg-light min-vh-100">
+            <div class="container-fluid max-w-800 mx-auto" style="max-width: 900px;">
+                <div class="mb-4">
+                    <a href="financeiro.html" class="text-decoration-none text-muted mb-2 d-inline-block">
+                        <i class="fas fa-arrow-left me-1"></i> Voltar para Financeiro
+                    </a>
+                    <h2 class="fw-bold mb-0">Novo Contrato</h2>
+                    <p class="text-muted">Crie um registro manual para acompanhamento de um serviço prestado.</p>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        <form id="formNovoContrato">
+                            
+                            <h5 class="fw-bold mb-4 text-primary"><i class="fas fa-file-signature me-2"></i>Informações Base</h5>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Cliente (Obrigatório)</label>
+                                    <select class="form-select" id="contrato_cliente_id" required>
+                                        <option value="">Carregando clientes...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Vincular a Projeto / Checklist (Opcional)</label>
+                                    <select class="form-select" id="contrato_checklist_id">
+                                        <option value="0">Sem projeto vinculado</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12 mt-3">
+                                    <label class="form-label">Título do Contrato / Serviço</label>
+                                    <input type="text" class="form-control" id="contrato_titulo" placeholder="Ex: Criação de E-commerce VIP" required>
+                                </div>
+                                
+                                <div class="col-12 mt-3">
+                                    <label class="form-label">Descrição do Escopo (Resumo)</label>
+                                    <textarea class="form-control" id="contrato_descricao" rows="3" placeholder="Insira detalhes sobre o que está sendo contratado..." required></textarea>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-4 text-primary"><i class="fas fa-dollar-sign me-2"></i>Financeiro e Prazos</h5>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Valor Total (R$)</label>
+                                    <input type="text" class="form-control" id="contrato_valor" placeholder="0,00" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Qtd. Parcelas</label>
+                                    <input type="number" class="form-control" id="contrato_parcelas" value="1" min="1" max="60" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Forma de Pagamento</label>
+                                    <select class="form-select" id="contrato_forma_pagamento">
+                                        <option value="pix">PIX</option>
+                                        <option value="boleto">Boleto Bancário</option>
+                                        <option value="cartao_credito">Cartão de Crédito</option>
+                                        <option value="transferencia">Transferência TED/DOC</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label">Data de Início</label>
+                                    <input type="date" class="form-control" id="contrato_data_inicio" required>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label">Prazo de Entrega</label>
+                                    <input type="date" class="form-control" id="contrato_data_prazo" required>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label">Vencimento do Pagamento</label>
+                                    <input type="date" class="form-control" id="contrato_data_vencimento" required>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Status Inicial e Observações</h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Status do Pagamento</label>
+                                    <select class="form-select" id="contrato_status_pagamento">
+                                        <option value="pendente" selected>Pendente</option>
+                                        <option value="pago">Pago Confirmado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Status do Projeto</label>
+                                    <select class="form-select" id="contrato_status_projeto">
+                                        <option value="em_andamento" selected>Em Andamento</option>
+                                        <option value="concluido">Concluído</option>
+                                        <option value="pausado">Pausado</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label class="form-label">Observações Internas (Opcional)</label>
+                                    <textarea class="form-control" id="contrato_observacoes" rows="2" placeholder="Ex: Cliente pediu nota fiscal antecipada..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div id="alertFeedback" class="alert d-none mt-4"></div>
+
+                            <div class="d-flex justify-content-end mt-5">
+                                <a href="financeiro.html" class="btn btn-light btn-lg me-3 px-4">Cancelar</a>
+                                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm" id="btnSalvar">
+                                    <i class="fas fa-save me-2"></i> Criar Registrar Contrato
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/contrato_criar.js"></script>
+</body>
+</html>

@@ -93,14 +93,11 @@ function updateConstraintVisibility(row) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const sessao = await ApiClientFlow.get("valida_sessao_logado.php");
-    if (sessao.status !== "ok") {
-        window.location.href = "login.html";
-        return;
-    }
+    await SidebarManager.init();
 
-    if (sessao.data && sessao.data.tipo === "client") {
-        window.location.href = "dashboard_client.html";
+    if (!Auth.hasAccess('perm_criar_projetos')) {
+        alert('Você não tem permissão para criar formulários.');
+        window.location.href = 'checklists.html';
         return;
     }
 
@@ -166,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const retorno = await ApiClientFlow.post("checklist_criar.php", {
+        const retorno = await API.post("checklist_criar.php", {
             titulo,
             descricao,
             itens: JSON.stringify(itens)
@@ -182,6 +179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         linkInput.value = link;
         linkCard.classList.remove("d-none");
+        linkCard.scrollIntoView({ behavior: 'smooth' });
     });
 
     copyLinkBtn.addEventListener("click", async () => {
@@ -190,9 +188,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await navigator.clipboard.writeText(linkInput.value);
-        copyLinkBtn.textContent = "Copiado";
+        copyLinkBtn.innerHTML = '<i class="fas fa-check me-1"></i> Copiado';
         setTimeout(() => {
-            copyLinkBtn.textContent = "Copiar";
+            copyLinkBtn.innerHTML = '<i class="fa-solid fa-copy me-1"></i> Copiar Link';
         }, 1500);
     });
 });

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Equipe - ClientFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <style>
+        .member-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+        }
+        .member-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .role-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.65rem;
+            border-radius: 6px;
+        }
+        .badge-admin_agencia { background: #e0e7ff; color: #3730a3; }
+        .badge-gerente { background: #dcfce7; color: #166534; }
+        .badge-dev { background: #f3e8ff; color: #6b21a8; }
+        .badge-gestor_cliente { background: #ffedd5; color: #9a3412; }
+        .badge-financeiro { background: #fce7f3; color: #9d174d; }
+        .inactive-member { opacity: 0.6; grayscale: 100%; }
+        
+        .perm-icon {
+            font-size: 0.85rem;
+            margin-right: 5px;
+            color: #6c757d;
+        }
+        .perm-active { color: #10b981; }
+        .perm-inactive { color: #ef4444; text-decoration: line-through; }
+    </style>
+</head>
+<body>
+
+    <div class="d-flex">
+        <!-- Sidebar placeholder (será carregado via JS puro ou incluído) -->
+        <div id="sidebar-container"></div>
+
+        <div class="main-content flex-grow-1 p-4 bg-light min-vh-100">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0">Minha Equipe</h2>
+                        <p class="text-muted mb-0">Gerencie os membros da sua agência e seus níveis de acesso.</p>
+                    </div>
+                    <button class="btn btn-primary d-none" id="btnNovoMembro" onclick="window.location.href='agency_member_create.html'">
+                        <i class="fas fa-plus me-2"></i>Novo Membro
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingTeam" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyTeam" class="text-center py-5 d-none">
+                    <div class="display-3 text-muted mb-3"><i class="fas fa-users-slash"></i></div>
+                    <h4>Nenhum membro encontrado</h4>
+                    <p class="text-muted">Sua agência ainda não possui outros membros.</p>
+                </div>
+
+                <!-- Team Grid -->
+                <div class="row g-4" id="teamContainer">
+                    <!-- Cards de membros renderizados via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Permissões -->
+    <div class="modal fade" id="modalEditarPermissoes" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Membro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarPermissoes">
+                        <input type="hidden" id="edit_ua_id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Membro</label>
+                            <input type="text" class="form-control" id="edit_nome" readonly disabled>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Papel (Role)</label>
+                            <select class="form-select" id="edit_papel" required>
+                                <option value="gerente">Gerente Geral</option>
+                                <option value="dev">Desenvolvedor/Designer</option>
+                                <option value="gestor_cliente">Atendimento/Gestor de Cliente</option>
+                                <option value="financeiro">Financeiro</option>
+                            </select>
+                        </div>
+                        
+                        <h6 class="fw-bold mb-3">Permissões Específicas</h6>
+                        
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_ver_projetos">
+                            <label class="form-check-label" for="edit_perm_ver_projetos">Ver Projetos</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_criar_projetos">
+                            <label class="form-check-label" for="edit_perm_criar_projetos">Criar Projetos (Formulários)</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_ver_clientes">
+                            <label class="form-check-label" for="edit_perm_ver_clientes">Ver Todos os Clientes</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_criar_clientes">
+                            <label class="form-check-label" for="edit_perm_criar_clientes">Cadastrar Clientes</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_designar_projetos">
+                            <label class="form-check-label" for="edit_perm_designar_projetos">Atribuir Projetos p/ Membros</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_financeiro">
+                            <label class="form-check-label" for="edit_perm_financeiro">Módulo Financeiro (Contratos)</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="edit_perm_gerenciar_membros">
+                            <label class="form-check-label" for="edit_perm_gerenciar_membros">Gerenciar Membros</label>
+                        </div>
+                        
+                        <div id="alertEditar" class="alert alert-danger d-none mt-3"></div>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="btnSalvarPermissoes">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Atribuir Projeto -->
+    <div class="modal fade" id="modalDesignarProjeto" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Designar Projeto a <span id="designarNome" class="fw-bold"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Selecione um projeto para atribuir a este membro. Ele passará a ter acesso aos detalhes e itens do checklist.</p>
+                    <form id="formDesignarProjeto">
+                        <input type="hidden" id="designar_ua_id">
+                        <select class="form-select mb-3" id="select_projetos" required>
+                            <option value="">Carregando projetos...</option>
+                        </select>
+                        <div id="alertDesignar" class="alert d-none"></div>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-success" id="btnSalvarDesignacao">Designar</button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    <h6 class="fw-bold mb-3">Projetos Atuais</h6>
+                    <ul class="list-group" id="lista_projetos_membro">
+                        <li class="list-group-item text-muted text-center"><small>Nenhum projeto atribuído.</small></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/agency_team.js"></script>
+</body>
+</html>
