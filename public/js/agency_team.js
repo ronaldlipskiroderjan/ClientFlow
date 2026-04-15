@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Exibir o botão "Novo Membro"
     document.getElementById('btnNovoMembro').classList.remove('d-none');
 
     // Variáveis globais para os modais
