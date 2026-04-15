@@ -94,6 +94,12 @@ function updateConstraintVisibility(row) {
 
 document.addEventListener("DOMContentLoaded", async () => {
     await SidebarManager.init();
+    const sessao = await Auth.validateSession();
+
+    if (!sessao) {
+        window.location.href = "login.html";
+        return;
+    }
 
     if (!Auth.hasAccess('perm_criar_projetos')) {
         alert('Você não tem permissão para criar formulários.');
@@ -107,30 +113,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     const linkCard = document.getElementById("linkResultCard");
     const linkInput = document.getElementById("projectLinkInput");
     const copyLinkBtn = document.getElementById("copyLinkBtn");
+    const templateManagerCard = document.getElementById("templateManagerCard");
+    const templateSelect = document.getElementById("templateSelect");
+    const loadTemplateBtn = document.getElementById("loadTemplateBtn");
+    const templateNameInput = document.getElementById("templateNameInput");
+    const templateDescriptionInput = document.getElementById("templateDescriptionInput");
+    const saveTemplateBtn = document.getElementById("saveTemplateBtn");
+    const templateHint = document.getElementById("templateHint");
 
-    function addField() {
-        const row = createFieldRow();
+    const canUseTemplates = (
+        (sessao.tipo === "agency" || sessao.tipo === "agency_member") &&
+        Boolean(sessao.agencia_id)
+    );
 
-        row.querySelector(".remove-field-btn").addEventListener("click", () => {
-            row.remove();
-        });
+    function atualizarHintTemplate(mensagem = "", tipo = "info") {
+        if (!templateHint) {
+            return;
+        }
 
-        const typeSelect = row.querySelector(".field-type");
-        typeSelect.addEventListener("change", () => updateConstraintVisibility(row));
+        templateHint.classList.remove("d-none", "alert-info", "alert-warning", "alert-success");
+        if (!mensagem) {
+            templateHint.classList.add("d-none");
+            return;
+        }
 
-        updateConstraintVisibility(row);
-        fieldsContainer.appendChild(row);
+        const classes = {
+            info: "alert-info",
+            warning: "alert-warning",
+            success: "alert-success"
+        };
+
+        templateHint.classList.add(classes[tipo] || "alert-info");
+        templateHint.textContent = mensagem;
     }
 
-    addField();
-    addFieldBtn.addEventListener("click", addField);
+    function montarLinkCliente(token) {
+        const link = `${window.location.origin}/ClientFlow/public/pages/cadastro.html?token=${encodeURIComponent(token)}`;
+        linkInput.value = link;
+        linkCard.classList.remove("d-none");
+        linkCard.scrollIntoView({ behavior: 'smooth' });
+    }
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        const titulo = document.getElementById("projectTitle").value.trim();
-        const descricao = document.getElementById("projectDescription").value.trim();
-
+    function coletarItensFormulario() {
         const itens = [];
         fieldsContainer.querySelectorAll(".field-row").forEach((row) => {
             const nome = row.querySelector(".field-name").value.trim();
@@ -158,6 +182,194 @@ document.addEventListener("DOMContentLoaded", async () => {
             itens.push(item);
         });
 
+        return itens;
+    }
+
+    async function listarTemplates() {
+        if (!canUseTemplates || !templateSelect) {
+            return;
+        }
+
+        templateSelect.innerHTML = '<option value="">Carregando templates...</option>';
+
+        const retorno = await API.get("template_listar.php");
+        if (!retorno || retorno.status !== "ok") {
+            templateSelect.innerHTML = '<option value="">Nenhum template disponível</option>';
+            if (loadTemplateBtn) {
+                loadTemplateBtn.disabled = true;
+            }
+            atualizarHintTemplate((retorno && retorno.mensagem) || "Não foi possível carregar templates.", "warning");
+            return;
+        }
+
+        const templates = Array.isArray(retorno.data) ? retorno.data : [];
+        templateSelect.innerHTML = '<option value="">Selecione um template...</option>';
+
+        templates.forEach((template) => {
+            const option = document.createElement("option");
+            option.value = String(template.id);
+            option.textContent = `${template.nome} (${template.quantidade_itens || 0} item(ns))`;
+            templateSelect.appendChild(option);
+        });
+
+        if (loadTemplateBtn) {
+            loadTemplateBtn.disabled = templates.length === 0;
+        }
+
+        if (!templates.length) {
+            atualizarHintTemplate("Você ainda não possui templates salvos para esta agência.", "info");
+        } else {
+            atualizarHintTemplate("");
+        }
+    }
+
+    async function salvarComoTemplate() {
+        const nomeTemplate = templateNameInput?.value.trim() || "";
+        const descricaoTemplate = templateDescriptionInput?.value.trim() || "";
+
+        if (!nomeTemplate) {
+            alert("Informe um nome para o template.");
+            return;
+        }
+
+        const itens = coletarItensFormulario();
+        if (!itens.length) {
+            alert("Adicione pelo menos um item para salvar o template.");
+            return;
+        }
+
+        if (saveTemplateBtn) {
+            saveTemplateBtn.disabled = true;
+            saveTemplateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Salvando...';
+        }
+
+        try {
+            const retorno = await API.post("template_salvar.php", {
+                nome: nomeTemplate,
+                descricao: descricaoTemplate,
+                itens: JSON.stringify(itens)
+            });
+
+            if (!retorno || retorno.status !== "ok") {
+                alert((retorno && retorno.mensagem) || "Erro ao salvar template.");
+                return;
+            }
+
+            if (templateNameInput) {
+                templateNameInput.value = "";
+            }
+            if (templateDescriptionInput) {
+                templateDescriptionInput.value = "";
+            }
+
+            atualizarHintTemplate(`Template "${retorno.data?.nome || nomeTemplate}" salvo com sucesso.`, "success");
+            await listarTemplates();
+        } catch (error) {
+            console.error("Erro ao salvar template:", error);
+            alert("Erro ao salvar template.");
+        } finally {
+            if (saveTemplateBtn) {
+                saveTemplateBtn.disabled = false;
+                saveTemplateBtn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i> Salvar Template';
+            }
+        }
+    }
+
+    async function criarChecklistPorTemplate() {
+        const templateId = templateSelect?.value || "";
+        if (!templateId) {
+            alert("Selecione um template para continuar.");
+            return;
+        }
+
+        const titulo = document.getElementById("projectTitle").value.trim();
+        const descricao = document.getElementById("projectDescription").value.trim();
+
+        if (!titulo) {
+            alert("Informe o título do projeto antes de carregar o template.");
+            return;
+        }
+
+        if (loadTemplateBtn) {
+            loadTemplateBtn.disabled = true;
+            loadTemplateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Criando...';
+        }
+
+        try {
+            const retorno = await API.post("template_carregar.php", {
+                template_id: templateId,
+                titulo,
+                descricao
+            });
+
+            if (!retorno || retorno.status !== "ok") {
+                alert((retorno && retorno.mensagem) || "Erro ao criar checklist a partir do template.");
+                return;
+            }
+
+            const token = retorno.data && retorno.data.link_hash ? retorno.data.link_hash : "";
+            montarLinkCliente(token);
+            atualizarHintTemplate("Checklist criado a partir do template com sucesso.", "success");
+        } catch (error) {
+            console.error("Erro ao criar checklist por template:", error);
+            alert("Erro ao criar checklist a partir do template.");
+        } finally {
+            if (loadTemplateBtn) {
+                loadTemplateBtn.disabled = false;
+                loadTemplateBtn.innerHTML = '<i class="fa-solid fa-clone me-1"></i> Criar';
+            }
+        }
+    }
+
+    function addField() {
+        const row = createFieldRow();
+
+        row.querySelector(".remove-field-btn").addEventListener("click", () => {
+            row.remove();
+        });
+
+        const typeSelect = row.querySelector(".field-type");
+        typeSelect.addEventListener("change", () => updateConstraintVisibility(row));
+
+        updateConstraintVisibility(row);
+        fieldsContainer.appendChild(row);
+    }
+
+    addField();
+    addFieldBtn.addEventListener("click", addField);
+
+    if (!canUseTemplates) {
+        if (templateManagerCard) {
+            templateManagerCard.classList.add("d-none");
+        }
+    } else {
+        if (templateSelect) {
+            templateSelect.addEventListener("change", () => {
+                if (loadTemplateBtn) {
+                    loadTemplateBtn.disabled = !templateSelect.value;
+                }
+            });
+        }
+
+        if (saveTemplateBtn) {
+            saveTemplateBtn.addEventListener("click", salvarComoTemplate);
+        }
+
+        if (loadTemplateBtn) {
+            loadTemplateBtn.addEventListener("click", criarChecklistPorTemplate);
+            loadTemplateBtn.disabled = true;
+        }
+
+        await listarTemplates();
+    }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const titulo = document.getElementById("projectTitle").value.trim();
+        const descricao = document.getElementById("projectDescription").value.trim();
+        const itens = coletarItensFormulario();
+
         if (!itens.length) {
             alert("Adicione pelo menos um item ao formulário.");
             return;
@@ -175,11 +387,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const token = retorno.data && retorno.data.link_hash ? retorno.data.link_hash : "";
-        const link = `${window.location.origin}/ClientFlow/public/pages/cadastro.html?token=${encodeURIComponent(token)}`;
-
-        linkInput.value = link;
-        linkCard.classList.remove("d-none");
-        linkCard.scrollIntoView({ behavior: 'smooth' });
+        montarLinkCliente(token);
     });
 
     copyLinkBtn.addEventListener("click", async () => {

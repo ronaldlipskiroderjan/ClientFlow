@@ -36,16 +36,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const dados = resumo.status === "ok" ? (resumo.data || {}) : {};
 
-        const finished = Number(dados.finished || 0);
-        const pending = Number(dados.pending || 0);
-        const review = Number(dados.review || 0);
+        function aplicarResumoOnboarding(resumoOnboarding = {}) {
+            const finished = Number(resumoOnboarding.finished || 0);
+            const pending = Number(resumoOnboarding.pending || 0);
+            const review = Number(resumoOnboarding.review || 0);
 
-        document.getElementById("count-finished").textContent = finished;
-        document.getElementById("count-pending").textContent = pending;
-        document.getElementById("count-review").textContent = review;
+            document.getElementById("count-finished").textContent = finished;
+            document.getElementById("count-pending").textContent = pending;
+            document.getElementById("count-review").textContent = review;
+
+            return {
+                finished,
+                pending,
+                review,
+                total: finished + pending + review
+            };
+        }
+
+        const resumoOnboarding = aplicarResumoOnboarding(dados);
+        const finished = resumoOnboarding.finished;
+        const pending = resumoOnboarding.pending;
+        const review = resumoOnboarding.review;
 
         const ctx = document.getElementById("progressChart").getContext("2d");
-        const total = finished + pending + review;
+        const total = resumoOnboarding.total;
 
         new Chart(ctx, {
             type: "doughnut",
@@ -164,6 +178,42 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
         }
+
+        let pollingStatusId = null;
+        let pollingEmAndamento = false;
+
+        const atualizarStatusTempoReal = async () => {
+            if (document.hidden || pollingEmAndamento) {
+                return;
+            }
+
+            pollingEmAndamento = true;
+            try {
+                const resumoTempoReal = await API.get("dashboard_agencia_resumo.php");
+                if (resumoTempoReal && resumoTempoReal.status === "ok") {
+                    aplicarResumoOnboarding(resumoTempoReal.data || {});
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar status em tempo real:", error);
+            } finally {
+                pollingEmAndamento = false;
+            }
+        };
+
+        pollingStatusId = window.setInterval(atualizarStatusTempoReal, 5000);
+
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                atualizarStatusTempoReal();
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (pollingStatusId) {
+                window.clearInterval(pollingStatusId);
+                pollingStatusId = null;
+            }
+        }, { once: true });
 
     } catch (error) {
         window.location.href = "login.html";

@@ -84,33 +84,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         return col;
     }
 
-    async function carregarProjetos() {
-        setViewState("loading");
-        if (grid) {
-            grid.innerHTML = "";
+    async function carregarProjetos({ silent = false } = {}) {
+        if (!silent) {
+            setViewState("loading");
+            if (grid) {
+                grid.innerHTML = "";
+            }
         }
 
         const retorno = await API.get("cliente_checklists_listar.php");
         if (!retorno || retorno.status !== "ok") {
-            atualizarKpis([]);
-            setViewState("error");
-            return;
+            if (!silent) {
+                atualizarKpis([]);
+                setViewState("error");
+            }
+            return false;
         }
 
         const projetos = Array.isArray(retorno.data) ? retorno.data : [];
         atualizarKpis(projetos);
 
         if (!projetos.length) {
+            if (grid) {
+                grid.innerHTML = "";
+            }
             setViewState("empty");
-            return;
+            return true;
         }
 
+        if (grid) {
+            grid.innerHTML = "";
+        }
         projetos.forEach((project) => {
             if (grid) {
                 grid.appendChild(criarCard(project));
             }
         });
         setViewState("content");
+        return true;
     }
 
     try {
@@ -133,6 +144,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await carregarProjetos();
+
+        let pollingClientId = null;
+        let pollingEmAndamento = false;
+
+        const atualizarChecklistsTempoReal = async () => {
+            if (document.hidden || pollingEmAndamento) {
+                return;
+            }
+
+            pollingEmAndamento = true;
+            try {
+                await carregarProjetos({ silent: true });
+            } catch (error) {
+                console.error("Erro ao atualizar checklists em tempo real:", error);
+            } finally {
+                pollingEmAndamento = false;
+            }
+        };
+
+        pollingClientId = window.setInterval(atualizarChecklistsTempoReal, 5000);
+
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                atualizarChecklistsTempoReal();
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (pollingClientId) {
+                window.clearInterval(pollingClientId);
+                pollingClientId = null;
+            }
+        }, { once: true });
     } catch (error) {
         console.error("Dashboard client error:", error);
         setViewState("error");

@@ -151,3 +151,15 @@ CREATE TABLE IF NOT EXISTS contratos (
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
     FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS templates_checklist (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    agencia_id INT NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT NULL,
+    itens JSON NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_template_agencia_nome (agencia_id, nome),
+    FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE
+);
