@@ -171,7 +171,7 @@ function setupInputMasks() {
         });
     });
 
-    document.querySelectorAll('input[name="phone"]').forEach((input) => {
+    document.querySelectorAll('input[name="phone"], input[name="legal_contact_phone"]').forEach((input) => {
         input.addEventListener('input', () => {
             input.value = formatPhone(input.value);
         });
@@ -194,9 +194,12 @@ function buildRegisterData(tabId, raw) {
     }
 
     return {
-        name: raw.corporate_name,
+        name: raw.responsavel_nome,
+        responsible_name: raw.responsavel_nome,
         corporate_name: raw.corporate_name,
-        legal_contact: raw.legal_contact,
+        legal_contact_name: raw.legal_contact_name,
+        legal_contact_email: raw.legal_contact_email,
+        legal_contact_phone: raw.legal_contact_phone,
         cnpj: raw.cpf_cnpj,
         cpf_cnpj: onlyDigits(raw.cpf_cnpj),
         phone: raw.phone,
@@ -226,6 +229,11 @@ function validateFormByTab(tabId, raw) {
 
     if (tabId === 'pj' && !isValidCNPJ(raw.cpf_cnpj)) {
         alert('CNPJ invalido. Verifique e tente novamente.');
+        return false;
+    }
+
+    if (tabId === 'pj' && raw.role === 'agency' && !String(raw.legal_contact_name || '').trim()) {
+        alert('Informe o nome do contato juridico da agencia.');
         return false;
     }
 
@@ -280,7 +288,10 @@ async function handleRegisterSubmit(event) {
             documento: userData.cpf_cnpj,
             data_nascimento: toISODateFromBR(userData.birth_date || ''),
             nome_empresa: userData.corporate_name || '',
-            nome_responsavel: userData.legal_contact || ''
+            nome_responsavel: userData.responsible_name || '',
+            contato_juridico_nome: userData.legal_contact_name || '',
+            contato_juridico_email: userData.legal_contact_email || '',
+            contato_juridico_telefone: userData.legal_contact_phone || ''
         });
 
         if (retorno.status !== 'ok') {
@@ -317,19 +328,111 @@ async function handleRegisterSubmit(event) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const forms = document.querySelectorAll('.tab-pane form');
-
     setupInputMasks();
-
-    forms.forEach((form) => {
-        form.addEventListener('submit', handleRegisterSubmit);
-    });
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
-    if (token) {
-        document.querySelectorAll('a[href="login.html"]').forEach(a => {
-            a.href = `login.html?token=${encodeURIComponent(token)}`;
-        });
+    const roleSelectPJ = document.querySelector('#roleSelectPJ select[name="role"]');
+    const legalContactSection = document.getElementById('legalContactSection');
+    const legalContactName = legalContactSection ? legalContactSection.querySelector('input[name="legal_contact_name"]') : null;
+    const legalContactEmail = legalContactSection ? legalContactSection.querySelector('input[name="legal_contact_email"]') : null;
+    const legalContactPhone = legalContactSection ? legalContactSection.querySelector('input[name="legal_contact_phone"]') : null;
+
+    function toggleLegalContactSection() {
+        if (!roleSelectPJ || !legalContactSection) return;
+        const isAgency = roleSelectPJ.value === 'agency';
+        legalContactSection.classList.toggle('d-none', !isAgency);
+        if (legalContactName) legalContactName.required = isAgency;
+        if (legalContactEmail) legalContactEmail.required = false;
+        if (legalContactPhone) legalContactPhone.required = false;
     }
+
+    if (roleSelectPJ) {
+        roleSelectPJ.addEventListener('change', toggleLegalContactSection);
+        toggleLegalContactSection();
+    }
+
+    // UI Logic for token
+    if (token) {
+        const tokenNotice = document.getElementById('tokenNotice');
+        if (tokenNotice) tokenNotice.classList.remove('d-none');
+
+        // Force 'client' role and hide selectors if token is present
+        document.querySelectorAll('select[name="role"]').forEach(sel => {
+            sel.value = 'client';
+            const containerPF = document.getElementById('roleSelectPF');
+            const containerPJ = document.getElementById('roleSelectPJ');
+            if (containerPF) containerPF.classList.add('d-none');
+            if (containerPJ) containerPJ.classList.add('d-none');
+        });
+
+        // Update login link
+        const loginLink = document.getElementById('loginLink');
+        if (loginLink) {
+            loginLink.href = `login.html?token=${encodeURIComponent(token)}`;
+        }
+    }
+
+    const forms = document.querySelectorAll('.tab-pane form');
+    forms.forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const tabId = form.closest('.tab-pane').id;
+            const rawData = formToObject(form);
+            if (!validateFormByTab(tabId, rawData)) return;
+
+            const userData = buildRegisterData(tabId, rawData);
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Processando...';
+
+            try {
+                const res = await API.post('usuario_cadastrar.php', {
+                    nome: userData.name,
+                    email: userData.email,
+                    senha: userData.password,
+                    tipo: userData.role,
+                    telefone: userData.phone,
+                    documento: userData.cpf_cnpj,
+                    data_nascimento: toISODateFromBR(userData.birth_date || ''),
+                    nome_empresa: userData.corporate_name || '',
+                    nome_responsavel: userData.responsible_name || '',
+                    contato_juridico_nome: userData.legal_contact_name || '',
+                    contato_juridico_email: userData.legal_contact_email || '',
+                    contato_juridico_telefone: userData.legal_contact_phone || ''
+                });
+
+                if (res.status !== 'ok') {
+                    alert(res.mensagem || 'Erro ao criar conta.');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                    return;
+                }
+
+                // Auto Login
+                const loginRes = await API.post('usuario_login.php', {
+                    email: userData.email,
+                    senha: userData.password
+                });
+
+                if (loginRes.status === 'ok') {
+                    if (token) {
+                        const vinculo = await API.post('checklist_vincular_cliente.php', { token });
+                        if (vinculo.status !== 'ok') {
+                            alert('Conta criada, mas houve um erro ao vincular o projeto: ' + vinculo.mensagem);
+                        }
+                    }
+                    window.location.href = getRedirectByRole(userData.role);
+                } else {
+                    alert('Conta criada com sucesso! Por favor, faça login.');
+                    window.location.href = 'login.html' + (token ? `?token=${encodeURIComponent(token)}` : '');
+                }
+            } catch (error) {
+                alert('Erro na conexão com o servidor.');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    });
 });

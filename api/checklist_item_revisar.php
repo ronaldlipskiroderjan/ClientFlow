@@ -8,10 +8,14 @@ $retorno = [
     "data" => null
 ];
 
-$agencia_usuario_id = $_SESSION['usuario_id'] ?? null;
+$usuario_id = $_SESSION['usuario_id'] ?? null;
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? null;
+$agencia_id = $_SESSION['agencia_id'] ?? null;
+$ua_id = $_SESSION['ua_id'] ?? null;
+$papel_agencia = $_SESSION['papel_agencia'] ?? null;
+$permissoes = $_SESSION['permissoes'] ?? [];
 
-if (empty($agencia_usuario_id)) {
+if (empty($usuario_id)) {
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -19,6 +23,13 @@ if (empty($agencia_usuario_id)) {
 
 if ($usuario_tipo === "client") {
     $retorno["mensagem"] = "Perfil sem permissão para revisar itens.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member') && empty($permissoes['perm_ver_projetos'])) {
+    $retorno["mensagem"] = "Você não tem permissão para revisar itens.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -43,13 +54,20 @@ if ($acao === "reprovar" && $motivo === "") {
     exit();
 }
 
-$stmt_check = $conexao->prepare(
-    "SELECT i.id, i.checklist_id
+$sql_check = "SELECT i.id, i.checklist_id
      FROM itens_checklist i
-     INNER JOIN checklists c ON c.id = i.checklist_id
-     WHERE i.id = ? AND c.agencia_usuario_id = ?"
-);
-$stmt_check->bind_param("ii", $item_id, $agencia_usuario_id);
+     INNER JOIN checklists c ON c.id = i.checklist_id";
+
+if ($usuario_tipo === 'agency_member' && $papel_agencia === 'dev') {
+    $sql_check .= " INNER JOIN projetos_membros pm ON pm.checklist_id = c.id
+    WHERE i.id = ? AND c.agencia_id = ? AND pm.usuario_agencia_id = ?";
+    $stmt_check = $conexao->prepare($sql_check);
+    $stmt_check->bind_param("iii", $item_id, $agencia_id, $ua_id);
+} else {
+    $sql_check .= " WHERE i.id = ? AND c.agencia_id = ?";
+    $stmt_check = $conexao->prepare($sql_check);
+    $stmt_check->bind_param("ii", $item_id, $agencia_id);
+}
 $stmt_check->execute();
 $check_result = $stmt_check->get_result();
 

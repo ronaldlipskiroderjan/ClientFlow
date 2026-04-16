@@ -1,55 +1,82 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const grid = document.getElementById("projects-grid");
+    const loadingState = document.getElementById("projects-loading");
     const emptyState = document.getElementById("empty-state");
+    const errorState = document.getElementById("error-state");
+
+    const kpiTotal = document.getElementById("client-kpi-total");
+    const kpiPending = document.getElementById("client-kpi-pending");
+    const kpiFinished = document.getElementById("client-kpi-finished");
 
     const statusMap = {
-        pending:   { badge: "bg-warning text-dark", icon: "fa-clock", label: "Pendente" },
-        review:    { badge: "bg-primary",            icon: "fa-eye",   label: "Em Revisão" },
-        approved:  { badge: "bg-success",            icon: "fa-check", label: "Concluído" },
-        completed: { badge: "bg-success",            icon: "fa-check", label: "Concluído" },
-        rejected:  { badge: "bg-danger",             icon: "fa-triangle-exclamation", label: "Atenção" },
+        pending: { badge: "bg-warning text-dark", icon: "fa-clock", label: "Pendente" },
+        review: { badge: "bg-primary", icon: "fa-eye", label: "Em Revisão" },
+        approved: { badge: "bg-success", icon: "fa-check", label: "Concluído" },
+        completed: { badge: "bg-success", icon: "fa-check", label: "Concluído" },
+        rejected: { badge: "bg-danger", icon: "fa-triangle-exclamation", label: "Atenção" }
     };
 
-    function criarCard(checklist) {
-        const s = statusMap[checklist.status] || statusMap.pending;
-        const responsavel = checklist.agencia_nome_contato || checklist.agencia_empresa || "Agência";
+    function setViewState(state) {
+        if (loadingState) loadingState.classList.toggle("d-none", state !== "loading");
+        if (grid) grid.classList.toggle("d-none", state !== "content");
+        if (emptyState) emptyState.classList.toggle("d-none", state !== "empty");
+        if (errorState) errorState.classList.toggle("d-none", state !== "error");
+    }
 
-        const completados = checklist.itens_concluidos || 0;
-        const total = checklist.total_itens || 0;
-        const percent = total > 0 ? Math.round((completados / total) * 100) : 0;
+    function atualizarKpis(projects = []) {
+        const total = projects.length;
+        const done = projects.filter((project) => project.status === "approved" || project.status === "completed").length;
+        const pending = projects.filter((project) => project.status === "pending" || project.status === "review" || project.status === "rejected").length;
+
+        if (kpiTotal) kpiTotal.textContent = total;
+        if (kpiPending) kpiPending.textContent = pending;
+        if (kpiFinished) kpiFinished.textContent = done;
+    }
+
+    function criarCard(checklist) {
+        const status = statusMap[checklist.status] || statusMap.pending;
+        const responsavel = checklist.agencia_nome_contato || checklist.agencia_empresa || "Agência";
+        const totalItens = Number(checklist.total_itens || 0);
+        const itensConcluidos = Number(checklist.itens_concluidos || 0);
+        const percent = totalItens > 0 ? Math.round((itensConcluidos / totalItens) * 100) : 0;
 
         const col = document.createElement("div");
-        col.className = "col-12 col-md-10 col-lg-8 mx-auto";
+        col.className = "col-12 col-xl-6";
         col.innerHTML = `
-            <div class="card card-custom border-0 shadow-sm h-100" style="border-left: 4px solid var(--navy-blue) !important;">
-                <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                    <div class="flex-grow-1">
-                        <div class="d-flex align-items-center mb-2">
-                            <h5 class="fw-bold text-navy-blue mb-0 me-3">${checklist.titulo}</h5>
-                            <span class="badge ${s.badge} rounded-pill text-nowrap">
-                                <i class="fa-solid ${s.icon} me-1"></i>${s.label}
-                            </span>
-                        </div>
-                        <p class="text-muted small mb-3">
-                            <i class="fa-solid fa-user-tie me-1"></i>
-                            <span class="fw-semibold">${responsavel}</span>
-                        </p>
-                        <div class="w-100" style="max-width: 400px;">
-                            <div class="d-flex justify-content-between text-muted small mb-1">
-                                <span>Progresso</span>
-                                <span class="fw-bold text-dark">${percent}% (${completados}/${total})</span>
+            <div class="card card-custom border-0 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                <h5 class="fw-bold text-navy-blue mb-0">${checklist.titulo}</h5>
+                                <span class="badge ${status.badge} rounded-pill text-nowrap">
+                                    <i class="fa-solid ${status.icon} me-1"></i>${status.label}
+                                </span>
                             </div>
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: ${percent}%;" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
+                            <p class="text-muted small mb-0">${checklist.descricao || "Sem descrição adicional para este projeto."}</p>
                         </div>
-                    </div>
-                    
-                    <div class="mt-3 mt-md-0 ms-md-4">
-                        <a href="checklist_details.html?id=${checklist.id}"
-                           class="btn btn-primary-custom px-4 py-2 text-nowrap shadow-sm">
+                        <a href="checklist_details.html?id=${checklist.id}" class="btn btn-primary-custom btn-sm text-nowrap">
                             <i class="fa-solid fa-folder-open me-2"></i>Abrir Projeto
                         </a>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="status-pill">
+                            <i class="fa-solid fa-user-tie text-primary"></i>${responsavel}
+                        </span>
+                        <span class="status-pill">
+                            <i class="fa-solid fa-list-check text-success"></i>${totalItens} item(s)
+                        </span>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between text-muted small mb-1">
+                            <span>Progresso</span>
+                            <span class="fw-semibold text-dark">${percent}% (${itensConcluidos}/${totalItens})</span>
+                        </div>
+                        <div class="progress progress-soft">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: ${percent}%" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -57,36 +84,101 @@ document.addEventListener("DOMContentLoaded", async () => {
         return col;
     }
 
-    async function carregarProjetos() {
-        const retorno = await ApiClientFlow.get("cliente_checklists_listar.php");
-        if (retorno.status !== "ok" || !retorno.data || !retorno.data.length) {
-            emptyState.classList.remove("d-none");
-            return;
+    async function carregarProjetos({ silent = false } = {}) {
+        if (!silent) {
+            setViewState("loading");
+            if (grid) {
+                grid.innerHTML = "";
+            }
         }
-        retorno.data.forEach(c => grid.appendChild(criarCard(c)));
+
+        const retorno = await API.get("cliente_checklists_listar.php");
+        if (!retorno || retorno.status !== "ok") {
+            if (!silent) {
+                atualizarKpis([]);
+                setViewState("error");
+            }
+            return false;
+        }
+
+        const projetos = Array.isArray(retorno.data) ? retorno.data : [];
+        atualizarKpis(projetos);
+
+        if (!projetos.length) {
+            if (grid) {
+                grid.innerHTML = "";
+            }
+            setViewState("empty");
+            return true;
+        }
+
+        if (grid) {
+            grid.innerHTML = "";
+        }
+        projetos.forEach((project) => {
+            if (grid) {
+                grid.appendChild(criarCard(project));
+            }
+        });
+        setViewState("content");
+        return true;
     }
 
     try {
-        const sessao = await ApiClientFlow.get("valida_sessao_logado.php");
-        if (sessao.status !== "ok") { window.location.href = "login.html"; return; }
-        if (!sessao.data || sessao.data.tipo !== "client") { window.location.href = "dashboard_agency.html"; return; }
+        await SidebarManager.init();
+
+        const sessao = await Auth.validateSession();
+        if (!sessao) {
+            window.location.href = "login.html";
+            return;
+        }
+        if (sessao.tipo !== "client") {
+            window.location.href = "dashboard_agency.html";
+            return;
+        }
 
         if (window.ClientFlowIdentity) {
-            window.ClientFlowIdentity.apply(sessao.data, { avatarBackground: "E63946" });
+            window.ClientFlowIdentity.apply(sessao, {
+                avatarBackground: "4F46E5"
+            });
         }
 
         await carregarProjetos();
 
-        const logoutLink = document.querySelector(".js-logout-link");
-        if (logoutLink) {
-            logoutLink.addEventListener("click", async (e) => {
-                e.preventDefault();
-                await ApiClientFlow.post("usuario_logoff.php");
-                window.location.href = "../../index.html";
-            });
-        }
-    } catch (e) {
-        console.error("Dashboard error:", e);
-        // window.location.href = "login.html";
+        let pollingClientId = null;
+        let pollingEmAndamento = false;
+
+        const atualizarChecklistsTempoReal = async () => {
+            if (document.hidden || pollingEmAndamento) {
+                return;
+            }
+
+            pollingEmAndamento = true;
+            try {
+                await carregarProjetos({ silent: true });
+            } catch (error) {
+                console.error("Erro ao atualizar checklists em tempo real:", error);
+            } finally {
+                pollingEmAndamento = false;
+            }
+        };
+
+        pollingClientId = window.setInterval(atualizarChecklistsTempoReal, 5000);
+
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                atualizarChecklistsTempoReal();
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (pollingClientId) {
+                window.clearInterval(pollingClientId);
+                pollingClientId = null;
+            }
+        }, { once: true });
+    } catch (error) {
+        console.error("Dashboard client error:", error);
+        setViewState("error");
     }
 });

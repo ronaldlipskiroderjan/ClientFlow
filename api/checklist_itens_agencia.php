@@ -8,11 +8,15 @@ $retorno = [
     "data" => []
 ];
 
-$agencia_usuario_id = $_SESSION['usuario_id'] ?? null;
+$usuario_id = $_SESSION['usuario_id'] ?? null;
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? null;
+$agencia_id = $_SESSION['agencia_id'] ?? null;
+$ua_id = $_SESSION['ua_id'] ?? null;
+$papel_agencia = $_SESSION['papel_agencia'] ?? null;
+$permissoes = $_SESSION['permissoes'] ?? [];
 $checklist_id = intval($_GET['checklist_id'] ?? 0);
 
-if (empty($agencia_usuario_id)) {
+if (empty($usuario_id)) {
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -25,6 +29,13 @@ if ($usuario_tipo === "client") {
     exit();
 }
 
+if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member') && empty($permissoes['perm_ver_projetos'])) {
+    $retorno["mensagem"] = "Você não tem permissão para visualizar itens.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
 if ($checklist_id <= 0) {
     $retorno["mensagem"] = "Checklist inválido.";
     header("Content-type: application/json;charset:utf-8");
@@ -32,8 +43,7 @@ if ($checklist_id <= 0) {
     exit();
 }
 
-$stmt = $conexao->prepare(
-    "SELECT
+$sql_base = "SELECT
         i.id,
         i.nome_item,
         i.descricao_item,
@@ -56,11 +66,20 @@ $stmt = $conexao->prepare(
         cl.email AS cliente_email
      FROM itens_checklist i
      INNER JOIN checklists c ON c.id = i.checklist_id
-     LEFT JOIN clientes cl ON cl.id = c.cliente_id
-     WHERE i.checklist_id = ? AND c.agencia_usuario_id = ?
-     ORDER BY i.id ASC"
-);
-$stmt->bind_param("ii", $checklist_id, $agencia_usuario_id);
+     LEFT JOIN clientes cl ON cl.id = c.cliente_id";
+
+if ($usuario_tipo === 'agency_member' && $papel_agencia === 'dev') {
+    $sql_base .= " INNER JOIN projetos_membros pm ON pm.checklist_id = c.id
+    WHERE i.checklist_id = ? AND c.agencia_id = ? AND pm.usuario_agencia_id = ?
+    ORDER BY i.id ASC";
+    $stmt = $conexao->prepare($sql_base);
+    $stmt->bind_param("iii", $checklist_id, $agencia_id, $ua_id);
+} else {
+    $sql_base .= " WHERE i.checklist_id = ? AND c.agencia_id = ?
+    ORDER BY i.id ASC";
+    $stmt = $conexao->prepare($sql_base);
+    $stmt->bind_param("ii", $checklist_id, $agencia_id);
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 

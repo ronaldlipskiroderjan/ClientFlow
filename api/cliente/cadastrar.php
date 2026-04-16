@@ -11,10 +11,10 @@ $retorno = [
     'data' => null,
 ];
 
-$agencia_usuario_id = $_SESSION['usuario_id'] ?? null;
+$agencia_id = $_SESSION['agencia_id'] ?? null;
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? null;
 
-if (empty($agencia_usuario_id)) {
+if (empty($agencia_id)) {
     $retorno['mensagem'] = 'Usuário não autenticado';
     http_response_code(401);
     echo json_encode($retorno);
@@ -37,6 +37,7 @@ if (is_array($payload)) {
 
 $nome = trim($dados['nome'] ?? '');
 $email = trim($dados['email'] ?? '');
+$telefone = trim($dados['telefone'] ?? '');
 $senha = $dados['senha'] ?? '';
 $empresa = trim($dados['empresa'] ?? '');
 
@@ -59,8 +60,8 @@ $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 $conexao->begin_transaction();
 
 $stmt_usuario = $conexao->prepare(
-    "INSERT INTO usuarios (nome, email, senha_hash, tipo, nome_empresa, status_conta)
-     VALUES (?, ?, ?, 'client', ?, 'aprovado')"
+    "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, nome_empresa, status_conta)
+     VALUES (?, ?, ?, 'client', ?, ?, 'aprovado')"
 );
 
 if (!$stmt_usuario) {
@@ -71,7 +72,7 @@ if (!$stmt_usuario) {
     exit();
 }
 
-$stmt_usuario->bind_param('ssss', $nome, $email, $senha_hash, $empresa);
+$stmt_usuario->bind_param('sssss', $nome, $email, $senha_hash, $telefone, $empresa);
 
 if (!$stmt_usuario->execute()) {
     $conexao->rollback();
@@ -86,8 +87,8 @@ $usuario_id = $conexao->insert_id;
 $stmt_usuario->close();
 
 $stmt_cliente = $conexao->prepare(
-    "INSERT INTO clientes (agencia_usuario_id, usuario_id, nome, email, senha, empresa)
-     VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO clientes (agencia_id, usuario_id, nome, email, telefone, senha, empresa)
+     VALUES (?, ?, ?, ?, ?, ?, ?)"
 );
 
 if (!$stmt_cliente) {
@@ -98,7 +99,7 @@ if (!$stmt_cliente) {
     exit();
 }
 
-$stmt_cliente->bind_param('iissss', $agencia_usuario_id, $usuario_id, $nome, $email, $senha_hash, $empresa);
+$stmt_cliente->bind_param('iisssss', $agencia_id, $usuario_id, $nome, $email, $telefone, $senha_hash, $empresa);
 
 if (!$stmt_cliente->execute()) {
     $conexao->rollback();

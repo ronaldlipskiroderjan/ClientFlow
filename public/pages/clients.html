@@ -20,115 +20,68 @@
 </head>
 <body class="bg-arctic-gray">
 
-<!-- Sidebar Offcanvas -->
-<div class="offcanvas offcanvas-start sidebar-offcanvas text-white" tabindex="-1" id="agencySidebar" aria-labelledby="agencySidebarLabel">
-  <div class="offcanvas-header border-bottom border-secondary">
-    <h5 class="offcanvas-title fw-bold" id="agencySidebarLabel">
-        <i class="fa-solid fa-layer-group text-primary me-2"></i> ClientFlow
-    </h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body d-flex flex-column">
-    <ul class="nav flex-column mb-auto">
-      <li class="nav-item">
-        <a href="dashboard_agency.html" class="nav-link">
-          <i class="fa-solid fa-chart-pie me-2"></i> Visão Geral
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="clients.html" class="nav-link active">
-          <i class="fa-solid fa-users me-2"></i> Clientes
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="form_builder.html" class="nav-link">
-          <i class="fa-solid fa-list-check me-2"></i> Criar Formulário
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="checklists.html" class="nav-link">
-          <i class="fa-solid fa-file-signature me-2"></i> Meus Projetos
-        </a>
-      </li>
-    </ul>
-    <hr class="border-secondary">
-    <div class="dropdown">
-      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-        <img data-user-avatar src="https://ui-avatars.com/api/?name=ClientFlow&background=0D8ABC&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
-        <strong data-user-display-name></strong>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-        <li><a class="dropdown-item" href="#">Configurações</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item text-danger js-logout-link" href="../../index.html">Sair</a></li>
-      </ul>
-    </div>
-  </div>
+<div class="d-flex app-shell">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content flex-grow-1 min-vh-100">
+        <div class="container-fluid py-4 px-3 px-lg-4">
+            <section class="page-header-card mb-4">
+                <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-3">
+                    <div>
+                        <h1 class="h3 fw-bold mb-1 text-navy-blue">Base de Clientes</h1>
+                        <p class="text-muted mb-0">Gerencie sua carteira de clientes com histórico claro e ações rápidas.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary-custom" id="btnNovoCliente" onclick="window.location.href='form_builder.html'">
+                            <i class="fa-solid fa-user-plus me-2"></i>Adicionar via Link
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="surface-panel p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-premium table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Nome</th>
+                                <th>Empresa</th>
+                                <th>E-mail</th>
+                                <th>Data de cadastro</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody">
+                            <tr><td colspan="5" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="surface-panel mt-4 p-4">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="text-primary fs-5"><i class="fas fa-circle-info"></i></div>
+                    <p class="text-muted mb-0">
+                        Clientes são vinculados automaticamente quando se cadastram pelo link de um projeto.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer text-center mt-auto py-4 bg-white border-top">
+          <div class="container text-center">
+            <div class="text-muted small">
+                &copy; 2026 ClientFlow. Todos os direitos reservados.
+            </div>
+          </div>
+        </footer>
+    </main>
 </div>
-
-<!-- App Topnavbar -->
-<nav class="navbar navbar-light bg-white border-bottom px-3 sticky-top">
-    <div class="d-flex align-items-center w-100">
-        <button class="btn btn-text-custom me-3 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#agencySidebar" aria-controls="agencySidebar">
-            <i class="fa-solid fa-bars fs-4 text-navy-blue"></i>
-        </button>
-        <span class="navbar-brand mb-0 h1 fw-bold text-navy-blue d-none d-md-block">Gerenciamento de Clientes</span>
-        <div class="ms-auto d-flex align-items-center">
-            <span class="text-muted d-none d-sm-block" data-user-greeting>Olá, <span class="fw-bold text-navy-blue"></span></span>
-        </div>
-    </div>
-</nav>
-
-<div class="container-fluid py-4 bg-arctic-gray min-vh-100">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h4 class="fw-bold text-navy-blue">Meus Clientes</h4>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-          <a class="btn btn-primary-custom" href="form_builder.html">
-            <i class="fa-solid fa-link me-2"></i> Criar Formulário e Gerar Link
-          </a>
-        </div>
-    </div>
-    
-    <div class="card card-custom p-4 border-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nome</th>
-                        <th>Empresa</th>
-                        <th>E-mail</th>
-                        <th>Data de Cadastro</th>
-                        <th class="text-end">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTableBody">
-                    <!-- Dynamic Rows -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="container pb-4">
-    <div class="alert alert-info border-0">
-        Clientes agora sao vinculados automaticamente quando se cadastram pelo link gerado em <strong>Criar Formulario</strong>.
-    </div>
-</div>
-
-<!-- Footer -->
-<footer class="footer text-center mt-auto py-4">
-  <div class="container text-center">
-    <div class="border-top pt-3 text-muted text-sm border-arctic-gray-dark">
-        &copy; 2024 ClientFlow. Todos os direitos reservados.
-    </div>
-  </div>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/sidebar.js"></script>
 <script src="../js/clients.js"></script>
 </body>
 </html>

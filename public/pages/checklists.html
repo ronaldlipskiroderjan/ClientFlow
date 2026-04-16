@@ -12,36 +12,95 @@
     <link href="../css/style.css" rel="stylesheet">
 </head>
 <body class="bg-arctic-gray">
-<nav class="navbar navbar-light bg-white border-bottom px-3 sticky-top">
-    <div class="d-flex align-items-center w-100">
-        <a href="dashboard_agency.html" class="btn btn-text-custom me-3 p-0"><i class="fa-solid fa-arrow-left fs-5 text-navy-blue"></i></a>
-        <span class="navbar-brand mb-0 h1 fw-bold text-navy-blue">Meus Projetos e Links</span>
-    </div>
-</nav>
 
-<div class="container py-4">
-    <div class="card card-custom border-0 p-4">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Projeto</th>
-                        <th>Cliente Vinculado</th>
-                        <th>Itens</th>
-                        <th>Status</th>
-                        <th>Link</th>
-                                                <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="checklistsTableBody"></tbody>
-            </table>
+<div class="d-flex app-shell">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content flex-grow-1 min-vh-100">
+        <div class="container-fluid py-4 px-3 px-lg-4">
+            <section class="page-header-card mb-4">
+                <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-3">
+                    <div>
+                        <h1 class="h3 fw-bold mb-1 text-navy-blue">Projetos e Onboarding</h1>
+                        <p class="text-muted mb-0">Acompanhe progresso, revise envios e mantenha o cliente sempre atualizado.</p>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <button class="btn btn-primary-custom" id="btnNovoChecklist" onclick="window.location.href='form_builder.html'">
+                            <i class="fa-solid fa-plus me-2"></i>Criar Formulário
+                        </button>
+                        <button class="btn btn-outline-custom" onclick="abrirModalVincularCPF()">
+                            <i class="fa-solid fa-link me-2"></i>Vincular por CPF
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="surface-panel p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-premium table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Projeto / Descrição</th>
+                                <th>Cliente vinculado</th>
+                                <th>Itens</th>
+                                <th>Status</th>
+                                <th>Link de acesso</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checklistsTableBody">
+                            <tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer text-center mt-auto py-4 bg-white border-top">
+            <div class="container text-center">
+                <div class="text-muted small">&copy; 2026 ClientFlow. Todos os direitos reservados.</div>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<!-- Modal Vincular CPF -->
+<div class="modal fade" id="modalVincularCPF" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Vincular Cliente via CPF/CNPJ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">Se o cliente já possui conta no sistema, você pode vinculá-lo diretamente a um projeto através do documento.</p>
+                <form id="formVincularCPF">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Selecione o Projeto</label>
+                        <select class="form-select" id="vinculo_checklist_id" required>
+                            <option value="">Carregando projetos...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">CPF ou CNPJ do Cliente</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="vinculo_cpf" placeholder="000.000.000-00" required>
+                            <button class="btn btn-outline-secondary" type="button" id="btnBuscarCPF"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div id="feedbackClienteCPF" class="small mt-1 d-none"></div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg" id="btnConfirmarVinculo" disabled>Confirmar Vínculo</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header">
                 <h5 class="modal-title" id="reviewModalTitle">Revisão de Itens</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
@@ -51,7 +110,7 @@
                 <div id="reviewItemsList"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
@@ -77,15 +136,16 @@
         <form id="widgetMessageForm" class="d-flex gap-2 m-0 h-100 align-items-center">
             <input type="text" id="widgetMessageInput" class="form-control bg-light border-0 px-3 h-100" placeholder="Digite sua mensagem..." required autocomplete="off" style="font-size: 0.95rem;">
             <button type="submit" class="btn btn-primary-custom rounded d-flex align-items-center justify-content-center px-3 h-100" id="widgetBtnSend">
-                <i class="fa-solid fa-paper-plane ms-reverse-1"></i>
+                <i class="fa-solid fa-paper-plane"></i>
             </button>
         </form>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/main.js?v=2"></script>
-<script src="../js/api.js?v=2"></script>
-<script src="../js/checklists.js?v=3"></script>
+<script src="../js/main.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/checklists.js"></script>
 </body>
 </html>

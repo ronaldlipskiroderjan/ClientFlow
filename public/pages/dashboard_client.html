@@ -13,70 +13,80 @@
 </head>
 <body class="bg-arctic-gray">
 
-<!-- Sidebar Offcanvas -->
-<div class="offcanvas offcanvas-start sidebar-offcanvas text-white" tabindex="-1" id="clientSidebar" aria-labelledby="clientSidebarLabel">
-  <div class="offcanvas-header border-bottom border-secondary">
-    <h5 class="offcanvas-title fw-bold" id="clientSidebarLabel">
-        <i class="fa-solid fa-layer-group text-primary me-2"></i> ClientFlow
-    </h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body d-flex flex-column">
-    <ul class="nav flex-column mb-auto">
-      <li class="nav-item">
-        <a href="dashboard_client.html" class="nav-link active">
-          <i class="fa-solid fa-folder-open me-2"></i> Meus Projetos
-        </a>
-      </li>
-    </ul>
-    <hr class="border-secondary">
-    <div class="dropdown">
-      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownClient" data-bs-toggle="dropdown" aria-expanded="false">
-        <img data-user-avatar src="https://ui-avatars.com/api/?name=ClientFlow&background=E63946&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
-        <strong data-user-display-name></strong>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownClient">
-        <li><a class="dropdown-item text-danger js-logout-link" href="#">Sair</a></li>
-      </ul>
-    </div>
-  </div>
-</div>
+<div class="d-flex app-shell">
+    <div id="sidebar-container"></div>
 
-<!-- Topnav -->
-<nav class="navbar navbar-light bg-white border-bottom px-3 sticky-top">
-    <div class="d-flex align-items-center w-100">
-        <button class="btn btn-text-custom me-3 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#clientSidebar">
-            <i class="fa-solid fa-bars fs-4 text-navy-blue"></i>
-        </button>
-        <span class="navbar-brand mb-0 h1 fw-bold text-navy-blue">Meus Projetos</span>
-        <div class="ms-auto">
-            <span class="text-muted d-none d-sm-block" data-user-greeting>Olá, <span class="fw-bold text-navy-blue"></span></span>
+    <main class="main-content flex-grow-1 min-vh-100">
+        <div class="container-fluid py-4 px-3 px-lg-4">
+            <section class="page-header-card mb-4">
+                <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                    <div>
+                        <h1 class="h3 fw-bold mb-1 text-navy-blue">Meus Projetos</h1>
+                        <p class="text-muted mb-0" data-user-greeting>Olá, acompanhe o andamento dos seus envios.</p>
+                    </div>
+                    <span class="status-pill">
+                        <i class="fa-solid fa-sparkles text-primary"></i>
+                        Experiência SaaS ClientFlow
+                    </span>
+                </div>
+            </section>
+
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-4">
+                    <div class="kpi-mini-card h-100">
+                        <div class="kpi-mini-label">Projetos ativos</div>
+                        <div class="kpi-mini-value" id="client-kpi-total">0</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-4">
+                    <div class="kpi-mini-card h-100">
+                        <div class="kpi-mini-label">Em andamento</div>
+                        <div class="kpi-mini-value text-warning" id="client-kpi-pending">0</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-4">
+                    <div class="kpi-mini-card h-100">
+                        <div class="kpi-mini-label">Concluídos</div>
+                        <div class="kpi-mini-value text-success" id="client-kpi-finished">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="projects-loading" class="surface-panel text-center py-5 mb-4">
+                <div class="spinner-border text-primary mb-3" role="status"></div>
+                <p class="text-muted mb-0">Carregando seus projetos...</p>
+            </div>
+
+            <div id="projects-grid" class="row g-4 d-none"></div>
+
+            <div id="empty-state" class="surface-panel empty-state-card text-center py-5 d-none">
+                <i class="fa-solid fa-folder-open fs-1 text-muted opacity-50 mb-3"></i>
+                <h5 class="fw-bold mb-2">Nenhum projeto encontrado</h5>
+                <p class="text-muted mb-0">Você ainda não tem projetos vinculados à sua conta.</p>
+            </div>
+
+            <div id="error-state" class="surface-panel empty-state-card text-center py-5 d-none">
+                <i class="fa-solid fa-triangle-exclamation fs-2 text-danger mb-3"></i>
+                <h5 class="fw-bold mb-2">Não foi possível carregar os projetos</h5>
+                <p class="text-muted mb-3">Verifique sua conexão e tente novamente.</p>
+                <button type="button" class="btn btn-primary-custom btn-sm" onclick="window.location.reload()">
+                    <i class="fa-solid fa-rotate me-2"></i>Recarregar
+                </button>
+            </div>
         </div>
-    </div>
-</nav>
 
-<div class="container py-5">
-    <div id="projects-grid" class="row g-4">
-        <!-- Cards injected here -->
-    </div>
-    <div id="empty-state" class="text-center py-5 text-muted d-none">
-        <i class="fa-solid fa-folder-open fs-1 mb-3 opacity-25"></i>
-        <h5>Nenhum projeto encontrado</h5>
-        <p>Você ainda não tem projetos vinculados à sua conta.</p>
-    </div>
+        <footer class="footer text-center mt-auto py-4 bg-white border-top">
+            <div class="container text-center">
+                <div class="text-muted small">&copy; 2026 ClientFlow. Todos os direitos reservados.</div>
+            </div>
+        </footer>
+    </main>
 </div>
-
-<footer class="footer text-center mt-auto py-4">
-  <div class="container text-center">
-    <div class="border-top pt-3 text-muted text-sm">
-        &copy; 2026 ClientFlow. Todos os direitos reservados.
-    </div>
-  </div>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/api.js?v=2"></script>
+<script src="../js/sidebar.js"></script>
 <script src="../js/dashboard_client.js?v=2"></script>
 </body>
 </html>
