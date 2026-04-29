@@ -17,6 +17,7 @@ $usuario_tipo = $_SESSION['usuario_tipo'] ?? null;
 $agencia_id = $_SESSION['agencia_id'] ?? null;
 $ua_id = $_SESSION['ua_id'] ?? null;
 $papel_agencia = $_SESSION['papel_agencia'] ?? null;
+$permissoes = $_SESSION['permissoes'] ?? [];
 
 if (empty($usuario_id)) {
     header("Content-type: application/json;charset:utf-8");
@@ -31,25 +32,33 @@ if ($usuario_tipo === "client") {
     exit();
 }
 
+if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member' || $usuario_tipo === 'freelancer') && empty($permissoes['perm_ver_projetos'])) {
+    $retorno["mensagem"] = "Você não tem permissão para visualizar o dashboard.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+if (empty($agencia_id)) {
+    $retorno["mensagem"] = "Agência não identificada na sessão.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
 $sql_base = "SELECT i.status, COUNT(*) AS total
              FROM itens_checklist i
              INNER JOIN checklists c ON c.id = i.checklist_id ";
 
-if ($usuario_tipo === "freelancer") {
-    $sql_base .= " WHERE c.agencia_id IS NULL AND c.cliente_id IN (SELECT id FROM clientes WHERE usuario_id = ?) GROUP BY i.status";
+if ($usuario_tipo === 'agency_member' && $papel_agencia === 'dev') {
+    $sql_base .= " INNER JOIN projetos_membros pm ON pm.checklist_id = c.id
+                   WHERE c.agencia_id = ? AND pm.usuario_agencia_id = ? GROUP BY i.status";
     $stmt = $conexao->prepare($sql_base);
-    $stmt->bind_param("i", $usuario_id);
+    $stmt->bind_param("ii", $agencia_id, $ua_id);
 } else {
-    if ($papel_agencia === 'dev') {
-        $sql_base .= " INNER JOIN projetos_membros pm ON pm.checklist_id = c.id
-                       WHERE c.agencia_id = ? AND pm.usuario_agencia_id = ? GROUP BY i.status";
-        $stmt = $conexao->prepare($sql_base);
-        $stmt->bind_param("ii", $agencia_id, $ua_id);
-    } else {
-        $sql_base .= " WHERE c.agencia_id = ? GROUP BY i.status";
-        $stmt = $conexao->prepare($sql_base);
-        $stmt->bind_param("i", $agencia_id);
-    }
+    $sql_base .= " WHERE c.agencia_id = ? GROUP BY i.status";
+    $stmt = $conexao->prepare($sql_base);
+    $stmt->bind_param("i", $agencia_id);
 }
 
 $stmt->execute();

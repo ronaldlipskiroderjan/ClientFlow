@@ -1,5 +1,6 @@
 <?php
 include_once("db_conexao.php");
+include_once("plano_infra.php");
 session_start();
 
 $retorno = [
@@ -70,6 +71,58 @@ if (!in_array($papel, $papeis_permitidos)) {
 
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
+try {
+    cf_bootstrap_planos($conexao, (int) $agencia_id);
+} catch (Exception $e) {
+    $retorno["mensagem"] = "Nao foi possivel validar estrutura de planos: " . $e->getMessage();
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+$stmt_limite = $conexao->prepare(
+    "SELECT tp.limite_colaboradores,
+            (SELECT COUNT(DISTINCT ua.usuario_id)
+             FROM usuarios_agencia ua
+             WHERE ua.agencia_id = ? AND ua.ativo = 1) AS total_colaboradores
+     FROM assinaturas_planos ap
+     JOIN tipos_planos tp ON tp.id = ap.tipo_plano_id
+     WHERE ap.agencia_id = ? AND ap.status = 'ativa'
+     LIMIT 1"
+);
+
+if (!$stmt_limite) {
+    $retorno["mensagem"] = "Erro ao validar limite de colaboradores do plano.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+$stmt_limite->bind_param("ii", $agencia_id, $agencia_id);
+$stmt_limite->execute();
+$res_limite = $stmt_limite->get_result();
+
+if (!$res_limite || $res_limite->num_rows === 0) {
+    $stmt_limite->close();
+    $retorno["mensagem"] = "Nao foi possivel identificar o plano ativo da agencia.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+$dados_limite = $res_limite->fetch_assoc();
+$stmt_limite->close();
+
+$limite_colaboradores = (int) ($dados_limite['limite_colaboradores'] ?? 0);
+$total_colaboradores = (int) ($dados_limite['total_colaboradores'] ?? 0);
+
+if ($limite_colaboradores > 0 && $total_colaboradores >= $limite_colaboradores) {
+    $retorno["mensagem"] = "Limite de colaboradores do seu plano foi atingido ({$total_colaboradores}/{$limite_colaboradores}). Altere o plano para adicionar novos membros.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
 $conexao->begin_transaction();
 
 try {
@@ -133,6 +186,23 @@ try {
             }
         }
         $stmt_proj->close();
+    }
+
+    $stmt_sync_uso = $conexao->prepare(
+        "UPDATE uso_recursos_agencia
+         SET total_colaboradores = (
+                SELECT COUNT(DISTINCT ua.usuario_id)
+                FROM usuarios_agencia ua
+                WHERE ua.agencia_id = ? AND ua.ativo = 1
+            ),
+            data_calculo = NOW()
+         WHERE agencia_id = ?"
+    );
+
+    if ($stmt_sync_uso) {
+        $stmt_sync_uso->bind_param("ii", $agencia_id, $agencia_id);
+        $stmt_sync_uso->execute();
+        $stmt_sync_uso->close();
     }
 
     $conexao->commit();

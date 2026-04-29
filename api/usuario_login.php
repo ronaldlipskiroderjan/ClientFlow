@@ -7,6 +7,46 @@ $retorno = [
     "data" => null
 ];
 
+function carregar_vinculo_agencia_ativo($conexao, $usuario_id) {
+    $stmt_ua = $conexao->prepare(
+        "SELECT id as ua_id, agencia_id, papel,
+                perm_ver_clientes, perm_criar_clientes,
+                perm_ver_projetos, perm_criar_projetos, perm_designar_projetos,
+                perm_financeiro, perm_gerenciar_membros, ativo
+         FROM usuarios_agencia
+         WHERE usuario_id = ? AND ativo = 1
+         LIMIT 1"
+    );
+
+    if (!$stmt_ua) {
+        return null;
+    }
+
+    $stmt_ua->bind_param("i", $usuario_id);
+    if (!$stmt_ua->execute()) {
+        $stmt_ua->close();
+        return null;
+    }
+
+    $res_ua = $stmt_ua->get_result();
+    $ua = $res_ua->num_rows === 1 ? $res_ua->fetch_assoc() : null;
+    $stmt_ua->close();
+
+    return $ua;
+}
+
+function montar_permissoes_sessao($ua) {
+    return [
+        'perm_ver_clientes' => (bool)$ua['perm_ver_clientes'],
+        'perm_criar_clientes' => (bool)$ua['perm_criar_clientes'],
+        'perm_ver_projetos' => (bool)$ua['perm_ver_projetos'],
+        'perm_criar_projetos' => (bool)$ua['perm_criar_projetos'],
+        'perm_designar_projetos' => (bool)$ua['perm_designar_projetos'],
+        'perm_financeiro' => (bool)$ua['perm_financeiro'],
+        'perm_gerenciar_membros' => (bool)$ua['perm_gerenciar_membros']
+    ];
+}
+
 $email_form = trim($_POST['email'] ?? '');
 $senha_form = $_POST['senha'] ?? '';
 
@@ -49,7 +89,7 @@ if ($email_form == "admin@clientflow.com") {
     $stmt_check->close();
 }
 
-$stmt = $conexao->prepare("SELECT id, nome, email, senha_hash, tipo, status_conta FROM usuarios WHERE email = ?");
+$stmt = $conexao->prepare("SELECT id, nome, email, senha_hash, tipo, telefone, documento, nome_empresa, nome_responsavel, status_conta FROM usuarios WHERE email = ?");
 $stmt->bind_param("s", $email_form);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -70,44 +110,22 @@ if ($resultado->num_rows === 1) {
             $_SESSION['usuario_nome'] = $usuario['nome'];
             $_SESSION['usuario_email'] = $usuario['email'];
             $_SESSION['usuario_tipo'] = $usuario['tipo'];
-            
-            // Se for agency_member, buscamos os dados da agência e as permissões
-            if ($usuario['tipo'] === 'agency_member' || $usuario['tipo'] === 'agency') {
-                $stmt_ua = $conexao->prepare(
-                    "SELECT id as ua_id, agencia_id, papel, 
-                            perm_ver_clientes, perm_criar_clientes, 
-                            perm_ver_projetos, perm_criar_projetos, perm_designar_projetos, 
-                            perm_financeiro, perm_gerenciar_membros, ativo
-                     FROM usuarios_agencia 
-                     WHERE usuario_id = ? AND ativo = 1 LIMIT 1"
-                );
-                $stmt_ua->bind_param("i", $usuario['id']);
-                $stmt_ua->execute();
-                $res_ua = $stmt_ua->get_result();
-                
-                if ($res_ua->num_rows === 1) {
-                    $ua = $res_ua->fetch_assoc();
-                    $_SESSION['agencia_id'] = $ua['agencia_id'];
-                    $_SESSION['papel_agencia'] = $ua['papel'];
-                    $_SESSION['ua_id'] = $ua['ua_id'];
-                    $_SESSION['permissoes'] = [
-                        'perm_ver_clientes' => (bool)$ua['perm_ver_clientes'],
-                        'perm_criar_clientes' => (bool)$ua['perm_criar_clientes'],
-                        'perm_ver_projetos' => (bool)$ua['perm_ver_projetos'],
-                        'perm_criar_projetos' => (bool)$ua['perm_criar_projetos'],
-                        'perm_designar_projetos' => (bool)$ua['perm_designar_projetos'],
-                        'perm_financeiro' => (bool)$ua['perm_financeiro'],
-                        'perm_gerenciar_membros' => (bool)$ua['perm_gerenciar_membros']
-                    ];
-                } else {
-                    // Usuário é membro mas vínculo foi desativado ou não existe
+
+            if (in_array($usuario['tipo'], ['agency_member', 'agency'], true)) {
+                $ua = carregar_vinculo_agencia_ativo($conexao, $usuario['id']);
+
+                if (!$ua) {
                     session_destroy();
-                    $retorno["mensagem"] = "Sua conta de membro da agência foi desativada ou não existe.";
+                    $retorno["mensagem"] = "Sua conta não possui um vínculo de agência ativo.";
                     header("Content-type: application/json;charset:utf-8");
                     echo json_encode($retorno);
                     exit();
                 }
-                $stmt_ua->close();
+
+                $_SESSION['agencia_id'] = $ua['agencia_id'];
+                $_SESSION['papel_agencia'] = $ua['papel'];
+                $_SESSION['ua_id'] = $ua['ua_id'];
+                $_SESSION['permissoes'] = montar_permissoes_sessao($ua);
             }
 
             $retorno["status"] = "ok";
@@ -118,10 +136,11 @@ if ($resultado->num_rows === 1) {
                 "email" => $usuario['email'],
                 "tipo" => $usuario['tipo']
             ];
-            
+
             if (isset($_SESSION['permissoes'])) {
                 $retorno["data"]["permissoes"] = $_SESSION['permissoes'];
                 $retorno["data"]["papel_agencia"] = $_SESSION['papel_agencia'];
+                $retorno["data"]["agencia_id"] = $_SESSION['agencia_id'];
             }
         }
     }

@@ -75,8 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </button>
             `;
             
-            // Somente admin_agencia pode excluir contratos
-            if (Auth.get('papel_agencia') === 'admin_agencia') {
+            // Dono da agência/freelancer pode excluir contratos
+            if (Auth.get('papel_agencia') === 'admin_agencia' || Auth.getTipo() === 'freelancer' || Auth.getTipo() === 'admin') {
                 btnAcoes += `
                     <button class="btn btn-sm btn-light btn-outline-danger" onclick="excluirContrato(${c.id})" title="Excluir Contrato">
                         <i class="fas fa-trash-alt"></i>

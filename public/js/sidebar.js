@@ -2,6 +2,11 @@ class SidebarManager {
     static async init() {
         this.mountLayout();
 
+        // Bind theme toggle now that the sidebar DOM exists
+        if (window.ClientFlowTheme) {
+            window.ClientFlowTheme.bindToggles();
+        }
+
         const user = await Auth.validateSession();
         const role = Auth.getTipo();
         const papel = Auth.get("papel_agencia");
@@ -26,8 +31,6 @@ class SidebarManager {
         let navHtml = "";
         if (role === "agency" || role === "agency_member") {
             navHtml = this.getAgencyNav(papel);
-        } else if (role === "freelancer") {
-            navHtml = this.getFreelancerNav();
         } else if (role === "client") {
             navHtml = this.getClientNav();
         }
@@ -91,7 +94,11 @@ class SidebarManager {
                     <div class="offcanvas-body p-3 d-flex flex-column">
                         <div class="sidebar-section-label">Navegação</div>
                         <div class="nav flex-column gap-1" id="sidebarNav"></div>
-                        <div class="mt-auto pt-3 border-top">
+                        <div class="mt-auto pt-3 border-top d-flex flex-column gap-2">
+                            <button type="button" class="sidebar-theme-btn" data-theme-toggle="sidebar" id="sidebarThemeBtn">
+                                <i class="fa-solid fa-moon fs-6"></i>
+                                <span id="sidebarThemeBtnLabel">Modo Escuro</span>
+                            </button>
                             <button class="btn btn-outline-danger sidebar-logout-btn w-100 text-start" onclick="Auth.logout()">
                                 <i class="fas fa-sign-out-alt me-2"></i><span>Sair</span>
                             </button>
@@ -107,7 +114,6 @@ class SidebarManager {
 
     static getRoleLabel(role, papel) {
         if (role === "client") return "Cliente";
-        if (role === "freelancer") return "Freelancer";
         if (role === "agency" || role === "agency_member") {
             const roleMap = {
                 admin_agencia: "Owner Agência",
@@ -142,21 +148,10 @@ class SidebarManager {
             <hr class="my-2">
             <a href="agency_team.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-users-cog"></i><span>Equipe da Agência</span>
+            </a>
+            <a href="planos.html" class="sidebar-nav-link nav-link">
+                <i class="fas fa-layer-group"></i><span>Planos e Upgrade</span>
             </a>` : ""}
-        `;
-    }
-
-    static getFreelancerNav() {
-        return `
-            <a href="dashboard_agency.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-home"></i><span>Dashboard</span>
-            </a>
-            <a href="checklists.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-tasks"></i><span>Meus Projetos</span>
-            </a>
-            <a href="clients.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-address-book"></i><span>Clientes</span>
-            </a>
         `;
     }
 

@@ -237,7 +237,7 @@ function validateFormByTab(tabId, raw) {
         return false;
     }
 
-    if (!raw.role || !['client', 'freelancer', 'agency'].includes(raw.role)) {
+    if (!raw.role || !['client', 'agency'].includes(raw.role)) {
         alert('Perfil de cadastro invalido.');
         return false;
     }
@@ -252,6 +252,7 @@ function getRedirectByRole(role) {
 
     return 'dashboard_agency.html';
 }
+
 
 function formToObject(form) {
     const formData = new FormData(form);

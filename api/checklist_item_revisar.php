@@ -28,8 +28,15 @@ if ($usuario_tipo === "client") {
     exit();
 }
 
-if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member') && empty($permissoes['perm_ver_projetos'])) {
+if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member' || $usuario_tipo === 'freelancer') && empty($permissoes['perm_ver_projetos'])) {
     $retorno["mensagem"] = "Você não tem permissão para revisar itens.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+if (empty($agencia_id)) {
+    $retorno["mensagem"] = "Agência não identificada na sessão.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();

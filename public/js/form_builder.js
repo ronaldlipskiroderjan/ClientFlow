@@ -121,10 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const saveTemplateBtn = document.getElementById("saveTemplateBtn");
     const templateHint = document.getElementById("templateHint");
 
-    const canUseTemplates = (
-        (sessao.tipo === "agency" || sessao.tipo === "agency_member") &&
-        Boolean(sessao.agencia_id)
-    );
+    const canUseTemplates = sessao.tipo !== "client" && Auth.hasAccess("perm_criar_projetos");
 
     function atualizarHintTemplate(mensagem = "", tipo = "info") {
         if (!templateHint) {
@@ -401,4 +398,5 @@ document.addEventListener("DOMContentLoaded", async () => {
             copyLinkBtn.innerHTML = '<i class="fa-solid fa-copy me-1"></i> Copiar Link';
         }, 1500);
     });
+
 });
