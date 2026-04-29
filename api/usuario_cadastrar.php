@@ -125,18 +125,26 @@ try {
     $usuario_id = $conexao->insert_id;
     $stmt->close();
 
-    // Todas as agências (antiga lógica de freelancer + agency) agora usam o mesmo workflow
+    // Prestador de servico pode ser PF (CPF) ou PJ (CNPJ)
     if ($tipo_normalizado === 'agency') {
         $documento_numerico = preg_replace('/\D/', '', $documento);
+        $eh_pf = strlen($documento_numerico) === 11;
+        $eh_pj = strlen($documento_numerico) === 14;
 
-        // CNPJ é obrigatório para agências
-        if (empty($nome_empresa) || strlen($documento_numerico) !== 14) {
-            throw new Exception("Nome da empresa e CNPJ válido são obrigatórios para prestadores de serviço.");
+        if (!$eh_pf && !$eh_pj) {
+            throw new Exception("CPF ou CNPJ invalido para prestador de servico.");
         }
 
-        $agencia_nome_empresa = $nome_empresa;
+        if ($eh_pj && empty($nome_empresa)) {
+            throw new Exception("Nome da empresa e CNPJ valido sao obrigatorios para prestadores de servico PJ.");
+        }
+
+        $agencia_nome_empresa = $eh_pj
+            ? $nome_empresa
+            : ($nome_empresa !== '' ? $nome_empresa : $nome);
+
         $agencia_contato_nome = $contato_juridico_nome ?: ($nome_responsavel ?: $nome);
-        $agencia_cnpj = strlen($documento_numerico) === 14 ? $documento_numerico : null;
+        $agencia_cnpj = $eh_pj ? $documento_numerico : null;
 
         $stmt_agencia = $conexao->prepare(
             "INSERT INTO agencias (nome_empresa, nome_contato_juridico, email_contato_juridico, telefone_contato_juridico, cnpj, telefone)
@@ -157,7 +165,7 @@ try {
         $agencia_id = $conexao->insert_id;
         $stmt_agencia->close();
 
-        // Todas as novas agências começam como 'individual' (1 colaborador)
+        // Todas as novas agencias comecam como 'individual' (1 colaborador)
         $stmt_plano = $conexao->prepare(
             "INSERT INTO assinaturas_planos (agencia_id, tipo_plano_id, data_inicio, tipo_renovacao, status)
              SELECT ?, id, CURDATE(), 'mensal', 'ativa'

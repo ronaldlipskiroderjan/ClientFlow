@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS agencias (
     site VARCHAR(255) NULL,
     descricao TEXT NULL,
     logo_path VARCHAR(255) NULL,
-    plano ENUM('Gold', 'Platinum', 'Diamond') DEFAULT 'Gold',
     status_conta ENUM('Ativa', 'Inativa', 'Bloqueada') DEFAULT 'Ativa',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -31,7 +30,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nome VARCHAR(150) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     senha_hash VARCHAR(255) NOT NULL,
-    tipo ENUM('client', 'freelancer', 'agency', 'agency_member', 'admin') NOT NULL,
+    tipo ENUM('client', 'agency', 'agency_member', 'admin') NOT NULL,
     telefone VARCHAR(20) NULL,
     documento VARCHAR(20) NULL,
     data_nascimento DATE NULL,
@@ -163,3 +162,57 @@ CREATE TABLE IF NOT EXISTS templates_checklist (
     UNIQUE KEY uk_template_agencia_nome (agencia_id, nome),
     FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS tipos_planos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) UNIQUE NOT NULL,
+    descricao TEXT NULL,
+    preco_mensal DECIMAL(8,2) NOT NULL,
+    preco_anual DECIMAL(8,2) NULL,
+    limite_colaboradores INT NOT NULL,
+    limite_projetos INT NOT NULL,
+    limite_armazenamento_gb INT NOT NULL,
+    ativo TINYINT(1) DEFAULT 1,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS assinaturas_planos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    agencia_id INT NOT NULL UNIQUE,
+    tipo_plano_id INT NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_renovacao DATE NULL,
+    data_cancelamento DATE NULL,
+    status ENUM('ativa', 'cancelada', 'suspensa') DEFAULT 'ativa',
+    tipo_renovacao ENUM('mensal', 'anual') DEFAULT 'mensal',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE,
+    FOREIGN KEY (tipo_plano_id) REFERENCES tipos_planos(id)
+);
+
+CREATE TABLE IF NOT EXISTS uso_recursos_agencia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    agencia_id INT NOT NULL UNIQUE,
+    total_colaboradores INT DEFAULT 0,
+    total_projetos INT DEFAULT 0,
+    armazenamento_usado_mb INT DEFAULT 0,
+    data_calculo TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE
+);
+
+INSERT INTO tipos_planos (nome, descricao, preco_mensal, preco_anual, limite_colaboradores, limite_projetos, limite_armazenamento_gb)
+VALUES
+    ('individual', 'Plano individual - apenas um acesso', 0.00, 0.00, 1, 10, 5),
+    ('basico', 'Plano basico para pequenos negocios', 49.00, 490.00, 3, 25, 20),
+    ('profissional', 'Plano profissional para agencias em crescimento', 99.00, 990.00, 10, 100, 100),
+    ('enterprise', 'Plano enterprise - colaboradores e projetos ilimitados', 299.00, 2990.00, 999999, 999999, 1000)
+ON DUPLICATE KEY UPDATE
+    descricao = VALUES(descricao),
+    preco_mensal = VALUES(preco_mensal),
+    preco_anual = VALUES(preco_anual),
+    limite_colaboradores = VALUES(limite_colaboradores),
+    limite_projetos = VALUES(limite_projetos),
+    limite_armazenamento_gb = VALUES(limite_armazenamento_gb),
+    ativo = 1;

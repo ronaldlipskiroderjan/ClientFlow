@@ -29,6 +29,26 @@
 </nav>
 
 <div class="main-content d-flex align-items-center justify-content-center" style="min-vh: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+    <script>
+        // Fix background gradient for dark mode
+        (function(){
+            var theme = document.documentElement.getAttribute('data-theme') || 'light';
+            var el = document.querySelector('.main-content');
+            if (theme === 'dark') {
+                el.style.background = 'linear-gradient(135deg, #0d1117 0%, #0a0e17 100%)';
+            }
+            // Atualiza quando tema mudar
+            var observer = new MutationObserver(function() {
+                theme = document.documentElement.getAttribute('data-theme');
+                if (theme === 'dark') {
+                    el.style.background = 'linear-gradient(135deg, #0d1117 0%, #0a0e17 100%)';
+                } else {
+                    el.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)';
+                }
+            });
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        })();
+    </script>
 <div class="container py-5">
     <div class="row w-100 justify-content-center m-0">
         <div class="col-md-8 col-lg-5">
@@ -63,8 +83,8 @@
                                 <div class="mb-3" id="roleSelectPF">
                                     <label class="form-label text-muted small fw-bold">Eu sou...</label>
                                     <select name="role" class="form-select border-0 bg-light">
-                                        <option value="client">Cliente (Vou enviar materiais)</option>
-                                        <option value="agency">Prestador de Servico (Sou profissional)</option>
+                                    <option value="client">Cliente (Vou enviar materiais)</option>
+                                    <option value="agency">Prestador de Serviço - PF (Autônomo com CPF)</option>
                                     </select>
                                 </div>
                                 <div class="row">
@@ -103,8 +123,8 @@
                                 <div class="mb-3" id="roleSelectPJ">
                                     <label class="form-label text-muted small fw-bold">Eu sou...</label>
                                     <select name="role" class="form-select border-0 bg-light">
-                                        <option value="client">Cliente (Vou enviar materiais)</option>
-                                        <option value="agency">Prestador de Servico (Agencia ou Profissional)</option>
+                                    <option value="client">Cliente (Vou enviar materiais)</option>
+                                    <option value="agency">Prestador de Serviço - PJ (Agência/Empresa)</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">

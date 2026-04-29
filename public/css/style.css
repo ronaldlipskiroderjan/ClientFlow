@@ -522,6 +522,75 @@ body,
 .bg-gradient-warning { background: linear-gradient(135deg, #c26706 0%, #9a3412 100%); }
 .bg-gradient-danger { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
 
+/* ── Cadastro (Registro) — Dark Mode ── */
+[data-theme="dark"] .card.border-0.shadow-lg {
+  background-color: var(--dk-surface) !important;
+  color: #d0dae8;
+}
+
+[data-theme="dark"] .card.border-0.shadow-lg .bg-white {
+  background-color: var(--dk-surface) !important;
+}
+
+[data-theme="dark"] #registerTabs {
+  background-color: var(--dk-elevated) !important;
+}
+
+[data-theme="dark"] .nav-pills .nav-link {
+  color: #b0bdd0;
+  background-color: var(--dk-elevated);
+}
+
+[data-theme="dark"] .nav-pills .nav-link.active {
+  background-color: #6366f1 !important;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .nav-pills .nav-link:hover {
+  color: #d7e1f8;
+  background-color: rgba(99,102,241,0.12);
+}
+
+[data-theme="dark"] .form-select.border-0.bg-light,
+[data-theme="dark"] .form-control.border-0.bg-light {
+  background-color: var(--dk-elevated) !important;
+  color: #e2e8f0 !important;
+  border-color: var(--dk-border-strong) !important;
+}
+
+[data-theme="dark"] .form-select.border-0.bg-light:focus,
+[data-theme="dark"] .form-control.border-0.bg-light:focus {
+  background-color: #1e2640 !important;
+  border-color: rgba(99,102,241,0.5) !important;
+  box-shadow: 0 0 0 0.25rem rgba(99,102,241,0.14);
+}
+
+[data-theme="dark"] .form-select.border-0.bg-light option,
+[data-theme="dark"] .form-control.border-0.bg-light::placeholder {
+  color: #8899aa;
+}
+
+[data-theme="dark"] .bg-primary.bg-opacity-10 {
+  background-color: rgba(99,102,241,0.12) !important;
+}
+
+[data-theme="dark"] .form-label.text-muted.small.fw-bold {
+  color: #a7b4c4 !important;
+}
+
+[data-theme="dark"] .tab-pane .form-label {
+  color: #a7b4c4 !important;
+}
+
+[data-theme="dark"] .text-center.mt-4.pt-3.border-top {
+  border-color: var(--dk-border) !important;
+}
+
+[data-theme="dark"] .text-center.mt-4.pt-3.border-top .text-muted {
+  color: #8899aa !important;
+}
+
+
 
 [data-theme="dark"] .table-light th,
 [data-theme="dark"] thead.table-light th,
