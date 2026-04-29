@@ -168,11 +168,11 @@ class PlanosManager {
                         <ul class="list-unstyled small mb-4">
                             <li class="mb-2">
                                 <i class="fas fa-check text-success me-2"></i>
-                                <strong>${plano.limite_colaboradores >= 999999 ? '∞' : plano.limite_colaboradores}</strong> colaboradores
+                                <strong>${plano.limite_colaboradores >= 999999 ? 'Ilimitados' : plano.limite_colaboradores}</strong> colaboradores
                             </li>
                             <li class="mb-2">
                                 <i class="fas fa-check text-success me-2"></i>
-                                <strong>${plano.limite_projetos >= 999999 ? '∞' : plano.limite_projetos}</strong> projetos
+                                <strong>${plano.limite_projetos >= 999999 ? 'Ilimitados' : plano.limite_projetos}</strong> projetos
                             </li>
                             <li class="mb-2">
                                 <i class="fas fa-check text-success me-2"></i>
