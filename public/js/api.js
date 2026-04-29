@@ -89,7 +89,9 @@ const Auth = {
     hasAccess(permKey) {
         if (!this.userSess) return false;
         if (this.userSess.tipo === 'admin') return true;
-        if (this.userSess.tipo === 'freelancer') return true;
+        if (this.userSess.tipo === 'freelancer') {
+            return permKey !== 'perm_gerenciar_membros';
+        }
         if (this.userSess.tipo === 'agency' || this.userSess.tipo === 'agency_member') {
             if (this.userSess.papel_agencia === 'admin_agencia') return true;
             return Boolean(this.userSess.permissoes && this.userSess.permissoes[permKey]);

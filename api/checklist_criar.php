@@ -26,8 +26,15 @@ if ($usuario_tipo === "client") {
     exit();
 }
 
-if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member') && empty($permissoes['perm_criar_projetos'])) {
+if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member' || $usuario_tipo === 'freelancer') && empty($permissoes['perm_criar_projetos'])) {
     $retorno["mensagem"] = "Você não tem permissão para criar projetos.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+if (empty($agencia_id)) {
+    $retorno["mensagem"] = "Agência não identificada para criar formulário.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -92,9 +99,7 @@ try {
         "INSERT INTO checklists (agencia_id, titulo, descricao, link_hash, status)
          VALUES (?, ?, ?, ?, 'Aberto')"
     );
-    // agencia_id is null for freelancer, so we must allow it to be null
-    $bind_agencia_id = ($usuario_tipo === 'freelancer') ? null : $agencia_id;
-    $stmt_checklist->bind_param("isss", $bind_agencia_id, $titulo, $descricao, $link_hash);
+    $stmt_checklist->bind_param("isss", $agencia_id, $titulo, $descricao, $link_hash);
     $stmt_checklist->execute();
     $checklist_id = $conexao->insert_id;
     $stmt_checklist->close();

@@ -106,4 +106,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     loginForm.addEventListener('submit', handleLoginSubmit);
+    
 });

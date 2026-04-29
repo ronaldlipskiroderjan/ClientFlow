@@ -20,8 +20,15 @@ if (empty($usuario_id)) {
     exit();
 }
 
-if (($tipo === 'agency' || $tipo === 'agency_member') && empty($permissoes['perm_designar_projetos'])) {
+if (($tipo === 'agency' || $tipo === 'agency_member' || $tipo === 'freelancer') && empty($permissoes['perm_designar_projetos'])) {
     $retorno["mensagem"] = "Você não tem permissão para vincular clientes a projetos.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+if (empty($agencia_id)) {
+    $retorno["mensagem"] = "Agência não identificada na sessão.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -47,21 +54,17 @@ if (strlen($cpf_cnpj) !== 11 && strlen($cpf_cnpj) !== 14) {
 }
 
 // 1. Validar checklist
-if ($tipo === 'freelancer') {
-    // Para freelancer, validar de outra forma se necessário
-} else {
-    $stmt_chk = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
-    $stmt_chk->bind_param("ii", $checklist_id, $agencia_id);
-    $stmt_chk->execute();
-    if ($stmt_chk->get_result()->num_rows !== 1) {
-        $retorno["mensagem"] = "Projeto (checklist) inválido ou não pertence a esta agência.";
-        $stmt_chk->close();
-        header("Content-type: application/json;charset:utf-8");
-        echo json_encode($retorno);
-        exit();
-    }
+$stmt_chk = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
+$stmt_chk->bind_param("ii", $checklist_id, $agencia_id);
+$stmt_chk->execute();
+if ($stmt_chk->get_result()->num_rows !== 1) {
+    $retorno["mensagem"] = "Projeto (checklist) inválido ou não pertence a esta agência.";
     $stmt_chk->close();
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
 }
+$stmt_chk->close();
 
 $conexao->begin_transaction();
 
@@ -84,37 +87,23 @@ try {
     $cliente_id_final = 0;
 
     // 3. Verifica ou Cria registro na tabela Clientes
-    if ($tipo === 'agency' || $tipo === 'agency_member') {
-        $stmt_cli = $conexao->prepare("SELECT id FROM clientes WHERE usuario_id = ? AND agencia_id = ? LIMIT 1");
-        $stmt_cli->bind_param("ii", $cliente_usuario_id, $agencia_id);
-        $stmt_cli->execute();
-        $res_cli = $stmt_cli->get_result();
+    $stmt_cli = $conexao->prepare("SELECT id FROM clientes WHERE usuario_id = ? AND agencia_id = ? LIMIT 1");
+    $stmt_cli->bind_param("ii", $cliente_usuario_id, $agencia_id);
+    $stmt_cli->execute();
+    $res_cli = $stmt_cli->get_result();
 
-        if ($res_cli->num_rows === 1) {
-            $cliente_id_final = $res_cli->fetch_assoc()['id'];
-        } else {
-            $stmt_ins = $conexao->prepare("INSERT INTO clientes (agencia_id, usuario_id, nome, email, senha, empresa) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt_ins->bind_param("iissss", $agencia_id, $cliente_usuario_id, $usu['nome'], $usu['email'], $usu['senha_hash'], $usu['nome_empresa']);
-            if (!$stmt_ins->execute()) {
-                throw new Exception("Erro ao registrar cliente na agência.");
-            }
-            $cliente_id_final = $conexao->insert_id;
-            $stmt_ins->close();
-        }
-        $stmt_cli->close();
+    if ($res_cli->num_rows === 1) {
+        $cliente_id_final = $res_cli->fetch_assoc()['id'];
     } else {
-        // Freelancer context
-         $stmt_cli = $conexao->prepare("SELECT id FROM clientes WHERE usuario_id = ? LIMIT 1");
-         $stmt_cli->bind_param("i", $cliente_usuario_id);
-         $stmt_cli->execute();
-         $res_cli = $stmt_cli->get_result();
-         if ($res_cli->num_rows === 1) {
-             $cliente_id_final = $res_cli->fetch_assoc()['id'];
-         } else {
-             throw new Exception("Freelancer não tem vínculo com este cliente.");
-         }
-         $stmt_cli->close();
+        $stmt_ins = $conexao->prepare("INSERT INTO clientes (agencia_id, usuario_id, nome, email, senha, empresa) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt_ins->bind_param("iissss", $agencia_id, $cliente_usuario_id, $usu['nome'], $usu['email'], $usu['senha_hash'], $usu['nome_empresa']);
+        if (!$stmt_ins->execute()) {
+            throw new Exception("Erro ao registrar cliente na agência.");
+        }
+        $cliente_id_final = $conexao->insert_id;
+        $stmt_ins->close();
     }
+    $stmt_cli->close();
 
     // 4. Update Checklist
     $stmt_upd = $conexao->prepare("UPDATE checklists SET cliente_id = ? WHERE id = ?");

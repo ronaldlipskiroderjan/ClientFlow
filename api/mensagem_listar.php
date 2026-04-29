@@ -48,46 +48,38 @@ if ($usuario_tipo === 'client') {
     }
     $stmt->close();
 } else if ($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member' || $usuario_tipo === 'freelancer') {
-    if ($usuario_tipo === 'freelancer') {
+    if (empty($permissoes['perm_ver_projetos'])) {
+        $retorno["mensagem"] = "Você não tem permissão para acessar mensagens.";
+        header("Content-type: application/json;charset:utf-8");
+        echo json_encode($retorno);
+        exit();
+    }
+
+    if (empty($agencia_id)) {
+        $retorno["mensagem"] = "Agência não identificada na sessão.";
+        header("Content-type: application/json;charset:utf-8");
+        echo json_encode($retorno);
+        exit();
+    }
+
+    if ($usuario_tipo === 'agency_member' && $papel_agencia === 'dev') {
         $stmt = $conexao->prepare("
             SELECT ch.id
             FROM checklists ch
-            JOIN clientes c ON ch.cliente_id = c.id
-            WHERE ch.id = ? AND ch.agencia_id IS NULL AND c.usuario_id = ?
+            INNER JOIN projetos_membros pm ON pm.checklist_id = ch.id
+            WHERE ch.id = ? AND ch.agencia_id = ? AND pm.usuario_agencia_id = ?
         ");
-        $stmt->bind_param("ii", $checklist_id, $usuario_id);
-        $stmt->execute();
-        if ($stmt->get_result()->num_rows > 0) {
-            $pode_acessar = true;
-        }
-        $stmt->close();
+        $stmt->bind_param("iii", $checklist_id, $agencia_id, $ua_id);
     } else {
-        if (empty($permissoes['perm_ver_projetos'])) {
-            $retorno["mensagem"] = "Você não tem permissão para acessar mensagens.";
-            header("Content-type: application/json;charset:utf-8");
-            echo json_encode($retorno);
-            exit();
-        }
-
-        if ($papel_agencia === 'dev') {
-            $stmt = $conexao->prepare("
-                SELECT ch.id
-                FROM checklists ch
-                INNER JOIN projetos_membros pm ON pm.checklist_id = ch.id
-                WHERE ch.id = ? AND ch.agencia_id = ? AND pm.usuario_agencia_id = ?
-            ");
-            $stmt->bind_param("iii", $checklist_id, $agencia_id, $ua_id);
-        } else {
-            $stmt = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
-            $stmt->bind_param("ii", $checklist_id, $agencia_id);
-        }
-
-        $stmt->execute();
-        if ($stmt->get_result()->num_rows > 0) {
-            $pode_acessar = true;
-        }
-        $stmt->close();
+        $stmt = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
+        $stmt->bind_param("ii", $checklist_id, $agencia_id);
     }
+
+    $stmt->execute();
+    if ($stmt->get_result()->num_rows > 0) {
+        $pode_acessar = true;
+    }
+    $stmt->close();
 } else if ($usuario_tipo === 'admin') {
     $pode_acessar = true;
 }

@@ -137,4 +137,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnSalvar.innerHTML = '<i class="fas fa-save me-2"></i> Criar Membro';
         }
     });
+
 });

@@ -53,7 +53,8 @@ function normalizar_data_para_iso($valor) {
     return false;
 }
 
-$tipos_permitidos = ["client", "freelancer", "agency", "admin"];
+// Tipos permitidos na api (freelancer será tratado como agency)
+$tipos_permitidos = ["client", "agency", "admin"];
 
 if (empty($nome) || empty($email) || empty($senha) || empty($tipo)) {
     $retorno["mensagem"] = "Preencha os campos obrigatórios.";
@@ -62,7 +63,10 @@ if (empty($nome) || empty($email) || empty($senha) || empty($tipo)) {
     exit();
 }
 
-if (!in_array($tipo, $tipos_permitidos, true)) {
+// Normalizar tipo: freelancer é tratado como agency
+$tipo_normalizado = ($tipo === 'freelancer') ? 'agency' : $tipo;
+
+if (!in_array($tipo_normalizado, $tipos_permitidos, true)) {
     $retorno["mensagem"] = "Tipo de usuário inválido.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
@@ -90,7 +94,7 @@ $conexao->begin_transaction();
 
 try {
     // Se for agency, o tipo na tabela usuarios sera agency_member (para o proprio login)
-    $tipo_db = ($tipo === 'agency') ? 'agency_member' : $tipo;
+    $tipo_db = ($tipo_normalizado === 'agency') ? 'agency_member' : $tipo_normalizado;
 
     $stmt = $conexao->prepare(
         "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, status_conta)
@@ -121,14 +125,18 @@ try {
     $usuario_id = $conexao->insert_id;
     $stmt->close();
 
-    // Se o tipo original era 'agency', precisamos criar a agência em si e vinculá-lo como admin
-    if ($tipo === 'agency') {
-        if (empty($nome_empresa) || empty($documento)) {
-            throw new Exception("Nome da empresa e CNPJ são obrigatórios para agências.");
+    // Todas as agências (antiga lógica de freelancer + agency) agora usam o mesmo workflow
+    if ($tipo_normalizado === 'agency') {
+        $documento_numerico = preg_replace('/\D/', '', $documento);
+
+        // CNPJ é obrigatório para agências
+        if (empty($nome_empresa) || strlen($documento_numerico) !== 14) {
+            throw new Exception("Nome da empresa e CNPJ válido são obrigatórios para prestadores de serviço.");
         }
-        if (empty($contato_juridico_nome)) {
-            throw new Exception("Nome do contato jurídico é obrigatório para agências.");
-        }
+
+        $agencia_nome_empresa = $nome_empresa;
+        $agencia_contato_nome = $contato_juridico_nome ?: ($nome_responsavel ?: $nome);
+        $agencia_cnpj = strlen($documento_numerico) === 14 ? $documento_numerico : null;
 
         $stmt_agencia = $conexao->prepare(
             "INSERT INTO agencias (nome_empresa, nome_contato_juridico, email_contato_juridico, telefone_contato_juridico, cnpj, telefone)
@@ -136,20 +144,45 @@ try {
         );
         $stmt_agencia->bind_param(
             "ssssss",
-            $nome_empresa,
-            $contato_juridico_nome,
+            $agencia_nome_empresa,
+            $agencia_contato_nome,
             $contato_juridico_email,
             $contato_juridico_telefone,
-            $documento,
+            $agencia_cnpj,
             $telefone
         );
         if (!$stmt_agencia->execute()) {
-            throw new Exception("Erro ao criar agência: " . $stmt_agencia->error);
+            throw new Exception("Erro ao criar prestador de serviço: " . $stmt_agencia->error);
         }
         $agencia_id = $conexao->insert_id;
         $stmt_agencia->close();
 
-        // Vincula o usuário recém criado como dono (admin_agencia) e dá todas as permissões
+        // Todas as novas agências começam como 'individual' (1 colaborador)
+        $stmt_plano = $conexao->prepare(
+            "INSERT INTO assinaturas_planos (agencia_id, tipo_plano_id, data_inicio, tipo_renovacao, status)
+             SELECT ?, id, CURDATE(), 'mensal', 'ativa'
+             FROM tipos_planos WHERE nome = 'individual'"
+        );
+        $stmt_plano->bind_param("i", $agencia_id);
+        if (!$stmt_plano->execute()) {
+            throw new Exception("Erro ao atribuir plano: " . $stmt_plano->error);
+        }
+        $stmt_plano->close();
+
+        // Inicializar registro de uso de recursos
+        $total_colaboradores = 1;
+        $total_projetos = 0;
+        $stmt_uso = $conexao->prepare(
+            "INSERT INTO uso_recursos_agencia (agencia_id, total_colaboradores, total_projetos)
+             VALUES (?, ?, ?)"
+        );
+        $stmt_uso->bind_param("iii", $agencia_id, $total_colaboradores, $total_projetos);
+        if (!$stmt_uso->execute()) {
+            throw new Exception("Erro ao inicializar rastreamento de recursos: " . $stmt_uso->error);
+        }
+        $stmt_uso->close();
+
+        // Criar vínculo do usuário como admin da agência
         $stmt_membro = $conexao->prepare(
             "INSERT INTO usuarios_agencia (
                 agencia_id, usuario_id, papel, telefone,
@@ -160,7 +193,7 @@ try {
         );
         $stmt_membro->bind_param("iis", $agencia_id, $usuario_id, $telefone);
         if (!$stmt_membro->execute()) {
-            throw new Exception("Erro ao criar vínculo de admin da agência: " . $stmt_membro->error);
+            throw new Exception("Erro ao criar vínculo da conta: " . $stmt_membro->error);
         }
         $stmt_membro->close();
     }
@@ -172,7 +205,7 @@ try {
     $retorno["data"] = [
         "id" => $usuario_id,
         "nome" => $nome,
-        "tipo" => $tipo // Retornamos o tipo original que o app solicitou para não quebrar o front
+        "tipo" => $tipo_normalizado // Retorna tipo normalizado (freelancer convertido para agency)
     ];
 
 } catch (Exception $e) {

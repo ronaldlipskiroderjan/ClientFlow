@@ -26,8 +26,15 @@ if ($usuario_tipo === "client") {
     exit();
 }
 
-if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member') && empty($permissoes['perm_criar_clientes'])) {
+if (($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member' || $usuario_tipo === 'freelancer') && empty($permissoes['perm_criar_clientes'])) {
     $retorno["mensagem"] = "Você não tem permissão para cadastrar clientes.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
+if (empty($agencia_id)) {
+    $retorno["mensagem"] = "Agência não identificada na sessão.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -86,37 +93,17 @@ try {
     }
     $stmt_usr_check->close();
 
-    // 2. Vincula à agência se não for freelancer
-    if ($usuario_tipo === 'agency' || $usuario_tipo === 'agency_member') {
-        $stmt_cliente = $conexao->prepare(
-            "INSERT INTO clientes (agencia_id, usuario_id, nome, email, telefone, senha, empresa)
-             VALUES (?, ?, ?, ?, ?, ?, ?)"
-        );
-        $stmt_cliente->bind_param("iisssss", $agencia_id, $cli_usuario_id, $nome, $email, $telefone, $senha_hash, $empresa);
-        if (!$stmt_cliente->execute()) {
-            throw new Exception("Erro ao vincular cliente à agência. Talvez ele já esteja vinculado.");
-        }
-        $cliente_id = $conexao->insert_id;
-        $stmt_cliente->close();
-    } else {
-        // Freelancer: Na migration antiga, a tabela clientes exigia agencia_id. Se formos preservar o freelancer...
-        // O ideal é que freelancer não use a tabela `clientes` da agência, mas se usar, o migration de agencia_id precisava permitir nulo.
-        // Já verificamos que agencia_id agora é obrigatorio na schema atual e aponta para agencias. 
-        // Portanto, Freelancers precisam de uma fake agencia ou de um design de tabela flexível. 
-        // Para resolver sem quebrar: a tabela de clientflow_schema original NÃO tinha chave estrangeira de cliente baseada no usuario.id do freelancer.
-        // Como convertemos agencia_id para FK referenciando `agencias(id)`, o freelancer vai falhar.
-        // Vamos alterar o DB para permitir agencia_id NULL na tabela clientes, permitindo que freelancers criem!
-        // MAS vamos fazer isso no run command em breve ou tratar via dummy data. Assumindo que a table aceitaria.
-        $stmt_cliente = $conexao->prepare(
-            "INSERT INTO clientes (usuario_id, nome, email, telefone, senha, empresa)
-             VALUES (?, ?, ?, ?, ?, ?)"
-        );
-        // Observe: não passamos agencia_id e torcemos para o DB ter default nulo ou executaremos DDL rápido abaixo
-        $stmt_cliente->bind_param("isssss", $cli_usuario_id, $nome, $email, $telefone, $senha_hash, $empresa);
-        $stmt_cliente->execute();
-        $cliente_id = $conexao->insert_id;
-        $stmt_cliente->close();
+    // 2. Vincula o cliente à agência/workspace da conta atual.
+    $stmt_cliente = $conexao->prepare(
+        "INSERT INTO clientes (agencia_id, usuario_id, nome, email, telefone, senha, empresa)
+         VALUES (?, ?, ?, ?, ?, ?, ?)"
+    );
+    $stmt_cliente->bind_param("iisssss", $agencia_id, $cli_usuario_id, $nome, $email, $telefone, $senha_hash, $empresa);
+    if (!$stmt_cliente->execute()) {
+        throw new Exception("Erro ao vincular cliente à agência. Talvez ele já esteja vinculado.");
     }
+    $cliente_id = $conexao->insert_id;
+    $stmt_cliente->close();
 
     $conexao->commit();
 

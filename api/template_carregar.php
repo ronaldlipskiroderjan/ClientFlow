@@ -95,7 +95,7 @@ if (empty($usuario_id)) {
     responder_json($retorno);
 }
 
-if ($usuario_tipo !== 'agency' && $usuario_tipo !== 'agency_member') {
+if ($usuario_tipo !== 'agency' && $usuario_tipo !== 'agency_member' && $usuario_tipo !== 'freelancer') {
     $retorno["mensagem"] = "Templates estão disponíveis apenas para usuários da agência.";
     responder_json($retorno);
 }
