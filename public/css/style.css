@@ -398,6 +398,20 @@ body,
 [data-theme="dark"] .badge-gestor_cliente { background: rgba(245, 158, 11, 0.2) !important; color: #fcd34d !important; }
 [data-theme="dark"] .badge-financeiro { background: rgba(236, 72, 153, 0.2) !important; color: #f9a8d4 !important; }
 
+/* High-contrast alert: solid/light-friendly by default, and stronger in dark theme */
+.alert-contrast {
+  background-color: #e9f6ff !important;
+  color: #0b4a5a !important;
+  border: 1px solid rgba(11, 74, 90, 0.12) !important;
+}
+
+/* Dark theme override: ensure sufficient contrast on dark backgrounds */
+[data-theme="dark"] .alert-contrast {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: #e6eef8 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* Status badges for financeiro.html */
 [data-theme="dark"] .status-pagamento-pendente { background-color: rgba(254, 240, 138, 0.2) !important; color: #fde047 !important; }
 [data-theme="dark"] .status-pagamento-pago { background-color: rgba(220, 252, 231, 0.2) !important; color: #86efac !important; }

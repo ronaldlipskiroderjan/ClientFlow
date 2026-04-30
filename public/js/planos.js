@@ -73,7 +73,7 @@ class PlanosManager {
                     <div class="fw-bold text-navy-blue">${data_renovacao}</div>
                 </div>
                 <div class="col-12">
-                    <div class="alert alert-info mb-0" role="alert">
+                    <div class="alert alert-info alert-contrast mb-0" role="alert">
                         <small>
                             <i class="fas fa-info-circle me-2"></i>
                             Renovação: ${plano.tipo_renovacao === 'mensal' ? 'Mensal' : 'Anual'}
