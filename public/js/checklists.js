@@ -222,7 +222,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "completed": '<span class="badge bg-success shadow-sm"><i class="fa-solid fa-check me-1"></i> Concluído</span>'
             };
             const bdg = statusMap[item.status] || `<span class="badge bg-secondary">${item.status}</span>`;
-            const link = `${window.location.origin}/ClientFlow/public/pages/login.html?token=${encodeURIComponent(item.link_hash)}`;
+            const basePath = (window.location.pathname.match(/^(.*?)(?=\/public\/)/i)?.[1]) || "";
+            const link = `${window.location.origin}${basePath}/public/pages/login.html?token=${encodeURIComponent(item.link_hash)}`;
             
             const tr = document.createElement("tr");
             tr.innerHTML = `

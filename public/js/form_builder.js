@@ -144,8 +144,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         templateHint.textContent = mensagem;
     }
 
+    function getAppBasePath() {
+        const marker = "/public/";
+        const idx = window.location.pathname.toLowerCase().indexOf(marker);
+        if (idx === -1) {
+            return "";
+        }
+
+        return window.location.pathname.slice(0, idx);
+    }
+
     function montarLinkCliente(token) {
-        const link = `${window.location.origin}/ClientFlow/public/pages/cadastro.html?token=${encodeURIComponent(token)}`;
+        const basePath = getAppBasePath();
+        const link = `${window.location.origin}${basePath}/public/pages/cadastro.html?token=${encodeURIComponent(token)}`;
         linkInput.value = link;
         linkCard.classList.remove("d-none");
         linkCard.scrollIntoView({ behavior: 'smooth' });
