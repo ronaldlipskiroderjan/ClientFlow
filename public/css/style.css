@@ -460,7 +460,7 @@ body,
 /* Hero section background (usa a imagem na raiz do projeto: /hero-section.jpg) */
 .hero-section {
   position: relative;
-  background-image: url('../../hero-section.jpg');
+  background-image: url('../assets/hero-section.jpg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
