@@ -664,6 +664,14 @@ body,
   color: #8899aa;
 }
 
+/* ── Form Control Plaintext ── */
+p.form-control-plaintext {
+  color: #000000 !important;
+}
+[data-theme="dark"] p.form-control-plaintext {
+  color: #ffffff !important;
+}
+
 /* ── Modais ── */
 [data-theme="dark"] .modal-content {
   background: var(--dk-surface);

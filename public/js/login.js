@@ -3,6 +3,10 @@ function getDashboardByRole(role) {
         return 'dashboard_client.html';
     }
 
+    if (role === 'admin') {
+        return 'dashboard_admin.html';
+    }
+
     return 'dashboard_agency.html';
 }
 
