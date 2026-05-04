@@ -1,0 +1,9 @@
+# .gitignore
+.vscode/
+.idea/
+*.log
+setup-localhost.sh
+uploads/
+sync-xampp.sh
+.github/agents/
+backend-java/target/
