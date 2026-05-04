@@ -1,5 +1,5 @@
 <?php
-include_once("db_conexao.php");
+include_once __DIR__ . "/db_conexao.php";
 
 $retorno = [
     "status" => "nok",
