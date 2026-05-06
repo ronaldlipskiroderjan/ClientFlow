@@ -51,8 +51,9 @@ if ($image_info === false) {
 
 $base_dir   = realpath(__DIR__ . '/../') . '/uploads/avatars';
 if (!is_dir($base_dir)) {
-    mkdir($base_dir, 0755, true);
+    mkdir($base_dir, 0775, true);
 }
+chmod($base_dir, 0775);
 
 // Remove foto antiga do disco, se existir
 $stmt_old = $conexao->prepare("SELECT foto_path FROM usuarios WHERE id = ?");
