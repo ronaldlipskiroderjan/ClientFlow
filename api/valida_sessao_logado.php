@@ -12,7 +12,7 @@ $usuario_id = $_SESSION['usuario_id'] ?? null;
 
 if (!empty($usuario_id)) {
     $stmt = $conexao->prepare(
-        "SELECT id, nome, email, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, status_conta, criado_em
+        "SELECT id, nome, email, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, foto_path, status_conta, criado_em
          FROM usuarios
          WHERE id = ?"
     );

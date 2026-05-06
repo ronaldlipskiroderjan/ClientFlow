@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     data_nascimento DATE NULL,
     nome_empresa VARCHAR(150) NULL,
     nome_responsavel VARCHAR(150) NULL,
+    foto_path VARCHAR(255) NULL,
     status_conta ENUM('aprovado', 'pendente', 'banido') DEFAULT 'aprovado',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
