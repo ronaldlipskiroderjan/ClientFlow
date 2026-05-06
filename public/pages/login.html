@@ -22,7 +22,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="../index.html">
+    <a class="navbar-brand d-flex align-items-center" href="../../index.html">
       <i class="fa-solid fa-layer-group text-primary me-2"></i> ClientFlow
     </a>
   </div>
@@ -49,11 +49,28 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Entrar no painel</button>
-            
+
             <div class="text-center">
                 <span class="text-muted">Ainda não tem conta?</span> <a href="cadastro.html" class="text-primary fw-semibold">Cadastre-se grátis</a>
             </div>
         </form>
+
+        <div id="reativacaoPanel" class="d-none">
+            <div class="alert alert-warning d-flex gap-2 align-items-start mb-3">
+                <i class="fas fa-exclamation-triangle mt-1 flex-shrink-0"></i>
+                <div>
+                    <strong>Conta desativada.</strong><br>
+                    Você ainda tem <strong id="diasRestantes"></strong> dia(s) para reativar sua conta antes que ela seja desativada permanentemente.
+                </div>
+            </div>
+            <div id="alertReativacao" class="alert d-none mb-3" role="alert"></div>
+            <button id="btnReativar" class="btn btn-primary-custom w-100 btn-lg mb-2">
+                <i class="fas fa-user-check me-2"></i>Reativar Minha Conta
+            </button>
+            <button id="btnCancelarReativar" class="btn btn-outline-secondary w-100">
+                Voltar ao login
+            </button>
+        </div>
     </div>
 </div>
 </div>
@@ -68,7 +85,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/main.js"></script>
-<script src="../js/api.js?v=3"></script>
-<script src="../js/login.js?v=3"></script>
+<script src="../js/api.js?v=4"></script>
+<script src="../js/login.js?v=4"></script>
 </body>
 </html>
