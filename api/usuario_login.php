@@ -89,7 +89,7 @@ if ($email_form == "admin@clientflow.com") {
     $stmt_check->close();
 }
 
-$stmt = $conexao->prepare("SELECT id, nome, email, senha_hash, tipo, telefone, documento, nome_empresa, nome_responsavel, status_conta FROM usuarios WHERE email = ?");
+$stmt = $conexao->prepare("SELECT id, nome, email, senha_hash, tipo, telefone, documento, nome_empresa, nome_responsavel, status_conta, desativacao_aceita_em FROM usuarios WHERE email = ?");
 $stmt->bind_param("s", $email_form);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -101,9 +101,20 @@ if ($resultado->num_rows === 1) {
     if (password_verify($senha_form, $hash_banco)) {
         if ($usuario['status_conta'] == 'pendente') {
             $retorno["mensagem"] = "Sua conta ainda está pendente de aprovação.";
-        } else if ($usuario['status_conta'] == 'banido') {
+        } else if ($usuario['status_conta'] === 'banido') {
             $retorno["mensagem"] = "Esta conta foi banida da plataforma.";
-        } else if ($usuario['status_conta'] == 'aprovado') {
+        } else if ($usuario['status_conta'] === 'desativado') {
+            $aceita_em = $usuario['desativacao_aceita_em'] ?? null;
+            $expira_em = $aceita_em ? strtotime($aceita_em) + 180 * 86400 : null;
+            if ($expira_em && $expira_em < time()) {
+                $retorno["mensagem"] = "Sua conta foi desativada permanentemente e não pode ser recuperada.";
+            } else {
+                $dias_restantes = $expira_em ? max(1, (int)(($expira_em - time()) / 86400)) : 180;
+                $retorno["status"]   = "conta_desativada";
+                $retorno["mensagem"] = "Conta desativada.";
+                $retorno["data"]     = ["dias_restantes" => $dias_restantes];
+            }
+        } else if ($usuario['status_conta'] === 'aprovado') {
             session_start();
 
             $_SESSION['usuario_id'] = $usuario['id'];

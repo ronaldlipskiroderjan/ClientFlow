@@ -37,7 +37,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nome_empresa VARCHAR(150) NULL,
     nome_responsavel VARCHAR(150) NULL,
     foto_path VARCHAR(255) NULL,
-    status_conta ENUM('aprovado', 'pendente', 'banido') DEFAULT 'aprovado',
+    status_conta ENUM('aprovado', 'pendente', 'banido', 'solicitou_desativacao', 'desativado') DEFAULT 'aprovado',
+    desativacao_solicitada_em TIMESTAMP NULL,
+    desativacao_aceita_em TIMESTAMP NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -74,7 +74,7 @@ class SidebarManager {
                             <button class="btn btn-icon-soft" id="sidebarToggleBtn" type="button" title="Abrir menu">
                                 <i class="fas fa-bars fs-6"></i>
                             </button>
-                            <span class="app-brand mb-0 h5">
+                            <span class="app-brand mb-0 h5 text-white">
                                 <i class="fas fa-layer-group me-2 text-primary"></i>ClientFlow
                             </span>
                         </div>
@@ -94,8 +94,8 @@ class SidebarManager {
                 <div class="offcanvas offcanvas-start sidebar-offcanvas shadow-lg" id="sidebarOffcanvas" tabindex="-1" style="width: 292px;">
                     <div class="offcanvas-header py-3 px-3">
                         <div>
-                            <h5 class="offcanvas-title fw-bold text-primary mb-1">
-                                <i class="fas fa-layer-group me-2"></i>ClientFlow
+                            <h5 class="offcanvas-title fw-bold mb-1">
+                                <i class="fas fa-layer-group me-2 text-primary"></i><span class="app-brand">ClientFlow</span>
                             </h5>
                             <div class="sidebar-user-label">Bem-vindo de volta</div>
                             <div class="fw-semibold text-navy-blue mt-1" id="sidebarUserName">Usuário</div>
@@ -157,7 +157,7 @@ class SidebarManager {
                                     </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link profile-tab-danger" id="tab-excluir-btn" data-bs-toggle="tab" data-bs-target="#tabExcluir" type="button" role="tab">
-                                            <i class="fas fa-trash-alt me-2"></i>Excluir Conta
+                                            <i class="fas fa-user-slash me-2"></i>Desativar Conta
                                         </button>
                                     </li>
                                 </ul>
@@ -263,7 +263,7 @@ class SidebarManager {
                                     <div class="tab-pane fade" id="tabExcluir" role="tabpanel">
                                         <div class="alert alert-danger d-flex gap-2 align-items-start mb-4">
                                             <i class="fas fa-exclamation-triangle mt-1 flex-shrink-0"></i>
-                                            <div><strong>Atenção!</strong> Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos da plataforma.</div>
+                                            <div><strong>Atenção!</strong> Ao desativar sua conta você será desconectado imediatamente. Você terá 180 dias para reativá-la — após esse prazo a conta será desativada permanentemente.</div>
                                         </div>
                                         <form id="formExcluir" novalidate>
                                             <div class="mb-3">
@@ -272,7 +272,7 @@ class SidebarManager {
                                             </div>
                                             <div id="alertExcluir" class="alert d-none" role="alert"></div>
                                             <button type="submit" class="btn btn-danger">
-                                                <i class="fas fa-trash-alt me-2"></i>Excluir Minha Conta
+                                                <i class="fas fa-user-slash me-2"></i>Desativar Conta
                                             </button>
                                         </form>
                                     </div>
@@ -568,9 +568,9 @@ const ProfileModal = {
         const btn             = document.querySelector("#formExcluir [type='submit']");
         const senha_confirmar = document.getElementById("senhaExcluir").value;
 
-        this.setLoading(btn, true, "Excluindo...");
+        this.setLoading(btn, true, "Desativando...");
         try {
-            const res = await API.post("perfil_excluir.php", { senha_confirmar });
+            const res = await API.post("perfil_desativar_solicitar.php", { senha_confirmar });
             if (res.status === "ok") {
                 this.showAlert("alertExcluir", "success", res.mensagem);
                 setTimeout(() => { window.location.href = "../../index.html"; }, 1500);
@@ -581,7 +581,7 @@ const ProfileModal = {
         } catch (e) {
             this.showAlert("alertExcluir", "danger", "Erro de conexão.");
         }
-        this.setLoading(btn, false, '<i class="fas fa-trash-alt me-2"></i>Excluir Minha Conta');
+        this.setLoading(btn, false, '<i class="fas fa-user-slash me-2"></i>Desativar Conta');
     },
 
     setLoading(btn, loading, label) {

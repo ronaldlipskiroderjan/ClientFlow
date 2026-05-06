@@ -1,54 +1,56 @@
 function getDashboardByRole(role) {
-    if (role === 'client') {
-        return 'dashboard_client.html';
-    }
-
-    if (role === 'admin') {
-        return 'dashboard_admin.html';
-    }
-
+    if (role === 'client') return 'dashboard_client.html';
+    if (role === 'admin')  return 'dashboard_admin.html';
     return 'dashboard_agency.html';
+}
+
+function mostrarPainelReativacao(diasRestantes) {
+    document.getElementById('loginForm').classList.add('d-none');
+    document.getElementById('reativacaoPanel').classList.remove('d-none');
+    document.getElementById('diasRestantes').textContent = diasRestantes;
+}
+
+function ocultarPainelReativacao() {
+    document.getElementById('reativacaoPanel').classList.add('d-none');
+    document.getElementById('loginForm').classList.remove('d-none');
+    document.getElementById('alertReativacao').classList.add('d-none');
 }
 
 async function handleLoginSubmit(event) {
     event.preventDefault();
 
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const params   = new URLSearchParams(window.location.search);
+    const token    = params.get('token');
 
     try {
-        const retorno = await ApiClientFlow.post('usuario_login.php', {
-            email,
-            senha: password
-        });
+        const retorno = await ApiClientFlow.post('usuario_login.php', { email, senha: password });
+
+        if (retorno.status === 'conta_desativada') {
+            mostrarPainelReativacao(retorno.data?.dias_restantes ?? 180);
+            return;
+        }
 
         if (retorno.status !== 'ok') {
             alert(retorno.mensagem || 'E-mail ou senha incorretos.');
             return;
         }
 
-        const tipo = retorno.data && retorno.data.tipo ? retorno.data.tipo : null;
-
+        const tipo = retorno.data?.tipo;
         if (!tipo) {
-            alert('Nao foi possivel identificar o perfil do usuario.');
+            alert('Não foi possível identificar o perfil do usuário.');
             return;
         }
 
         if (token) {
             if (tipo !== 'client') {
-                alert('Este link de formulario exige login de cliente.');
+                alert('Este link de formulário exige login de cliente.');
                 return;
             }
-
             const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
             if (vinculo.status !== 'ok') {
-                alert(vinculo.mensagem || 'Nao foi possivel vincular o formulario.');
+                alert(vinculo.mensagem || 'Não foi possível vincular o formulário.');
                 return;
             }
         }
@@ -105,10 +107,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (descEl) descEl.innerHTML = 'Faça login para vincular o projeto à sua conta, ou <a href="cadastro.html?token=' + encodeURIComponent(token) + '" class="text-primary fw-semibold">cadastre-se</a>.';
     }
 
-    if (!loginForm) {
-        return;
-    }
+    if (!loginForm) return;
 
     loginForm.addEventListener('submit', handleLoginSubmit);
-    
+
+    document.getElementById('btnCancelarReativar')?.addEventListener('click', ocultarPainelReativacao);
+
+    document.getElementById('btnReativar')?.addEventListener('click', async () => {
+        const email    = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const alertEl  = document.getElementById('alertReativacao');
+        const btn      = document.getElementById('btnReativar');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Reativando...';
+        alertEl.classList.add('d-none');
+
+        try {
+            const res = await ApiClientFlow.post('conta_reativar.php', { email, senha: password });
+            if (res.status === 'ok') {
+                alertEl.className = 'alert alert-success mb-3';
+                alertEl.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + res.mensagem;
+                alertEl.classList.remove('d-none');
+                setTimeout(() => { window.location.href = getDashboardByRole(res.data?.tipo); }, 1200);
+            } else {
+                alertEl.className = 'alert alert-danger mb-3';
+                alertEl.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + res.mensagem;
+                alertEl.classList.remove('d-none');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-check me-2"></i>Reativar Minha Conta';
+            }
+        } catch (e) {
+            alertEl.className = 'alert alert-danger mb-3';
+            alertEl.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Erro de conexão.';
+            alertEl.classList.remove('d-none');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-check me-2"></i>Reativar Minha Conta';
+        }
+    });
 });

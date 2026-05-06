@@ -15,7 +15,7 @@ if (empty($usuario_id)) {
 }
 
 $stmt = $conexao->prepare(
-    "SELECT id, nome, email, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, foto_path, criado_em
+    "SELECT id, nome, email, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, foto_path, status_conta, desativacao_solicitada_em, criado_em
      FROM usuarios WHERE id = ?"
 );
 $stmt->bind_param("i", $usuario_id);
