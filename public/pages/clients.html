@@ -85,10 +85,98 @@
     </main>
 </div>
 
+<!-- Modal Detalhes do Cliente -->
+<div class="modal fade" id="modalClienteDetalhes" tabindex="-1" aria-labelledby="modalClienteDetalhesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom px-4 pt-4 pb-3">
+                <h5 class="modal-title fw-bold text-navy-blue" id="modalClienteDetalhesLabel">
+                    <i class="fa-solid fa-user-circle me-2 text-primary"></i>Detalhes do Cliente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Loading State -->
+                <div id="modal-cliente-loading" class="text-center py-5 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+
+                <!-- Content State -->
+                <div id="modal-cliente-content" class="d-none">
+                    <ul class="nav nav-tabs nav-justified px-4 mt-3 border-bottom-0" id="clientTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-semibold" id="dados-tab" data-bs-toggle="tab" data-bs-target="#dados-pane" type="button" role="tab" aria-controls="dados-pane" aria-selected="true">Dados Pessoais</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold" id="projetos-tab" data-bs-toggle="tab" data-bs-target="#projetos-pane" type="button" role="tab" aria-controls="projetos-pane" aria-selected="false">Projetos <span class="badge bg-secondary ms-1 rounded-pill" id="badge-projetos">0</span></button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold" id="contratos-tab" data-bs-toggle="tab" data-bs-target="#contratos-pane" type="button" role="tab" aria-controls="contratos-pane" aria-selected="false">Contratos <span class="badge bg-secondary ms-1 rounded-pill" id="badge-contratos">0</span></button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-4 bg-light rounded-bottom-4" id="clientTabsContent">
+                        <!-- Dados Pessoais -->
+                        <div class="tab-pane fade show active" id="dados-pane" role="tabpanel" aria-labelledby="dados-tab" tabindex="0">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="text-muted small fw-bold mb-1">Nome Completo</label>
+                                    <p class="mb-0 fw-medium" id="detalhe-nome">-</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small fw-bold mb-1">Empresa</label>
+                                    <p class="mb-0 fw-medium" id="detalhe-empresa">-</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small fw-bold mb-1">E-mail</label>
+                                    <p class="mb-0 fw-medium" id="detalhe-email">-</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small fw-bold mb-1">Telefone</label>
+                                    <p class="mb-0 fw-medium" id="detalhe-telefone">-</p>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label class="text-muted small fw-bold mb-1">Cliente desde</label>
+                                    <p class="mb-0 fw-medium" id="detalhe-cadastro">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Projetos -->
+                        <div class="tab-pane fade" id="projetos-pane" role="tabpanel" aria-labelledby="projetos-tab" tabindex="0">
+                            <div class="list-group list-group-flush border rounded" id="lista-projetos">
+                                <!-- Preenchido dinamicamente -->
+                            </div>
+                            <div id="empty-projetos" class="alert alert-light text-center text-muted mb-0 d-none">
+                                Este cliente ainda não possui projetos ativos.
+                            </div>
+                        </div>
+
+                        <!-- Contratos -->
+                        <div class="tab-pane fade" id="contratos-pane" role="tabpanel" aria-labelledby="contratos-tab" tabindex="0">
+                            <div class="list-group list-group-flush border rounded" id="lista-contratos">
+                                <!-- Preenchido dinamicamente -->
+                            </div>
+                            <div id="empty-contratos" class="alert alert-light text-center text-muted mb-0 d-none">
+                                Este cliente não possui nenhum contrato ativo.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 px-4 pb-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar Janela</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/main.js"></script>
-<script src="../js/api.js"></script>
-<script src="../js/sidebar.js"></script>
-<script src="../js/clients.js"></script>
+<script src="../js/api.js?v=2"></script>
+<script src="../js/sidebar.js?v=2"></script>
+<script src="../js/clients.js?v=2"></script>
 </body>
 </html>

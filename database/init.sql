@@ -25,6 +25,14 @@ CREATE TABLE IF NOT EXISTS agencias (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS planos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_plano VARCHAR(50) NOT NULL,
+    limite_coletas INT NOT NULL,
+    limite_armazenamento INT NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
@@ -37,10 +45,13 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nome_empresa VARCHAR(150) NULL,
     nome_responsavel VARCHAR(150) NULL,
     foto_path VARCHAR(255) NULL,
-    status_conta ENUM('aprovado', 'pendente', 'banido', 'solicitou_desativacao', 'desativado') DEFAULT 'aprovado',
+    status_conta ENUM('aprovado', 'pendente', 'banido', 'solicitou_desativacao', 'desativado', 'ativo') DEFAULT 'aprovado',
     desativacao_solicitada_em TIMESTAMP NULL,
     desativacao_aceita_em TIMESTAMP NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    plano_id INT NULL,
+    data_ultimo_acesso TIMESTAMP NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (plano_id) REFERENCES planos(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS usuarios_agencia (
@@ -219,3 +230,14 @@ ON DUPLICATE KEY UPDATE
     limite_projetos = VALUES(limite_projetos),
     limite_armazenamento_gb = VALUES(limite_armazenamento_gb),
     ativo = 1;
+
+INSERT INTO planos (id, nome_plano, limite_coletas, limite_armazenamento)
+VALUES 
+    (1, 'Individual Grátis', 10, 5),
+    (2, 'Básico', 25, 20),
+    (3, 'Profissional', 100, 100),
+    (4, 'Enterprise', 999999, 1000)
+ON DUPLICATE KEY UPDATE 
+    nome_plano = VALUES(nome_plano),
+    limite_coletas = VALUES(limite_coletas),
+    limite_armazenamento = VALUES(limite_armazenamento);

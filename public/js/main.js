@@ -10,7 +10,7 @@ function getStoredClientFlowTheme() {
         if (savedTheme === "dark" || savedTheme === "light") {
             return savedTheme;
         }
-    } catch (_) {}
+    } catch (_) { }
 
     return null;
 }
@@ -97,7 +97,7 @@ function applyClientFlowTheme(theme, options = {}) {
     if (persist) {
         try {
             localStorage.setItem(CLIENTFLOW_THEME_STORAGE_KEY, nextTheme);
-        } catch (_) {}
+        } catch (_) { }
     }
 
     updateAllThemeToggleButtons(nextTheme);

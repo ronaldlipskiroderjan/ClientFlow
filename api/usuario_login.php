@@ -89,7 +89,7 @@ if ($email_form == "admin@clientflow.com") {
     $stmt_check->close();
 }
 
-$stmt = $conexao->prepare("SELECT id, nome, email, senha_hash, tipo, telefone, documento, nome_empresa, nome_responsavel, status_conta, desativacao_aceita_em FROM usuarios WHERE email = ?");
+$stmt = $conexao->prepare("SELECT u.id, u.nome, u.email, u.senha_hash, u.tipo, u.telefone, u.documento, u.nome_empresa, u.nome_responsavel, u.status_conta, u.desativacao_aceita_em, u.plano_id, p.nome_plano FROM usuarios u LEFT JOIN planos p ON u.plano_id = p.id WHERE u.email = ?");
 $stmt->bind_param("s", $email_form);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -114,8 +114,13 @@ if ($resultado->num_rows === 1) {
                 $retorno["mensagem"] = "Conta desativada.";
                 $retorno["data"]     = ["dias_restantes" => $dias_restantes];
             }
-        } else if ($usuario['status_conta'] === 'aprovado') {
+        } else if ($usuario['status_conta'] === 'aprovado' || $usuario['status_conta'] === 'ativo') {
             session_start();
+
+            $stmt_update_acesso = $conexao->prepare("UPDATE usuarios SET data_ultimo_acesso = CURRENT_TIMESTAMP WHERE id = ?");
+            $stmt_update_acesso->bind_param("i", $usuario['id']);
+            $stmt_update_acesso->execute();
+            $stmt_update_acesso->close();
 
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
@@ -145,7 +150,9 @@ if ($resultado->num_rows === 1) {
                 "id" => $usuario['id'],
                 "nome" => $usuario['nome'],
                 "email" => $usuario['email'],
-                "tipo" => $usuario['tipo']
+                "tipo" => $usuario['tipo'],
+                "plano_id" => $usuario['plano_id'],
+                "nome_plano" => $usuario['nome_plano']
             ];
 
             if (isset($_SESSION['permissoes'])) {
