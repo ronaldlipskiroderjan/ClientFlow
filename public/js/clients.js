@@ -16,9 +16,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function montarLinhaCliente(cliente) {
         const row = document.createElement("tr");
+        row.style.cursor = "pointer";
+        row.classList.add("client-row");
         const dataCadastro = cliente.criado_em ? new Date(cliente.criado_em).toLocaleDateString() : "-";
         
-        let actionBtns = `<a href="#" class="btn btn-sm btn-outline-custom p-1 px-2" title="Projetos do Cliente"><i class="fa-solid fa-folder-open"></i></a>`;
+        let actionBtns = `<button type="button" class="btn btn-sm btn-outline-custom p-1 px-2 js-view-client" data-id="${cliente.id}" title="Ver Detalhes do Cliente"><i class="fa-solid fa-folder-open"></i></button>`;
         
         if (Auth.get('papel_agencia') === 'admin_agencia' || Auth.getTipo() === 'freelancer' || Auth.getTipo() === 'admin') {
             actionBtns += ` <button type="button" class="btn btn-sm btn-outline-danger p-1 px-2 js-delete-client" data-id="${cliente.id}"><i class="fa-solid fa-trash"></i></button>`;
@@ -34,12 +36,109 @@ document.addEventListener("DOMContentLoaded", async () => {
             </td>
         `;
 
+        row.addEventListener("click", (e) => {
+            if (!e.target.closest('button')) {
+                abrirModalDetalhesCliente(cliente.id);
+            }
+        });
+
         return row;
     }
 
-    function bindDeleteEvents() {
+    let modalDetalhes = null;
+
+    async function abrirModalDetalhesCliente(id) {
+        const modalEl = document.getElementById('modalClienteDetalhes');
+        if (!modalDetalhes) {
+            modalDetalhes = new bootstrap.Modal(modalEl);
+        }
+        
+        document.getElementById('modal-cliente-loading').classList.remove('d-none');
+        document.getElementById('modal-cliente-content').classList.add('d-none');
+        modalDetalhes.show();
+
+        try {
+            const retorno = await API.get(`cliente_detalhes.php?id=${id}`);
+            if (retorno.status !== 'ok') throw new Error(retorno.mensagem);
+            
+            const c = retorno.data;
+            document.getElementById('detalhe-nome').innerText = c.nome || '-';
+            document.getElementById('detalhe-empresa').innerText = c.empresa || '-';
+            document.getElementById('detalhe-email').innerText = c.email || '-';
+            document.getElementById('detalhe-telefone').innerText = c.telefone || '-';
+            document.getElementById('detalhe-cadastro').innerText = c.criado_em ? new Date(c.criado_em).toLocaleDateString() : '-';
+            
+            document.getElementById('badge-projetos').innerText = c.projetos.length;
+            document.getElementById('badge-contratos').innerText = c.contratos.length;
+
+            const listaProjetos = document.getElementById('lista-projetos');
+            const emptyProjetos = document.getElementById('empty-projetos');
+            listaProjetos.innerHTML = '';
+            if (c.projetos.length === 0) {
+                listaProjetos.classList.add('d-none');
+                emptyProjetos.classList.remove('d-none');
+            } else {
+                listaProjetos.classList.remove('d-none');
+                emptyProjetos.classList.add('d-none');
+                c.projetos.forEach(p => {
+                    listaProjetos.innerHTML += `
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${p.titulo}</h6>
+                                <small class="text-muted">Criado em: ${new Date(p.criado_em).toLocaleDateString()}</small>
+                            </div>
+                            <span class="badge bg-${p.status === 'Encerrado' ? 'success' : 'primary'} rounded-pill">${p.status}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            const listaContratos = document.getElementById('lista-contratos');
+            const emptyContratos = document.getElementById('empty-contratos');
+            listaContratos.innerHTML = '';
+            if (c.contratos.length === 0) {
+                listaContratos.classList.add('d-none');
+                emptyContratos.classList.remove('d-none');
+            } else {
+                listaContratos.classList.remove('d-none');
+                emptyContratos.classList.add('d-none');
+                c.contratos.forEach(cont => {
+                    listaContratos.innerHTML += `
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${cont.titulo}</h6>
+                                <span class="badge bg-${cont.status_pagamento === 'pago' ? 'success' : (cont.status_pagamento === 'atrasado' ? 'danger' : 'warning text-dark')}">${cont.status_pagamento}</span>
+                                <span class="badge bg-light text-dark border ms-1">${cont.status_projeto}</span>
+                            </div>
+                            <div class="text-end fw-bold text-success">
+                                R$ ${parseFloat(cont.valor_total).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('modal-cliente-loading').classList.add('d-none');
+            document.getElementById('modal-cliente-content').classList.remove('d-none');
+            
+        } catch (error) {
+            modalDetalhes.hide();
+            alert('Erro ao carregar detalhes do cliente: ' + error.message);
+        }
+    }
+
+    function bindEvents() {
+        document.querySelectorAll(".js-view-client").forEach((button) => {
+            button.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const clienteId = button.getAttribute("data-id");
+                if (clienteId) abrirModalDetalhesCliente(clienteId);
+            });
+        });
+
         document.querySelectorAll(".js-delete-client").forEach((button) => {
-            button.addEventListener("click", async () => {
+            button.addEventListener("click", async (e) => {
+                e.stopPropagation();
                 const clienteId = button.getAttribute("data-id");
                 if (!clienteId) return;
 
@@ -80,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 tableBody.appendChild(montarLinhaCliente(cliente));
             });
 
-            bindDeleteEvents();
+            bindEvents();
 
         } catch (error) {
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Erro ao carregar clientes.</td></tr>';
