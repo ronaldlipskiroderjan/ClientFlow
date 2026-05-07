@@ -60,7 +60,7 @@ class PlanosManager {
 
         container.innerHTML = `
             <div class="mb-3">
-                <h4 class="text-primary fw-bold mb-2">${plano.nome.charAt(0).toUpperCase() + plano.nome.slice(1)}</h4>
+                <h4 class="app-brand fw-bold mb-2">${plano.nome.charAt(0).toUpperCase() + plano.nome.slice(1)}</h4>
                 <p class="text-muted mb-2">${plano.descricao || 'Sem descrição'}</p>
             </div>
             <div class="row g-3">
@@ -73,7 +73,7 @@ class PlanosManager {
                     <div class="fw-bold text-navy-blue">${data_renovacao}</div>
                 </div>
                 <div class="col-12">
-                    <div class="alert alert-info mb-0" role="alert">
+                    <div class="alert alert-info planos-alert mb-0" role="alert">
                         <small>
                             <i class="fas fa-info-circle me-2"></i>
                             Renovação: ${plano.tipo_renovacao === 'mensal' ? 'Mensal' : 'Anual'}
@@ -156,7 +156,7 @@ class PlanosManager {
                 <div class="card ${classe_destaque} h-100 position-relative rounded-3 overflow-hidden" style="transition: transform 0.2s;">
                     ${badge_atual}
                     <div class="card-body p-4">
-                        <h5 class="card-title fw-bold text-primary mb-2">
+                        <h5 class="card-title fw-bold app-brand mb-2">
                             ${plano.nome.charAt(0).toUpperCase() + plano.nome.slice(1)}
                         </h5>
                         <p class="text-muted small mb-3">${plano.descricao || 'Sem descrição'}</p>

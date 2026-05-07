@@ -74,7 +74,7 @@ class SidebarManager {
                             <button class="btn btn-icon-soft" id="sidebarToggleBtn" type="button" title="Abrir menu">
                                 <i class="fas fa-bars fs-6"></i>
                             </button>
-                            <span class="app-brand mb-0 h5 text-white">
+                            <span class="app-brand mb-0 h5">
                                 <i class="fas fa-layer-group me-2 text-primary"></i>ClientFlow
                             </span>
                         </div>
@@ -310,7 +310,7 @@ class SidebarManager {
             </a>
             ${Auth.hasAccess("perm_ver_projetos") || Auth.hasAccess("perm_criar_projetos") ? `
             <a href="checklists.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-tasks"></i><span>Projetos / Formulários</span>
+                <i class="fas fa-tasks"></i><span>Projetos</span>
             </a>` : ""}
             ${Auth.hasAccess("perm_ver_clientes") || Auth.hasAccess("perm_criar_clientes") ? `
             <a href="clients.html" class="sidebar-nav-link nav-link">
@@ -318,12 +318,12 @@ class SidebarManager {
             </a>` : ""}
             ${Auth.hasAccess("perm_financeiro") ? `
             <a href="financeiro.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-file-invoice-dollar"></i><span>Contratos & Repasses</span>
+                <i class="fas fa-file-invoice-dollar"></i><span>Contratos</span>
             </a>` : ""}
             ${Auth.hasAccess("perm_gerenciar_membros") || papel === "admin_agencia" ? `
             <hr class="my-2">
             <a href="agency_team.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-users-cog"></i><span>Equipe da Agência</span>
+                <i class="fas fa-users-cog"></i><span>Colaboradores</span>
             </a>
             <a href="planos.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-layer-group"></i><span>Planos e Upgrade</span>
