@@ -1005,6 +1005,8 @@ a:hover {
 
 .main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-shell {
@@ -1337,6 +1339,26 @@ a:hover {
 
 .empty-state-card {
   border-style: dashed;
+}
+
+/* Alerta de lista vazia — modo claro e escuro */
+.empty-state-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #d0daf5;
+  background-color: #eef1fb;
+  color: #3d5080;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+[data-theme="dark"] .empty-state-alert {
+  background-color: var(--dk-elevated);
+  border-color: var(--dk-border);
+  color: var(--text-dark);
 }
 
 .footer {

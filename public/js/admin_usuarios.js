@@ -33,6 +33,7 @@ async function carregarUsuarios(pagina = 1) {
 
         if (usuarios.length === 0) {
             emptyState.classList.remove('d-none');
+            emptyState.innerHTML = '<div class="empty-state-alert"><i class="fas fa-info-circle"></i>Nenhum usuário encontrado.</div>';
             return;
         }
 

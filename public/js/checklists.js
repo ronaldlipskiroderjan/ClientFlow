@@ -206,15 +206,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const vazioMsg = 'Nenhum projeto encontrado.';
 
         if (retorno.status !== "ok") {
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-5">${vazioMsg}</td></tr>`;
-            if (cardContainer) cardContainer.innerHTML = `<div class="text-center py-4 text-muted">${vazioMsg}</div>`;
+            tableBody.innerHTML = `<tr><td colspan="6" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>${vazioMsg}</div></td></tr>`;
+            if (cardContainer) cardContainer.innerHTML = `<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>${vazioMsg}</div>`;
             return;
         }
 
         const lista = retorno.data || [];
         if (!lista.length) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-5">${vazioMsg}</td></tr>`;
-            if (cardContainer) cardContainer.innerHTML = `<div class="text-center py-4 text-muted">${vazioMsg}</div>`;
+            tableBody.innerHTML = `<tr><td colspan="6" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>${vazioMsg}</div></td></tr>`;
+            if (cardContainer) cardContainer.innerHTML = `<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>${vazioMsg}</div>`;
             return;
         }
 

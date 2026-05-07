@@ -195,8 +195,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
             const retorno = await API.get("cliente_listar.php");
-            const vazio = '<tr><td colspan="5" class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</td></tr>';
-            const vazioCard = '<div class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</div>';
+            const vazio = '<tr><td colspan="5" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>Nenhum cliente cadastrado ainda.</div></td></tr>';
+            const vazioCard = '<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>Nenhum cliente cadastrado ainda.</div>';
 
             if (retorno.status !== "ok") {
                 tableBody.innerHTML = vazio;
@@ -220,8 +220,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             bindEvents();
 
         } catch (error) {
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Erro ao carregar clientes.</td></tr>';
-            if (cardContainer) cardContainer.innerHTML = '<div class="text-center py-4 text-muted">Erro ao carregar clientes.</div>';
+            tableBody.innerHTML = '<tr><td colspan="5" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>Erro ao carregar clientes.</div></td></tr>';
+            if (cardContainer) cardContainer.innerHTML = '<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>Erro ao carregar clientes.</div>';
         }
     }
 

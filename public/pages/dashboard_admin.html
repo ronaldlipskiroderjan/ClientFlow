@@ -102,15 +102,15 @@
                             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
                                 <div>
                                     <h5 class="fw-bold text-navy-blue mb-0">
-                                        <i class="fa-solid fa-users-gear me-2 text-primary"></i>Gerenciar Usuários
+                                        <i class="fa-solid fa-building me-2 text-primary"></i>Prestadores de Serviço
                                     </h5>
+                                    <small class="text-muted">Somente agências cadastradas na plataforma</small>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2">
                                     <select id="filtro-status" class="form-select form-select-sm" style="min-width: 150px;" onchange="carregarUsuarios(1)">
                                         <option value="">Todos os Status</option>
                                         <option value="aprovado">Ativos</option>
                                         <option value="desativado">Desativados</option>
-                                        <option value="banido">Banidos</option>
                                         <option value="pendente">Pendentes</option>
                                     </select>
                                     <select id="filtro-plano" class="form-select form-select-sm" style="min-width: 150px;" onchange="carregarUsuarios(1)">
@@ -140,8 +140,8 @@
 
                             <!-- Estado: Vazio -->
                             <div id="empty-state" class="d-none">
-                                <div class="alert alert-info mb-0">
-                                    <i class="fas fa-info-circle me-2"></i>Nenhum usuário encontrado.
+                                <div class="empty-state-alert">
+                                    <i class="fas fa-info-circle"></i>Nenhum prestador de serviço encontrado.
                                 </div>
                             </div>
 
@@ -152,7 +152,7 @@
                                     <table class="table table-hover align-middle mb-0">
                                         <thead>
                                             <tr>
-                                                <th>Nome</th>
+                                                <th>Empresa / Responsável</th>
                                                 <th>E-mail</th>
                                                 <th>Plano</th>
                                                 <th>Último Acesso</th>
@@ -237,6 +237,56 @@
                 <button type="button" class="btn btn-warning" id="btn-confirmar-desat">
                     Sim, Desativar
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Membros da Agência -->
+<div class="modal fade" id="agenciaMembrosModal" tabindex="-1" aria-labelledby="agenciaMembrosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0" id="agenciaMembrosModalLabel">Membros da Agência</h5>
+                    <small class="text-muted" id="agenciaNomeLabel"></small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body px-4 pb-4 pt-3">
+
+                <!-- Toggle Clientes / Colaboradores -->
+                <div class="btn-group w-100 mb-3" role="group">
+                    <button type="button" class="btn btn-primary" id="btnTabClientes" onclick="mostrarTabMembros('clientes')">
+                        <i class="fas fa-user me-1"></i>Clientes
+                        <span class="badge bg-white text-primary ms-1" id="badgeQtdClientes">0</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btnTabColaboradores" onclick="mostrarTabMembros('colaboradores')">
+                        <i class="fas fa-users-cog me-1"></i>Colaboradores
+                        <span class="badge bg-primary text-white ms-1" id="badgeQtdColaboradores">0</span>
+                    </button>
+                </div>
+
+                <!-- Estado: Carregando -->
+                <div id="membrosLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-3 small">Carregando dados...</p>
+                </div>
+
+                <!-- Estado: Erro -->
+                <div id="membrosErro" class="d-none">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="membrosErroTexto">Erro ao carregar.</span>
+                    </div>
+                </div>
+
+                <!-- Conteúdo -->
+                <div id="membrosContent" class="d-none">
+                    <div id="membrosClientes"></div>
+                    <div id="membrosColaboradores" class="d-none"></div>
+                </div>
+
             </div>
         </div>
     </div>

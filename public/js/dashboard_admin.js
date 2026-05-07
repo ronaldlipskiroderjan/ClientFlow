@@ -1,6 +1,10 @@
 let paginaAtual = 1;
-let modalPlanoInstance = null;
-let modalDesatInstance = null;
+let modalPlanoInstance  = null;
+let modalDesatInstance  = null;
+let modalMembrosInstance = null;
+let agenciaAtualId      = null;
+let agenciaAtualNome    = '';
+let tabAtiva            = 'clientes';
 
 // ─── KPIs ─────────────────────────────────────────────────────────────────────
 
@@ -8,17 +12,17 @@ async function carregarResumoAdmin() {
     try {
         const retorno = await ApiClientFlow.get('dashboard_admin_resumo.php');
         if (retorno && retorno.status === 'ok' && retorno.data) {
-            document.getElementById('kpi-users').textContent     = retorno.data.active_users   ?? '0';
-            document.getElementById('kpi-agencies').textContent  = retorno.data.active_agencies ?? '0';
-            document.getElementById('kpi-clients').textContent   = retorno.data.clients         ?? '0';
-            document.getElementById('kpi-alerts').textContent    = retorno.data.alerts          ?? '0';
+            document.getElementById('kpi-users').textContent    = retorno.data.active_users    ?? '0';
+            document.getElementById('kpi-agencies').textContent = retorno.data.active_agencies ?? '0';
+            document.getElementById('kpi-clients').textContent  = retorno.data.clients         ?? '0';
+            document.getElementById('kpi-alerts').textContent   = retorno.data.alerts          ?? '0';
         }
-    } catch (error) {
-        console.error('Erro ao carregar resumo admin:', error);
+    } catch (e) {
+        console.error('Erro ao carregar resumo admin:', e);
     }
 }
 
-// ─── Usuários ─────────────────────────────────────────────────────────────────
+// ─── Prestadores de Serviço (tabela principal) ────────────────────────────────
 
 async function carregarUsuarios(pagina = 1) {
     paginaAtual = pagina;
@@ -41,35 +45,34 @@ async function carregarUsuarios(pagina = 1) {
     const filtroPlano  = document.getElementById('filtro-plano').value;
 
     try {
-        const queryParams = new URLSearchParams({ page: paginaAtual, limit: 10 });
+        const queryParams = new URLSearchParams({ page: paginaAtual, limit: 10, tipo: 'agency' });
         if (filtroStatus) queryParams.append('status', filtroStatus);
         if (filtroPlano)  queryParams.append('plano_id', filtroPlano);
 
         const retorno = await ApiClientFlow.get(`admin_usuarios_listar.php?${queryParams.toString()}`);
-        if (retorno.status !== 'ok') throw new Error(retorno.mensagem || 'Erro ao carregar usuários');
+        if (retorno.status !== 'ok') throw new Error(retorno.mensagem || 'Erro ao carregar');
 
-        const usuarios = Array.isArray(retorno.data) ? retorno.data : [];
-
+        const lista = Array.isArray(retorno.data) ? retorno.data : [];
         loadingState.classList.add('d-none');
 
-        if (usuarios.length === 0) {
+        if (lista.length === 0) {
             emptyState.classList.remove('d-none');
             return;
         }
 
         usuariosTbody.innerHTML = '';
-        usuariosCards.innerHTML = '';
+        if (usuariosCards) usuariosCards.innerHTML = '';
 
-        usuarios.forEach(usuario => {
-            const statusBadge = getStatusBadge(usuario.status_conta);
-            const nomePlano   = usuario.nome_plano
-                ? `<span class="badge bg-secondary">${usuario.nome_plano}</span>`
+        lista.forEach(u => {
+            const nomeExibido  = u.nome_empresa || u.nome;
+            const statusBadge  = getStatusBadge(u.status_conta);
+            const nomePlano    = u.nome_plano
+                ? `<span class="badge bg-secondary">${u.nome_plano}</span>`
                 : '<span class="badge bg-light text-dark border">Nenhum</span>';
-            const dataAcesso  = usuario.data_ultimo_acesso
-                ? new Date(usuario.data_ultimo_acesso).toLocaleString('pt-BR')
+            const dataAcesso   = u.data_ultimo_acesso
+                ? new Date(u.data_ultimo_acesso).toLocaleString('pt-BR')
                 : '<span class="text-muted">Nunca acessou</span>';
-
-            const estaDesativado = usuario.status_conta === 'desativado' || usuario.status_conta === 'banido';
+            const estaDesativado = u.status_conta === 'desativado' || u.status_conta === 'banido';
             const btnDesatClass  = estaDesativado ? 'btn-outline-success'  : 'btn-outline-warning';
             const btnDesatIcon   = estaDesativado ? 'fa-check-circle'      : 'fa-ban';
             const btnDesatTitle  = estaDesativado ? 'Ativar conta'         : 'Desativar conta';
@@ -77,19 +80,27 @@ async function carregarUsuarios(pagina = 1) {
             // Linha de tabela (desktop)
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="fw-semibold">${usuario.nome}</td>
-                <td class="text-muted">${usuario.email}</td>
+                <td>
+                    <div class="fw-semibold">${nomeExibido}</div>
+                    ${u.nome_empresa ? `<small class="text-muted">${u.nome}</small>` : ''}
+                </td>
+                <td class="text-muted">${u.email}</td>
                 <td>${nomePlano}</td>
                 <td class="small">${dataAcesso}</td>
                 <td>${statusBadge}</td>
                 <td class="text-end">
+                    <button class="btn btn-sm btn-outline-info me-1"
+                        onclick="abrirModalAgencia(${u.id}, '${(nomeExibido).replace(/'/g,"\\'")}') "
+                        title="Ver clientes e colaboradores">
+                        <i class="fa-solid fa-users"></i>
+                    </button>
                     <button class="btn btn-sm btn-outline-primary me-1"
-                        onclick="abrirModalMudarPlano(${usuario.id}, ${usuario.plano_id || 1})"
+                        onclick="abrirModalMudarPlano(${u.id}, ${u.plano_id || 1})"
                         title="Mudar Plano">
                         <i class="fa-solid fa-gem"></i>
                     </button>
                     <button class="btn btn-sm ${btnDesatClass}"
-                        onclick="abrirModalDesativar(${usuario.id}, '${usuario.status_conta}')"
+                        onclick="abrirModalDesativar(${u.id}, '${u.status_conta}')"
                         title="${btnDesatTitle}">
                         <i class="fa-solid ${btnDesatIcon}"></i>
                     </button>
@@ -97,35 +108,42 @@ async function carregarUsuarios(pagina = 1) {
             usuariosTbody.appendChild(row);
 
             // Card (mobile)
-            const card = document.createElement('div');
-            card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
-            card.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div class="overflow-hidden me-2">
-                        <div class="fw-semibold text-truncate">${usuario.nome}</div>
-                        <div class="text-muted small text-truncate">${usuario.email}</div>
+            if (usuariosCards) {
+                const card = document.createElement('div');
+                card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div class="overflow-hidden me-2">
+                            <div class="fw-semibold text-truncate">${nomeExibido}</div>
+                            <div class="text-muted small text-truncate">${u.email}</div>
+                        </div>
+                        ${statusBadge}
                     </div>
-                    ${statusBadge}
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="small">
-                        ${nomePlano}
-                        <div class="text-muted mt-1" style="font-size:0.72rem;">${dataAcesso}</div>
-                    </div>
-                    <div class="d-flex gap-1 ms-2 flex-shrink-0">
-                        <button class="btn btn-sm btn-outline-primary"
-                            onclick="abrirModalMudarPlano(${usuario.id}, ${usuario.plano_id || 1})"
-                            title="Mudar Plano">
-                            <i class="fa-solid fa-gem"></i>
-                        </button>
-                        <button class="btn btn-sm ${btnDesatClass}"
-                            onclick="abrirModalDesativar(${usuario.id}, '${usuario.status_conta}')"
-                            title="${btnDesatTitle}">
-                            <i class="fa-solid ${btnDesatIcon}"></i>
-                        </button>
-                    </div>
-                </div>`;
-            usuariosCards.appendChild(card);
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="small">
+                            ${nomePlano}
+                            <div class="text-muted mt-1" style="font-size:0.72rem;">${dataAcesso}</div>
+                        </div>
+                        <div class="d-flex gap-1 ms-2 flex-shrink-0">
+                            <button class="btn btn-sm btn-outline-info"
+                                onclick="abrirModalAgencia(${u.id}, '${(nomeExibido).replace(/'/g,"\\'")}') "
+                                title="Ver membros">
+                                <i class="fa-solid fa-users"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary"
+                                onclick="abrirModalMudarPlano(${u.id}, ${u.plano_id || 1})"
+                                title="Mudar Plano">
+                                <i class="fa-solid fa-gem"></i>
+                            </button>
+                            <button class="btn btn-sm ${btnDesatClass}"
+                                onclick="abrirModalDesativar(${u.id}, '${u.status_conta}')"
+                                title="${btnDesatTitle}">
+                                <i class="fa-solid ${btnDesatIcon}"></i>
+                            </button>
+                        </div>
+                    </div>`;
+                usuariosCards.appendChild(card);
+            }
         });
 
         usuariosContainer.classList.remove('d-none');
@@ -155,11 +173,11 @@ function renderizarPaginacao(paginacao) {
 
 function getStatusBadge(status) {
     const map = {
-        'ativo':       '<span class="badge bg-success">Ativo</span>',
-        'aprovado':    '<span class="badge bg-success">Ativo</span>',
-        'pendente':    '<span class="badge bg-warning text-dark">Pendente</span>',
-        'desativado':  '<span class="badge bg-secondary">Desativado</span>',
-        'banido':      '<span class="badge bg-danger">Banido</span>'
+        'ativo':      '<span class="badge bg-success">Ativo</span>',
+        'aprovado':   '<span class="badge bg-success">Ativo</span>',
+        'pendente':   '<span class="badge bg-warning text-dark">Pendente</span>',
+        'desativado': '<span class="badge bg-secondary">Desativado</span>',
+        'banido':     '<span class="badge bg-danger">Banido</span>'
     };
     return map[status] || '<span class="badge bg-light text-dark border">Desconhecido</span>';
 }
@@ -182,28 +200,21 @@ async function salvarNovoPlano() {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
 
     try {
-        const retorno = await ApiClientFlow.post('admin_usuario_atualizar_plano.php', {
-            usuario_id: id,
-            plano_id: planoId
-        });
-        if (retorno.status !== 'ok') {
-            alert(retorno.mensagem || 'Erro ao alterar plano');
-            return;
-        }
+        const retorno = await ApiClientFlow.post('admin_usuario_atualizar_plano.php', { usuario_id: id, plano_id: planoId });
+        if (retorno.status !== 'ok') { alert(retorno.mensagem || 'Erro ao alterar plano'); return; }
         if (modalPlanoInstance) modalPlanoInstance.hide();
         carregarUsuarios(paginaAtual);
-    } catch (error) {
+    } catch (e) {
         alert('Erro ao conectar com o servidor');
-        console.error(error);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-save me-2"></i>Salvar';
     }
 }
 
-// ─── Modal: Desativar / Ativar ────────────────────────────────────────────────
+// ─── Modal: Desativar / Ativar conta ─────────────────────────────────────────
 
-function abrirModalDesativar(id, statusAtual) {
+function abrirModalDesativar(id, statusAtual, callbackAposAcao) {
     document.getElementById('modal-desat-usuario-id').value = id;
 
     const titulo       = document.getElementById('desativarModalLabel');
@@ -213,19 +224,19 @@ function abrirModalDesativar(id, statusAtual) {
     const estaDesativado = statusAtual === 'desativado' || statusAtual === 'banido';
 
     if (estaDesativado) {
-        titulo.textContent        = 'Ativar Conta';
-        titulo.className          = 'modal-title fw-bold text-success';
-        texto.textContent         = 'Tem certeza de que deseja ativar esta conta? O usuário poderá acessar a plataforma novamente.';
-        btnConfirmar.textContent  = 'Sim, Ativar';
-        btnConfirmar.className    = 'btn btn-success';
-        btnConfirmar.onclick      = () => confirmarStatus(id, 'aprovado');
+        titulo.textContent       = 'Ativar Conta';
+        titulo.className         = 'modal-title fw-bold text-success';
+        texto.textContent        = 'Tem certeza de que deseja ativar esta conta? O usuário poderá acessar a plataforma novamente.';
+        btnConfirmar.textContent = 'Sim, Ativar';
+        btnConfirmar.className   = 'btn btn-success';
+        btnConfirmar.onclick     = () => confirmarStatus(id, 'aprovado', callbackAposAcao);
     } else {
-        titulo.textContent        = 'Desativar Conta';
-        titulo.className          = 'modal-title fw-bold text-warning';
-        texto.textContent         = 'Tem certeza de que deseja desativar esta conta? O acesso do usuário será suspenso imediatamente.';
-        btnConfirmar.textContent  = 'Sim, Desativar';
-        btnConfirmar.className    = 'btn btn-warning';
-        btnConfirmar.onclick      = () => confirmarStatus(id, 'desativado');
+        titulo.textContent       = 'Desativar Conta';
+        titulo.className         = 'modal-title fw-bold text-warning';
+        texto.textContent        = 'Tem certeza de que deseja desativar esta conta? O acesso será suspenso imediatamente.';
+        btnConfirmar.textContent = 'Sim, Desativar';
+        btnConfirmar.className   = 'btn btn-warning';
+        btnConfirmar.onclick     = () => confirmarStatus(id, 'desativado', callbackAposAcao);
     }
 
     const el = document.getElementById('desativarModal');
@@ -233,27 +244,196 @@ function abrirModalDesativar(id, statusAtual) {
     modalDesatInstance.show();
 }
 
-async function confirmarStatus(id, novoStatus) {
+async function confirmarStatus(id, novoStatus, callbackAposAcao) {
     const btn    = document.getElementById('btn-confirmar-desat');
     btn.disabled = true;
 
     try {
-        const retorno = await ApiClientFlow.post('admin_usuario_atualizar_status.php', {
-            usuario_id: id,
-            status: novoStatus
-        });
-        if (retorno.status !== 'ok') {
-            alert(retorno.mensagem || 'Erro ao alterar status');
-            return;
-        }
+        const retorno = await ApiClientFlow.post('admin_usuario_atualizar_status.php', { usuario_id: id, status: novoStatus });
+        if (retorno.status !== 'ok') { alert(retorno.mensagem || 'Erro ao alterar status'); return; }
         if (modalDesatInstance) modalDesatInstance.hide();
-        carregarUsuarios(paginaAtual);
-    } catch (error) {
+        if (typeof callbackAposAcao === 'function') {
+            callbackAposAcao();
+        } else {
+            carregarUsuarios(paginaAtual);
+        }
+    } catch (e) {
         alert('Erro ao conectar com o servidor');
-        console.error(error);
     } finally {
         btn.disabled = false;
     }
+}
+
+// ─── Modal: Membros da Agência ────────────────────────────────────────────────
+
+async function abrirModalAgencia(usuarioId, nome) {
+    agenciaAtualId   = usuarioId;
+    agenciaAtualNome = nome;
+
+    document.getElementById('agenciaMembrosModalLabel').textContent = `Membros da Agência`;
+    document.getElementById('agenciaNomeLabel').textContent         = nome;
+    document.getElementById('membrosLoading').classList.remove('d-none');
+    document.getElementById('membrosContent').classList.add('d-none');
+    document.getElementById('membrosErro').classList.add('d-none');
+
+    const el = document.getElementById('agenciaMembrosModal');
+    modalMembrosInstance = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
+    modalMembrosInstance.show();
+
+    await carregarMembrosAgencia();
+}
+
+async function carregarMembrosAgencia() {
+    document.getElementById('membrosLoading').classList.remove('d-none');
+    document.getElementById('membrosContent').classList.add('d-none');
+    document.getElementById('membrosErro').classList.add('d-none');
+
+    try {
+        const retorno = await ApiClientFlow.get(`admin_agencia_detalhe.php?usuario_id=${agenciaAtualId}`);
+        if (retorno.status !== 'ok') throw new Error(retorno.mensagem || 'Erro ao carregar');
+
+        const { clientes, colaboradores } = retorno.data;
+
+        document.getElementById('badgeQtdClientes').textContent      = clientes.length;
+        document.getElementById('badgeQtdColaboradores').textContent  = colaboradores.length;
+
+        renderMembrosClientes(clientes);
+        renderMembrosColaboradores(colaboradores);
+
+        document.getElementById('membrosLoading').classList.add('d-none');
+        document.getElementById('membrosContent').classList.remove('d-none');
+        mostrarTabMembros(tabAtiva);
+
+    } catch (e) {
+        document.getElementById('membrosLoading').classList.add('d-none');
+        document.getElementById('membrosErro').classList.remove('d-none');
+        document.getElementById('membrosErroTexto').textContent = e.message || 'Erro ao carregar dados.';
+    }
+}
+
+function mostrarTabMembros(tab) {
+    tabAtiva = tab;
+    const btnC  = document.getElementById('btnTabClientes');
+    const btnM  = document.getElementById('btnTabColaboradores');
+    const divC  = document.getElementById('membrosClientes');
+    const divM  = document.getElementById('membrosColaboradores');
+
+    if (tab === 'clientes') {
+        btnC.className = 'btn btn-primary';
+        btnM.className = 'btn btn-outline-primary';
+        divC.classList.remove('d-none');
+        divM.classList.add('d-none');
+    } else {
+        btnC.className = 'btn btn-outline-primary';
+        btnM.className = 'btn btn-primary';
+        divC.classList.add('d-none');
+        divM.classList.remove('d-none');
+    }
+}
+
+function renderMembrosClientes(clientes) {
+    const container = document.getElementById('membrosClientes');
+    if (!clientes.length) {
+        container.innerHTML = '<div class="text-center py-4 text-muted"><i class="fas fa-users fa-2x mb-2 d-block opacity-25"></i>Nenhum cliente cadastrado.</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+    clientes.forEach(c => {
+        const temConta       = c.usuario_id != null;
+        const statusAtual    = c.status_conta || 'aprovado';
+        const statusBadge    = temConta
+            ? getStatusBadge(statusAtual)
+            : '<span class="badge bg-light text-dark border">Sem conta</span>';
+        const estaDesativado = statusAtual === 'desativado' || statusAtual === 'banido';
+
+        const card = document.createElement('div');
+        card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div class="overflow-hidden flex-grow-1">
+                    <div class="fw-semibold text-truncate">${c.nome}</div>
+                    <div class="text-muted small text-truncate">${c.email}</div>
+                    ${c.empresa ? `<div class="text-muted small"><i class="fa-solid fa-building me-1"></i>${c.empresa}</div>` : ''}
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    ${statusBadge}
+                    ${temConta ? `
+                    <button class="btn btn-sm ${estaDesativado ? 'btn-outline-success' : 'btn-outline-warning'} js-toggle-cliente"
+                        data-id="${c.usuario_id}" data-status="${statusAtual}"
+                        title="${estaDesativado ? 'Ativar conta' : 'Desativar conta'}">
+                        <i class="fa-solid ${estaDesativado ? 'fa-check-circle' : 'fa-ban'}"></i>
+                    </button>` : ''}
+                </div>
+            </div>
+        `;
+
+        if (temConta) {
+            card.querySelector('.js-toggle-cliente').addEventListener('click', (e) => {
+                const btn    = e.currentTarget;
+                const uid    = parseInt(btn.dataset.id);
+                const st     = btn.dataset.status;
+                abrirModalDesativar(uid, st, carregarMembrosAgencia);
+            });
+        }
+
+        container.appendChild(card);
+    });
+}
+
+function renderMembrosColaboradores(colaboradores) {
+    const container = document.getElementById('membrosColaboradores');
+
+    if (!colaboradores.length) {
+        container.innerHTML = '<div class="text-center py-4 text-muted"><i class="fas fa-users-cog fa-2x mb-2 d-block opacity-25"></i>Nenhum colaborador cadastrado.</div>';
+        return;
+    }
+
+    const papelLabel = {
+        'admin_agencia': 'Proprietário',
+        'gerente':        'Gerente',
+        'dev':            'Especialista',
+        'gestor_cliente': 'Atendimento',
+        'financeiro':     'Financeiro'
+    };
+
+    container.innerHTML = '';
+    colaboradores.forEach(m => {
+        const statusAtual    = m.status_conta || 'aprovado';
+        const statusBadge    = getStatusBadge(statusAtual);
+        const estaDesativado = statusAtual === 'desativado' || statusAtual === 'banido';
+        const papel          = papelLabel[m.papel] || m.papel;
+
+        const card = document.createElement('div');
+        card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div class="overflow-hidden flex-grow-1">
+                    <div class="fw-semibold text-truncate">${m.nome}
+                        <span class="badge bg-primary-soft text-primary ms-1" style="font-size:0.68rem;">${papel}</span>
+                    </div>
+                    <div class="text-muted small text-truncate">${m.email}</div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    ${statusBadge}
+                    <button class="btn btn-sm ${estaDesativado ? 'btn-outline-success' : 'btn-outline-warning'} js-toggle-colab"
+                        data-id="${m.usuario_id}" data-status="${statusAtual}"
+                        title="${estaDesativado ? 'Ativar conta' : 'Desativar conta'}">
+                        <i class="fa-solid ${estaDesativado ? 'fa-check-circle' : 'fa-ban'}"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        card.querySelector('.js-toggle-colab').addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            const uid = parseInt(btn.dataset.id);
+            const st  = btn.dataset.status;
+            abrirModalDesativar(uid, st, carregarMembrosAgencia);
+        });
+
+        container.appendChild(card);
+    });
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

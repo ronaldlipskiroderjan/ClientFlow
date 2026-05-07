@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (filtrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">Nenhum contrato encontrado.</td></tr>';
-            if (cardContainer) cardContainer.innerHTML = '<div class="text-center py-4 text-muted">Nenhum contrato encontrado.</div>';
+            tbody.innerHTML = '<tr><td colspan="8" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>Nenhum contrato encontrado.</div></td></tr>';
+            if (cardContainer) cardContainer.innerHTML = '<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>Nenhum contrato encontrado.</div>';
             return;
         }
 
