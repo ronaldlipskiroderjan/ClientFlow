@@ -66,6 +66,20 @@ function validatePasswordStrength(password) {
     return null;
 }
 
+function getPasswordRules(password) {
+    const value = String(password || '');
+
+    return {
+        length: value.length >= 8,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /\d/.test(value),
+        special: /[^A-Za-z0-9]/.test(value),
+        noRepeat: !/(.)\1{2,}/.test(value),
+        noSequence: !hasSequentialPasswordPattern(value),
+    };
+}
+
 function formatCPF(value) {
     const digits = onlyDigits(value).slice(0, 11);
 
@@ -238,6 +252,80 @@ function setupInputMasks() {
     });
 }
 
+function setupPasswordUX() {
+    document.querySelectorAll('input[name="password"]').forEach((passwordInput) => {
+        const form = passwordInput.closest('form');
+        if (!form) return;
+
+        const checklist = form.querySelector(`[data-password-checklist="${passwordInput.id}"]`);
+        const confirmInput = form.querySelector('input[name="confirm_password"]');
+        const matchMessage = form.querySelector(`[data-password-match-message="${passwordInput.id}"]`);
+        const toggleButton = form.querySelector(`[data-password-toggle="${passwordInput.id}"]`);
+        const checklistItems = checklist ? checklist.querySelectorAll('.password-checklist-item') : [];
+
+        const refreshUI = () => {
+            const value = passwordInput.value;
+            const rules = getPasswordRules(value);
+            const showChecklist = document.activeElement === passwordInput || value.length > 0;
+
+            if (checklist) {
+                checklist.classList.toggle('d-none', !showChecklist);
+
+                checklistItems.forEach((item) => {
+                    const rule = item.dataset.rule;
+                    const isValid =
+                        (rule === 'length' && rules.length) ||
+                        (rule === 'uppercase' && rules.uppercase) ||
+                        (rule === 'lowercase' && rules.lowercase) ||
+                        (rule === 'number' && rules.number) ||
+                        (rule === 'special' && rules.special) ||
+                        (rule === 'no-repeat' && rules.noRepeat) ||
+                        (rule === 'no-sequence' && rules.noSequence);
+
+                    item.classList.toggle('is-valid', isValid);
+                    item.classList.toggle('is-invalid', !isValid);
+                });
+            }
+
+            if (confirmInput && matchMessage) {
+                const confirmValue = confirmInput.value;
+                const isMismatch = confirmValue.length > 0 && confirmValue !== value;
+
+                matchMessage.classList.toggle('d-none', !isMismatch);
+                confirmInput.classList.toggle('is-valid', confirmValue.length > 0 && confirmValue === value);
+                confirmInput.classList.toggle('is-invalid', isMismatch);
+            }
+        };
+
+        const hideIfEmpty = () => {
+            if (checklist && !passwordInput.value) {
+                checklist.classList.add('d-none');
+            }
+        };
+
+        passwordInput.addEventListener('focus', refreshUI);
+        passwordInput.addEventListener('input', refreshUI);
+        passwordInput.addEventListener('blur', hideIfEmpty);
+
+        if (confirmInput) {
+            confirmInput.addEventListener('input', refreshUI);
+        }
+
+        if (toggleButton) {
+            toggleButton.addEventListener('click', () => {
+                const isHidden = passwordInput.type === 'password';
+                passwordInput.type = isHidden ? 'text' : 'password';
+                toggleButton.innerHTML = isHidden
+                    ? '<i class="fa-solid fa-eye-slash"></i>'
+                    : '<i class="fa-solid fa-eye"></i>';
+                toggleButton.setAttribute('aria-label', isHidden ? 'Ocultar senha' : 'Mostrar senha');
+            });
+        }
+
+        refreshUI();
+    });
+}
+
 function buildRegisterData(tabId, raw) {
     if (tabId === 'pf') {
         return {
@@ -271,10 +359,16 @@ function buildRegisterData(tabId, raw) {
 
 function validateFormByTab(tabId, raw, form) {
     const isPersonTab = tabId === 'pf';
+    const confirmPassword = form ? form.querySelector('input[name="confirm_password"]') : null;
 
     const passwordError = validatePasswordStrength(raw.password);
     if (passwordError) {
         alert(passwordError);
+        return false;
+    }
+
+    if (confirmPassword && raw.password !== confirmPassword.value) {
+        alert('A confirmação de senha precisa ser igual à senha informada.');
         return false;
     }
 
@@ -402,6 +496,7 @@ async function handleRegisterSubmit(event) {
 
 document.addEventListener('DOMContentLoaded', () => {
     setupInputMasks();
+    setupPasswordUX();
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');

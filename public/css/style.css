@@ -399,6 +399,87 @@ body,
   background-color: var(--dk-bg) !important;
 }
 
+/* Cadastro - senha interativa */
+.password-field-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.password-toggle-btn {
+  min-width: 52px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.password-checklist {
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  border: 1px solid rgba(79, 70, 229, 0.12);
+}
+
+.password-checklist-header {
+  color: #0f172a;
+}
+
+.password-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  color: #475569;
+  margin-bottom: 0.45rem;
+}
+
+.password-checklist-item:last-child {
+  margin-bottom: 0;
+}
+
+.password-checklist-item i {
+  color: #ef4444;
+  transition: color 0.2s ease;
+}
+
+.password-checklist-item.is-valid {
+  color: #065f46;
+}
+
+.password-checklist-item.is-valid i {
+  color: #10b981;
+}
+
+.password-checklist-item.is-invalid {
+  color: #475569;
+}
+
+[data-theme="dark"] .password-checklist {
+  background: linear-gradient(180deg, rgba(22, 28, 45, 0.96) 0%, rgba(30, 38, 64, 0.96) 100%);
+  border-color: rgba(99, 102, 241, 0.18);
+}
+
+[data-theme="dark"] .password-checklist-header,
+[data-theme="dark"] .password-checklist-item {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .password-checklist-item i {
+  color: #f87171;
+}
+
+[data-theme="dark"] .password-checklist-item.is-valid i {
+  color: #22c55e;
+}
+
+[data-theme="dark"] .password-toggle-btn {
+  background: var(--dk-elevated);
+  border-color: var(--dk-border-strong);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .password-toggle-btn:hover {
+  color: #ffffff;
+}
+
 /* btn-light — fica branco no dark sem override */
 [data-theme="dark"] .btn-light {
   background-color: var(--dk-elevated) !important;

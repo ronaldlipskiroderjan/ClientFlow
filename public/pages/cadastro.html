@@ -102,19 +102,41 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-muted small fw-bold">Seu E-mail</label>
-                                    <input type="email" name="email" class="form-control border-0 bg-light" placeholder="exemplo@email.com" required>
-                                </div>
-                                <div class="mb-3">
                                     <label class="form-label text-muted small fw-bold">Telefone de Contato</label>
                                     <input type="text" name="phone" class="form-control border-0 bg-light" placeholder="(11) 99999-9999" required>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">Seu E-mail</label>
+                                    <input type="email" name="email" class="form-control border-0 bg-light" placeholder="exemplo@email.com" required>
+                                </div>
                                 <div class="mb-4">
                                     <label class="form-label text-muted small fw-bold">Sua Senha</label>
-                                    <input type="password" name="password" class="form-control border-0 bg-light" placeholder="Mínimo 8 caracteres" minlength="8" required>
-                                    <div class="form-text small mt-2">
-                                        1 maiúscula, 1 minúscula, 1 número, 1 caractere especial, sem sequências óbvias e sem repetição em sequência.
+                                    <div class="input-group password-field-group">
+                                        <input type="password" name="password" id="password_pf" class="form-control border-0 bg-light" placeholder="Crie sua senha" minlength="8" required>
+                                        <button class="btn btn-outline-custom password-toggle-btn" type="button" data-password-toggle="password_pf" aria-label="Mostrar senha">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
                                     </div>
+                                    <div class="password-checklist d-none mt-3" data-password-checklist="password_pf">
+                                        <div class="password-checklist-header small fw-bold text-muted mb-2">Sua senha precisa ter:</div>
+                                        <div class="password-checklist-item" data-rule="length"><i class="fa-solid fa-circle-check"></i><span>Mínimo de 8 caracteres</span></div>
+                                        <div class="password-checklist-item" data-rule="uppercase"><i class="fa-solid fa-circle-check"></i><span>1 letra maiúscula</span></div>
+                                        <div class="password-checklist-item" data-rule="lowercase"><i class="fa-solid fa-circle-check"></i><span>1 letra minúscula</span></div>
+                                        <div class="password-checklist-item" data-rule="number"><i class="fa-solid fa-circle-check"></i><span>1 número</span></div>
+                                        <div class="password-checklist-item" data-rule="special"><i class="fa-solid fa-circle-check"></i><span>1 caractere especial</span></div>
+                                        <div class="password-checklist-item" data-rule="no-repeat"><i class="fa-solid fa-circle-check"></i><span>Sem repetição em sequência</span></div>
+                                        <div class="password-checklist-item" data-rule="no-sequence"><i class="fa-solid fa-circle-check"></i><span>Sem sequências óbvias</span></div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-bold">Confirmar Senha</label>
+                                    <div class="input-group password-field-group">
+                                        <input type="password" name="confirm_password" id="confirm_password_pf" class="form-control border-0 bg-light" placeholder="Repita sua senha" minlength="8" required>
+                                        <button class="btn btn-outline-custom password-toggle-btn" type="button" data-password-toggle="confirm_password_pf" aria-label="Mostrar confirmação de senha">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text small mt-2 d-none" data-password-match-message="password_pf">As senhas não coincidem.</div>
                                 </div>
                                 <div class="form-check mb-4">
                                     <input class="form-check-input" type="checkbox" value="1" id="accept_terms_pf" name="accept_terms" required>
@@ -165,10 +187,32 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label text-muted small fw-bold">Sua Senha</label>
-                                    <input type="password" name="password" class="form-control border-0 bg-light" placeholder="Mínimo 8 caracteres" minlength="8" required>
-                                    <div class="form-text small mt-2">
-                                        1 maiúscula, 1 minúscula, 1 número, 1 caractere especial, sem sequências óbvias e sem repetição em sequência.
+                                    <div class="input-group password-field-group">
+                                        <input type="password" name="password" id="password_pj" class="form-control border-0 bg-light" placeholder="Crie sua senha" minlength="8" required>
+                                        <button class="btn btn-outline-custom password-toggle-btn" type="button" data-password-toggle="password_pj" aria-label="Mostrar senha">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
                                     </div>
+                                    <div class="password-checklist d-none mt-3" data-password-checklist="password_pj">
+                                        <div class="password-checklist-header small fw-bold text-muted mb-2">Sua senha precisa ter:</div>
+                                        <div class="password-checklist-item" data-rule="length"><i class="fa-solid fa-circle-check"></i><span>Mínimo de 8 caracteres</span></div>
+                                        <div class="password-checklist-item" data-rule="uppercase"><i class="fa-solid fa-circle-check"></i><span>1 letra maiúscula</span></div>
+                                        <div class="password-checklist-item" data-rule="lowercase"><i class="fa-solid fa-circle-check"></i><span>1 letra minúscula</span></div>
+                                        <div class="password-checklist-item" data-rule="number"><i class="fa-solid fa-circle-check"></i><span>1 número</span></div>
+                                        <div class="password-checklist-item" data-rule="special"><i class="fa-solid fa-circle-check"></i><span>1 caractere especial</span></div>
+                                        <div class="password-checklist-item" data-rule="no-repeat"><i class="fa-solid fa-circle-check"></i><span>Sem repetição em sequência</span></div>
+                                        <div class="password-checklist-item" data-rule="no-sequence"><i class="fa-solid fa-circle-check"></i><span>Sem sequências óbvias</span></div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-bold">Confirmar Senha</label>
+                                    <div class="input-group password-field-group">
+                                        <input type="password" name="confirm_password" id="confirm_password_pj" class="form-control border-0 bg-light" placeholder="Repita sua senha" minlength="8" required>
+                                        <button class="btn btn-outline-custom password-toggle-btn" type="button" data-password-toggle="confirm_password_pj" aria-label="Mostrar confirmação de senha">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text small mt-2 d-none" data-password-match-message="password_pj">As senhas não coincidem.</div>
                                 </div>
                                 <div class="form-check mb-4">
                                     <input class="form-check-input" type="checkbox" value="1" id="accept_terms_pj" name="accept_terms" required>
