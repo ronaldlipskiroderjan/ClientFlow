@@ -6,6 +6,66 @@ function isRepeatedDigits(value) {
     return /^([0-9])\1+$/.test(value);
 }
 
+function hasSequentialPasswordPattern(value) {
+    const segments = String(value || '').toLowerCase().match(/[a-z0-9]+/g) || [];
+
+    for (const segment of segments) {
+        if (segment.length < 3) {
+            continue;
+        }
+
+        for (let index = 0; index <= segment.length - 3; index += 1) {
+            const first = segment.charCodeAt(index);
+            const second = segment.charCodeAt(index + 1);
+            const third = segment.charCodeAt(index + 2);
+
+            if (second === first + 1 && third === second + 1) {
+                return true;
+            }
+
+            if (second === first - 1 && third === second - 1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function validatePasswordStrength(password) {
+    const value = String(password || '');
+
+    if (value.length < 8) {
+        return 'A senha deve ter no mínimo 8 caracteres.';
+    }
+
+    if (!/[A-Z]/.test(value)) {
+        return 'A senha deve conter ao menos 1 letra maiúscula.';
+    }
+
+    if (!/[a-z]/.test(value)) {
+        return 'A senha deve conter ao menos 1 letra minúscula.';
+    }
+
+    if (!/\d/.test(value)) {
+        return 'A senha deve conter ao menos 1 número.';
+    }
+
+    if (!/[^A-Za-z0-9]/.test(value)) {
+        return 'A senha deve conter ao menos 1 caractere especial.';
+    }
+
+    if (/(.)\1{2,}/.test(value)) {
+        return 'A senha não pode repetir o mesmo caractere em sequência.';
+    }
+
+    if (hasSequentialPasswordPattern(value)) {
+        return 'A senha não pode conter sequências óbvias como 123 ou abc.';
+    }
+
+    return null;
+}
+
 function formatCPF(value) {
     const digits = onlyDigits(value).slice(0, 11);
 
@@ -209,8 +269,20 @@ function buildRegisterData(tabId, raw) {
     };
 }
 
-function validateFormByTab(tabId, raw) {
+function validateFormByTab(tabId, raw, form) {
     const isPersonTab = tabId === 'pf';
+
+    const passwordError = validatePasswordStrength(raw.password);
+    if (passwordError) {
+        alert(passwordError);
+        return false;
+    }
+
+    const termsAccepted = form ? form.querySelector('input[name="accept_terms"]') : null;
+    if (!termsAccepted || !termsAccepted.checked) {
+        alert('Você precisa aceitar os Termos de Uso e a Política de Privacidade para concluir o cadastro.');
+        return false;
+    }
 
     if (isPersonTab && !isValidCPF(raw.cpf)) {
         alert('CPF invalido. Verifique e tente novamente.');
@@ -275,7 +347,7 @@ async function handleRegisterSubmit(event) {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
-    if (!validateFormByTab(tabId, rawData)) return;
+    if (!validateFormByTab(tabId, rawData, form)) return;
 
     const userData = buildRegisterData(tabId, rawData);
 
@@ -380,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             const tabId = form.closest('.tab-pane').id;
             const rawData = formToObject(form);
-            if (!validateFormByTab(tabId, rawData)) return;
+            if (!validateFormByTab(tabId, rawData, form)) return;
 
             const userData = buildRegisterData(tabId, rawData);
             const btn = form.querySelector('button[type="submit"]');

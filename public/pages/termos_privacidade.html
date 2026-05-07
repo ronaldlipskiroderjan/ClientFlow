@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso e Privacidade | ClientFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="../css/style.css" rel="stylesheet">
+    <script>
+        (function () {
+            var theme = localStorage.getItem('clientflow-theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <style>
+        .terms-page {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        [data-theme="dark"] .terms-page {
+            background: linear-gradient(135deg, #0d1117 0%, #0a0e17 100%);
+        }
+
+        .terms-hero {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(16, 185, 129, 0.08));
+            border: 1px solid rgba(79, 70, 229, 0.12);
+            border-radius: 1.25rem;
+        }
+
+        [data-theme="dark"] .terms-hero {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(13, 17, 23, 0.92));
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .terms-card {
+            border: 0;
+            border-radius: 1rem;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .terms-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(79, 70, 229, 0.12);
+            color: #4f46e5;
+        }
+
+        [data-theme="dark"] .terms-card {
+            background: var(--dk-surface);
+            color: #ffffff;
+            border: 1px solid var(--dk-border);
+            box-shadow: var(--dk-shadow);
+        }
+
+        [data-theme="dark"] .terms-icon {
+            background: rgba(99, 102, 241, 0.16);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="terms-page">
+    <div class="container py-4 py-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="cadastro.html" class="btn btn-outline-custom">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao cadastro
+            </a>
+            <span class="app-brand h4 mb-0">ClientFlow</span>
+        </div>
+
+        <div class="terms-hero p-4 p-md-5 mb-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="terms-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1 text-navy-blue">Termos de Uso e Política de Privacidade</h1>
+                    <p class="mb-0 text-muted">Uso responsável de dados, arquivos e materiais confidenciais no ClientFlow.</p>
+                </div>
+            </div>
+            <div class="alert alert-warning border-0 mb-0">
+                <strong>Atenção:</strong> ao usar a plataforma, você pode compartilhar conteúdos estratégicos, documentos internos, briefings e outros materiais confidenciais. O acesso deve ser restrito apenas a pessoas autorizadas.
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card terms-card mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="terms-icon"><i class="fas fa-file-lines"></i></div>
+                            <h2 class="h5 fw-bold mb-0 text-navy-blue">1. Termos de Uso</h2>
+                        </div>
+                        <p>O ClientFlow é uma plataforma destinada ao envio, organização e acompanhamento de materiais e projetos entre clientes, agências e colaboradores autorizados.</p>
+                        <ul class="mb-0">
+                            <li>Você se compromete a usar a plataforma apenas para fins lícitos e autorizados.</li>
+                            <li>Não é permitido compartilhar credenciais, links ou arquivos com pessoas não autorizadas.</li>
+                            <li>O conteúdo publicado na plataforma é de responsabilidade de quem o envia.</li>
+                            <li>Podemos registrar dados de acesso e atividade para fins de segurança e auditoria.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card terms-card">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="terms-icon"><i class="fas fa-lock"></i></div>
+                            <h2 class="h5 fw-bold mb-0 text-navy-blue">2. Política de Privacidade</h2>
+                        </div>
+                        <p>Coletamos apenas as informações necessárias para autenticação, operação da conta, suporte e comunicação entre as partes envolvidas no projeto.</p>
+                        <ul class="mb-0">
+                            <li>Dados de cadastro, como nome, e-mail, telefone, CPF/CNPJ e informações da empresa.</li>
+                            <li>Arquivos, briefings, comentários e documentos enviados para viabilizar a execução do serviço.</li>
+                            <li>Registros técnicos como IP, data, hora e eventos de segurança.</li>
+                            <li>O armazenamento é orientado por controle de acesso e boa prática de proteção de dados.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card terms-card mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="h6 fw-bold text-navy-blue mb-3">Materiais confidenciais</h3>
+                        <p class="text-muted small">Podem ser tratados como confidenciais:</p>
+                        <ul class="small mb-0">
+                            <li>Briefings internos</li>
+                            <li>Arquivos de cliente</li>
+                            <li>Documentos comerciais</li>
+                            <li>Dados estratégicos do projeto</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card terms-card">
+                    <div class="card-body p-4">
+                        <h3 class="h6 fw-bold text-navy-blue mb-3">Consentimento</h3>
+                        <p class="small mb-0">Ao continuar no cadastro, você confirma que leu e concorda com estes termos e com a política de privacidade.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
