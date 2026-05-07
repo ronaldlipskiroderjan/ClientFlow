@@ -14,6 +14,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const tableBody = document.getElementById("clientsTableBody");
 
+    function montarCardCliente(cliente) {
+        const dataCadastro = cliente.criado_em ? new Date(cliente.criado_em).toLocaleDateString('pt-BR') : '-';
+        const canDelete = Auth.get('papel_agencia') === 'admin_agencia' || Auth.getTipo() === 'freelancer' || Auth.getTipo() === 'admin';
+
+        const card = document.createElement('div');
+        card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-1">
+                <div class="overflow-hidden me-2">
+                    <div class="fw-bold text-truncate">${cliente.nome}</div>
+                    <div class="text-muted small text-truncate">${cliente.email}</div>
+                </div>
+                <div class="d-flex gap-1 flex-shrink-0">
+                    <button type="button" class="btn btn-sm btn-outline-custom p-1 px-2 js-view-client" data-id="${cliente.id}" title="Ver Detalhes">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </button>
+                    ${canDelete ? `<button type="button" class="btn btn-sm btn-outline-danger p-1 px-2 js-delete-client" data-id="${cliente.id}"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </div>
+            </div>
+            ${cliente.empresa ? `<div class="text-muted small"><i class="fa-solid fa-building me-1"></i>${cliente.empresa}</div>` : ''}
+            <div class="text-muted mt-1" style="font-size:0.72rem;"><i class="fa-solid fa-calendar me-1"></i>Cliente desde ${dataCadastro}</div>
+        `;
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) abrirModalDetalhesCliente(cliente.id);
+        });
+        return card;
+    }
+
     function montarLinhaCliente(cliente) {
         const row = document.createElement("tr");
         row.style.cursor = "pointer";
@@ -160,29 +189,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function carregarClientes() {
+        const cardContainer = document.getElementById('clientsCardContainer');
         tableBody.innerHTML = "";
+        if (cardContainer) cardContainer.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>';
 
         try {
             const retorno = await API.get("cliente_listar.php");
+            const vazio = '<tr><td colspan="5" class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</td></tr>';
+            const vazioCard = '<div class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</div>';
+
             if (retorno.status !== "ok") {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</td></tr>';
+                tableBody.innerHTML = vazio;
+                if (cardContainer) cardContainer.innerHTML = vazioCard;
                 return;
             }
 
             const clientes = retorno.data || [];
             if (!clientes.length) {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda.</td></tr>';
+                tableBody.innerHTML = vazio;
+                if (cardContainer) cardContainer.innerHTML = vazioCard;
                 return;
             }
 
+            if (cardContainer) cardContainer.innerHTML = '';
             clientes.forEach((cliente) => {
                 tableBody.appendChild(montarLinhaCliente(cliente));
+                if (cardContainer) cardContainer.appendChild(montarCardCliente(cliente));
             });
 
             bindEvents();
 
         } catch (error) {
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Erro ao carregar clientes.</td></tr>';
+            if (cardContainer) cardContainer.innerHTML = '<div class="text-center py-4 text-muted">Erro ao carregar clientes.</div>';
         }
     }
 

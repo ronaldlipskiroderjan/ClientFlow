@@ -43,7 +43,8 @@
             </section>
 
             <div class="surface-panel p-0 overflow-hidden">
-                <div class="table-responsive">
+                <!-- Desktop: Tabela -->
+                <div class="d-none d-md-block table-responsive">
                     <table class="table table-premium table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -55,10 +56,12 @@
                                 <th class="text-end pe-4">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="checklistsTableBody">
-                            <tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
-                        </tbody>
+                        <tbody id="checklistsTableBody"></tbody>
                     </table>
+                </div>
+                <!-- Mobile: Cards -->
+                <div class="d-md-none p-3" id="checklistsCardContainer">
+                    <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
                 </div>
             </div>
         </div>

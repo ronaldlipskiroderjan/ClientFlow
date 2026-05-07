@@ -80,21 +80,25 @@
                                     <div class="alert alert-info mb-0">Nenhum usuário encontrado.</div>
                                 </div>
 
-                                <div id="usuarios-container" class="d-none table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Nome</th>
-                                                <th>E-mail</th>
-                                                <th>Plano</th>
-                                                <th>Último Acesso</th>
-                                                <th>Status</th>
-                                                <th>Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="usuarios-tbody">
-                                        </tbody>
-                                    </table>
+                                <div id="usuarios-container" class="d-none">
+                                    <!-- Desktop: Tabela -->
+                                    <div class="d-none d-md-block table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nome</th>
+                                                    <th>E-mail</th>
+                                                    <th>Plano</th>
+                                                    <th>Último Acesso</th>
+                                                    <th>Status</th>
+                                                    <th class="text-end">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="usuarios-tbody"></tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Mobile: Cards -->
+                                    <div class="d-md-none" id="usuarios-cards"></div>
                                 </div>
                                 
                                 <div class="d-flex justify-content-center mt-4 d-none" id="pagination-container">
