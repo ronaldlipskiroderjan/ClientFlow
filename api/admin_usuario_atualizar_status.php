@@ -19,7 +19,7 @@ if ($usuario_tipo !== 'admin') {
 $usuario_id = isset($_POST['usuario_id']) ? (int)$_POST['usuario_id'] : 0;
 $novo_status = isset($_POST['status']) ? trim($_POST['status']) : '';
 
-if ($usuario_id <= 0 || !in_array($novo_status, ['aprovado', 'banido'])) {
+if ($usuario_id <= 0 || !in_array($novo_status, ['aprovado', 'banido', 'desativado'])) {
     $retorno["mensagem"] = "Dados inválidos.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);

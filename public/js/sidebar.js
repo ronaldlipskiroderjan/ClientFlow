@@ -43,6 +43,8 @@ class SidebarManager {
             navHtml = this.getAgencyNav(papel);
         } else if (role === "client") {
             navHtml = this.getClientNav();
+        } else if (role === "admin") {
+            navHtml = this.getAdminNav();
         }
 
         const navContainer = document.getElementById("sidebarNav");
@@ -290,15 +292,16 @@ class SidebarManager {
 
     static getRoleLabel(role, papel) {
         if (role === "client") return "Cliente";
+        if (role === "admin") return "Administrador";
         if (role === "agency" || role === "agency_member") {
             const roleMap = {
-                admin_agencia: "Owner Agência",
+                admin_agencia: "Owner Prestador",
                 gerente: "Gerente",
                 dev: "Especialista",
                 gestor_cliente: "Atendimento",
                 financeiro: "Financeiro"
             };
-            return roleMap[papel] || "Agência";
+            return roleMap[papel] || "Prestador";
         }
         return "Usuário";
     }
@@ -335,6 +338,14 @@ class SidebarManager {
         return `
             <a href="dashboard_client.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-folder-open"></i><span>Meus Projetos</span>
+            </a>
+        `;
+    }
+
+    static getAdminNav() {
+        return `
+            <a href="dashboard_admin.html" class="sidebar-nav-link nav-link">
+                <i class="fas fa-gauge-high"></i><span>Painel Admin</span>
             </a>
         `;
     }
@@ -607,10 +618,10 @@ const ProfileModal = {
 
     getRoleLabel(tipo, papel) {
         if (tipo === "client") return "Cliente";
-        if (tipo === "agency") return "Agência — Proprietário";
+        if (tipo === "agency") return "Prestador de Serviço — Proprietário";
         if (tipo === "agency_member") {
             const map = {
-                admin_agencia: "Admin da Agência",
+                admin_agencia: "Admin do Prestador",
                 gerente: "Gerente",
                 dev: "Especialista",
                 gestor_cliente: "Atendimento",

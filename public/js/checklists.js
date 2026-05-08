@@ -201,30 +201,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function carregarListaChecklists() {
+        const cardContainer = document.getElementById('checklistsCardContainer');
         const retorno = await API.get("checklist_listar_agencia.php");
+        const vazioMsg = 'Nenhum projeto encontrado.';
+
         if (retorno.status !== "ok") {
-            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-5">Nenhum projeto encontrado.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="6" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>${vazioMsg}</div></td></tr>`;
+            if (cardContainer) cardContainer.innerHTML = `<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>${vazioMsg}</div>`;
             return;
         }
 
         const lista = retorno.data || [];
         if (!lista.length) {
-            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-5">Nenhum projeto encontrado.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="6" class="py-3"><div class="empty-state-alert"><i class="fas fa-info-circle"></i>${vazioMsg}</div></td></tr>`;
+            if (cardContainer) cardContainer.innerHTML = `<div class="empty-state-alert m-2"><i class="fas fa-info-circle"></i>${vazioMsg}</div>`;
             return;
         }
 
         tableBody.innerHTML = "";
+        if (cardContainer) cardContainer.innerHTML = '';
+
         lista.forEach(item => {
             const statusMap = {
-                "pending": '<span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Pendente</span>',
-                "review": '<span class="badge bg-primary shadow-sm"><i class="fa-solid fa-eye me-1"></i> Em Revisão</span>',
-                "approved": '<span class="badge bg-success shadow-sm"><i class="fa-solid fa-check me-1"></i> Concluído</span>',
-                "completed": '<span class="badge bg-success shadow-sm"><i class="fa-solid fa-check me-1"></i> Concluído</span>'
+                "pending":   '<span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i>Pendente</span>',
+                "review":    '<span class="badge bg-primary shadow-sm"><i class="fa-solid fa-eye me-1"></i>Em Revisão</span>',
+                "approved":  '<span class="badge bg-success shadow-sm"><i class="fa-solid fa-check me-1"></i>Concluído</span>',
+                "completed": '<span class="badge bg-success shadow-sm"><i class="fa-solid fa-check me-1"></i>Concluído</span>'
             };
             const bdg = statusMap[item.status] || `<span class="badge bg-secondary">${item.status}</span>`;
             const basePath = (window.location.pathname.match(/^(.*?)(?=\/public\/)/i)?.[1]) || "";
             const link = `${window.location.origin}${basePath}/public/pages/login.html?token=${encodeURIComponent(item.link_hash)}`;
-            
+
+            // Linha de tabela (desktop)
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td class="ps-4">
@@ -242,15 +250,55 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </td>
                 <td class="text-end pe-4">
                     <div class="d-flex gap-1 justify-content-end">
-                        <button class="btn btn-sm btn-primary px-3 js-open-review" title="Revisar Envios"><i class="fas fa-tasks me-1"></i> Revisar</button>
+                        <button class="btn btn-sm btn-primary px-3 js-open-review" title="Revisar Envios"><i class="fas fa-tasks me-1"></i>Revisar</button>
                         <button class="btn btn-sm btn-outline-info js-open-chat" title="Abrir Chat"><i class="fas fa-comment"></i></button>
                     </div>
                 </td>
             `;
-
             tr.querySelector(".js-open-review").addEventListener("click", () => abrirRevisaoChecklist(item.id));
             tr.querySelector(".js-open-chat").addEventListener("click", () => abrirChatProjeto(item.id, item.titulo, item.cliente_nome));
             tableBody.appendChild(tr);
+
+            // Card (mobile)
+            if (cardContainer) {
+                const card = document.createElement('div');
+                card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="overflow-hidden me-2">
+                            <div class="fw-bold text-navy-blue text-truncate">${item.titulo}</div>
+                            <small class="text-muted">${item.descricao || 'Sem descrição'}</small>
+                        </div>
+                        ${bdg}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="small">
+                            ${item.cliente_nome
+                                ? `<span class="text-muted"><i class="fa-solid fa-user me-1"></i>${item.cliente_nome}</span>`
+                                : '<span class="text-muted fst-italic">Aguardando vínculo</span>'}
+                            <span class="badge bg-light text-dark border ms-2">${item.total_itens} itens</span>
+                        </div>
+                        <div class="d-flex gap-1 flex-shrink-0 ms-2">
+                            <button class="btn btn-sm btn-primary js-open-review-card" title="Revisar">
+                                <i class="fas fa-tasks"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary js-copy-link-card" data-link="${link}" title="Copiar Link">
+                                <i class="far fa-copy"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info js-open-chat-card" title="Chat">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                card.querySelector('.js-open-review-card').addEventListener('click', () => abrirRevisaoChecklist(item.id));
+                card.querySelector('.js-open-chat-card').addEventListener('click', () => abrirChatProjeto(item.id, item.titulo, item.cliente_nome));
+                card.querySelector('.js-copy-link-card').addEventListener('click', (e) => {
+                    navigator.clipboard.writeText(e.currentTarget.dataset.link);
+                    alert('Link copiado!');
+                });
+                cardContainer.appendChild(card);
+            }
         });
     }
 

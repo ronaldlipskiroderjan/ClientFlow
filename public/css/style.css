@@ -1005,6 +1005,8 @@ a:hover {
 
 .main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-shell {
@@ -1293,6 +1295,41 @@ a:hover {
   color: var(--navy-blue);
 }
 
+/* ── Utilitário: flex-nowrap responsivo (Bootstrap 5 não inclui) ── */
+@media (min-width: 768px) {
+  .flex-md-nowrap { flex-wrap: nowrap !important; }
+}
+@media (min-width: 576px) {
+  .flex-sm-nowrap { flex-wrap: nowrap !important; }
+}
+
+/* ── Badges PF / PJ no painel admin ── */
+.bg-purple-soft {
+  background-color: #f3e8ff;
+}
+.text-purple {
+  color: #7c3aed;
+}
+.border-purple-subtle {
+  border-color: #c4b5fd;
+}
+.bg-info-subtle {
+  background-color: #e0f2fe;
+}
+
+[data-theme="dark"] .bg-purple-soft {
+  background-color: rgba(124, 58, 237, 0.15);
+}
+[data-theme="dark"] .text-purple {
+  color: #a78bfa;
+}
+[data-theme="dark"] .bg-info-subtle {
+  background-color: rgba(14, 165, 233, 0.15);
+}
+[data-theme="dark"] .border-purple-subtle {
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -1337,6 +1374,26 @@ a:hover {
 
 .empty-state-card {
   border-style: dashed;
+}
+
+/* Alerta de lista vazia — modo claro e escuro */
+.empty-state-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #d0daf5;
+  background-color: #eef1fb;
+  color: #3d5080;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+[data-theme="dark"] .empty-state-alert {
+  background-color: var(--dk-elevated);
+  border-color: var(--dk-border);
+  color: var(--text-dark);
 }
 
 .footer {
@@ -1472,6 +1529,23 @@ a:hover {
   background: var(--white);
 }
 
+/* ============================================================
+   RESPONSIVIDADE — Sistema completo multi-breakpoint
+   ============================================================ */
+
+/* ── Tablet grande / desktop pequeno (≤ 1200px) ── */
+@media (max-width: 1200px) {
+  .pricing-featured {
+    transform: scale(1.02);
+  }
+
+  .hero-section .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* ── Tablet (≤ 992px) ── */
 @media (max-width: 992px) {
   .page-header-card {
     padding: 1.2rem;
@@ -1480,14 +1554,218 @@ a:hover {
   .sidebar-offcanvas {
     width: min(88vw, 320px) !important;
   }
+
+  /* Dashboard agency — KPI cards empilham em 2 colunas */
+  .dashboard-kpi-row .col-md-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  /* Topbar: comprime elementos */
+  .app-topbar .container-fluid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Tabelas: garante scroll horizontal */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hero section font size */
+  .hero-section h1.display-4 {
+    font-size: 2rem;
+  }
+
+  /* Pricing card destaque não escala em tablet */
+  .pricing-featured {
+    transform: scale(1.0);
+    margin-top: 1rem;
+  }
+
+  /* Filtros do financeiro: empilham */
+  .filter-row {
+    flex-wrap: wrap;
+  }
+
+  /* Seção de contato: empilha */
+  #contact .col-lg-5 {
+    margin-top: 2rem;
+  }
 }
 
-@media (max-width: 576px) {
-  .btn-primary-custom,
-  .btn-outline-custom {
+/* ── Mobile grande (≤ 768px) ── */
+@media (max-width: 768px) {
+  /* ── Páginas de app (com sidebar) ── */
+  .main-content {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  /* Container-fluid: padding menor em mobile */
+  .container-fluid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Page header card — layout vertical */
+  .page-header-card {
+    padding: 1rem;
+  }
+
+  .page-header-card .d-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  .page-header-card .d-flex > div:last-child {
     width: 100%;
   }
 
+  .page-header-card .d-flex > div:last-child .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* KPI cards: 2 colunas em mobile */
+  .kpi-mini-card {
+    padding: 0.85rem 1rem;
+  }
+
+  .kpi-mini-value {
+    font-size: 1.3rem;
+  }
+
+  /* Dashboard agency header */
+  .dashboard-header-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Cabeçalho de páginas sem page-header-card */
+  .page-flex-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .page-flex-header .btn {
+    width: 100%;
+  }
+
+  /* Filtros em linha nas tabelas */
+  .table-filter-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .table-filter-row .form-select {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  /* Hero section */
+  .hero-section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  .hero-section h1.display-4 {
+    font-size: 1.7rem;
+    line-height: 1.3;
+  }
+
+  .hero-section .hero-lead {
+    font-size: 1rem;
+  }
+
+  .hero-section .d-flex.justify-content-center.gap-3 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-section .d-flex.justify-content-center.gap-3 .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Navbar pública */
+  .navbar-custom {
+    padding: 0.6rem 0;
+  }
+
+  /* Pricing section */
+  .pricing-featured {
+    transform: none;
+    margin-bottom: 0;
+  }
+
+  /* Chat container */
+  .chat-container {
+    height: calc(100vh - 180px);
+    min-height: 400px;
+    border-radius: 0.75rem;
+  }
+
+  /* Modais: fullscreen em mobile pequeno */
+  .modal-dialog:not(.modal-fullscreen-sm-down) {
+    margin: 0.5rem auto;
+  }
+
+  /* App topbar */
+  .app-topbar .app-brand {
+    font-size: 1rem;
+  }
+
+  /* Botões de ação no topbar */
+  .btn-icon-soft {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Footer */
+  .footer .row > div {
+    text-align: center !important;
+  }
+
+  /* Seção de features — títulos */
+  #features h2,
+  #pricing h2,
+  #contact h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Seção de contato */
+  #contact .d-flex.gap-3 {
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Mobile padrão (≤ 576px) ── */
+@media (max-width: 576px) {
+  /* Botões primários ocupam linha toda fora de tabelas */
+  .btn-primary-custom,
+  .btn-outline-custom {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Exceção: botões dentro de grupos ou ações de tabela não expandem */
+  .btn-group .btn-primary-custom,
+  .btn-group .btn-outline-custom,
+  .table .btn-primary-custom,
+  .table .btn-outline-custom,
+  td .btn-primary-custom,
+  td .btn-outline-custom,
+  .d-flex .btn-primary-custom,
+  .d-flex .btn-outline-custom {
+    width: auto;
+  }
+
+  /* Floating chat widget: tela cheia em mobile */
   .floating-chat-widget {
     bottom: 0;
     right: 0;
@@ -1501,7 +1779,174 @@ a:hover {
   .rounded-bottom-custom {
     border-radius: 0;
   }
+
+  /* KPI cards financeiro: 1 coluna */
+  .kpi-card .display-6 {
+    font-size: 1.6rem;
+  }
+
+  /* Badges de status em tabelas: menores */
+  .status-pill {
+    font-size: 0.7rem;
+    padding: 0.28rem 0.55rem;
+  }
+
+  /* Dashboard agency: cabeçalho de página */
+  .container-fluid .row.mb-1 h4 {
+    font-size: 1.25rem;
+  }
+
+  /* Tabela premium em mobile: esconde colunas secundárias */
+  .table-premium .hide-mobile,
+  .table-hover .hide-mobile {
+    display: none;
+  }
+
+  /* Páginas de login/cadastro: padding menor */
+  .card .p-4.p-md-5 {
+    padding: 1.25rem !important;
+  }
+
+  /* Paginação */
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Empty state */
+  .empty-state-alert {
+    font-size: 0.85rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  /* Page-header ajuste de fonte */
+  .page-header-card h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header-card p {
+    font-size: 0.9rem;
+  }
+
+  /* Hero ajuste extra */
+  .hero-section h1.display-4 {
+    font-size: 1.5rem;
+  }
+
+  /* Section features: 1 coluna */
+  #features .col-md-4 {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Planos: garantir 1 coluna */
+  #pricing .col-lg-3 {
+    padding-bottom: 0.5rem;
+  }
+
+  /* Footer público */
+  .footer .row {
+    gap: 0.5rem;
+  }
+
+  /* Agency team: header */
+  .agency-team-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .agency-team-header .btn {
+    width: 100%;
+  }
+
+  /* Financeiro: header */
+  .financeiro-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .financeiro-header .btn {
+    width: 100%;
+  }
+
+  /* Filtros tela de financeiro */
+  .financeiro-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .financeiro-filters .form-select {
+    width: 100% !important;
+  }
+
+  /* Modais fullscreen em mobile */
+  .modal-dialog {
+    margin: 0;
+    max-width: 100%;
+    height: 100%;
+  }
+
+  .modal-dialog .modal-content {
+    border-radius: 0;
+    height: 100%;
+  }
+
+  .modal-dialog-centered {
+    min-height: 100%;
+    align-items: flex-end;
+  }
+
+  .modal-dialog-centered .modal-content {
+    border-radius: 16px 16px 0 0;
+    height: auto;
+  }
 }
+
+/* ── Mobile muito pequeno (≤ 380px) ── */
+@media (max-width: 380px) {
+  .app-brand {
+    font-size: 0.9rem;
+  }
+
+  .btn-icon-soft {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .app-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .kpi-mini-value {
+    font-size: 1.1rem;
+  }
+
+  .hero-section h1.display-4 {
+    font-size: 1.3rem;
+  }
+
+  .page-header-card h1 {
+    font-size: 1.1rem;
+  }
+
+  /* Nav tabs em mobile muito pequeno: scroll horizontal */
+  .nav-tabs,
+  .nav-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar,
+  .nav-pills::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 
 /* ============================================================
    PROFILE MODAL
@@ -1675,4 +2120,92 @@ a:hover {
 [data-theme="dark"] .profile-photo-wrap:hover {
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.28);
+}
+
+
+/* ============================================================
+   RESPONSIVIDADE — Complementos específicos de componentes
+   ============================================================ */
+
+/* ── Profile Modal — mobile ── */
+@media (max-width: 576px) {
+  /* Foto de perfil e texto empilham em mobile muito pequeno */
+  #profileModal .d-flex.align-items-center.gap-4.mb-4 {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
+  /* Nav tabs do perfil: scroll horizontal */
+  .profile-modal-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .profile-modal-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .profile-modal-tabs .nav-link {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 0.45rem 0.7rem;
+  }
+}
+
+/* ── Member cards — mobile: 1 coluna em telas muito pequenas ── */
+@media (max-width: 480px) {
+  #teamContainer .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── Cadastro: form tabs em mobile ── */
+@media (max-width: 480px) {
+  #registerTabs .nav-link {
+    font-size: 0.82rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  #registerTabs .nav-link i {
+    display: none;
+  }
+}
+
+/* ── Landing page: contact stats ── */
+@media (max-width: 576px) {
+  #contact .d-flex.gap-3 {
+    justify-content: center;
+  }
+
+  #contact .d-flex.gap-3 > div {
+    text-align: center;
+  }
+}
+
+/* ── Topbar: garantir que não haja overflow ── */
+.app-topbar {
+  overflow: hidden;
+}
+
+.app-topbar .container-fluid {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+/* ── App brand: trunca se não couber ── */
+.app-brand {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+@media (max-width: 380px) {
+  .app-brand {
+    max-width: 110px;
+  }
 }

@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (!templates.length) {
-            atualizarHintTemplate("Você ainda não possui templates salvos para esta agência.", "info");
+            atualizarHintTemplate("Você ainda não possui templates salvos para este prestador de serviço.", "info");
         } else {
             atualizarHintTemplate("");
         }

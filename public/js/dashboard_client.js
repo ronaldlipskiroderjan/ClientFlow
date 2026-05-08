@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function criarCard(checklist) {
         const status = statusMap[checklist.status] || statusMap.pending;
-        const responsavel = checklist.agencia_nome_contato || checklist.agencia_empresa || "Agência";
+        const responsavel = checklist.agencia_nome_contato || checklist.agencia_empresa || "Prestador de Serviço";
         const totalItens = Number(checklist.total_itens || 0);
         const itensConcluidos = Number(checklist.itens_concluidos || 0);
         const percent = totalItens > 0 ? Math.round((itensConcluidos / totalItens) * 100) : 0;

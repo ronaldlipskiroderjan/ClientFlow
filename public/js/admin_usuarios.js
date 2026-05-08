@@ -3,15 +3,16 @@ let paginaAtual = 1;
 
 async function carregarUsuarios(pagina = 1) {
     paginaAtual = pagina;
-    const loadingState = document.getElementById('loading-state');
-    const errorState = document.getElementById('error-state');
-    const emptyState = document.getElementById('empty-state');
-    const usuariosContainer = document.getElementById('usuarios-container');
-    const usuariosTbody = document.getElementById('usuarios-tbody');
+    const loadingState        = document.getElementById('loading-state');
+    const errorState          = document.getElementById('error-state');
+    const emptyState          = document.getElementById('empty-state');
+    const usuariosContainer   = document.getElementById('usuarios-container');
+    const usuariosTbody       = document.getElementById('usuarios-tbody');
+    const usuariosCards       = document.getElementById('usuarios-cards');
     const paginationContainer = document.getElementById('pagination-container');
-    
+
     const filtroStatus = document.getElementById('filtro-status').value;
-    const filtroPlano = document.getElementById('filtro-plano').value;
+    const filtroPlano  = document.getElementById('filtro-plano').value;
 
     loadingState.classList.remove('d-none');
     errorState.classList.add('d-none');
@@ -20,53 +21,84 @@ async function carregarUsuarios(pagina = 1) {
     paginationContainer.classList.add('d-none');
 
     try {
-        const queryParams = new URLSearchParams({
-            page: paginaAtual,
-            limit: 10
-        });
-        
+        const queryParams = new URLSearchParams({ page: paginaAtual, limit: 10 });
         if (filtroStatus) queryParams.append('status', filtroStatus);
-        if (filtroPlano) queryParams.append('plano_id', filtroPlano);
+        if (filtroPlano)  queryParams.append('plano_id', filtroPlano);
 
         const retorno = await ApiClientFlow.get(`admin_usuarios_listar.php?${queryParams.toString()}`);
-
-        if (retorno.status !== 'ok') {
-            throw new Error(retorno.mensagem || 'Erro ao carregar usuários');
-        }
+        if (retorno.status !== 'ok') throw new Error(retorno.mensagem || 'Erro ao carregar usuários');
 
         const usuarios = Array.isArray(retorno.data) ? retorno.data : [];
+        loadingState.classList.add('d-none');
 
         if (usuarios.length === 0) {
-            loadingState.classList.add('d-none');
             emptyState.classList.remove('d-none');
+            emptyState.innerHTML = '<div class="empty-state-alert"><i class="fas fa-info-circle"></i>Nenhum usuário encontrado.</div>';
             return;
         }
 
         usuariosTbody.innerHTML = '';
-        usuarios.forEach(usuario => {
-            const row = document.createElement('tr');
-            const statusBadge = getStatusBadge(usuario.status_conta);
-            const dataAcesso = usuario.data_ultimo_acesso 
-                ? new Date(usuario.data_ultimo_acesso).toLocaleString('pt-BR') 
-                : '<span class="text-muted">Nunca acessou</span>';
-            const nomePlano = usuario.nome_plano ? `<span class="badge bg-secondary">${usuario.nome_plano}</span>` : '<span class="badge bg-light text-dark">Nenhum</span>';
+        if (usuariosCards) usuariosCards.innerHTML = '';
 
+        usuarios.forEach(usuario => {
+            const statusBadge = getStatusBadge(usuario.status_conta);
+            const nomePlano   = usuario.nome_plano
+                ? `<span class="badge bg-secondary">${usuario.nome_plano}</span>`
+                : '<span class="badge bg-light text-dark border">Nenhum</span>';
+            const dataAcesso  = usuario.data_ultimo_acesso
+                ? new Date(usuario.data_ultimo_acesso).toLocaleString('pt-BR')
+                : '<span class="text-muted">Nunca acessou</span>';
+            const isBanido    = usuario.status_conta === 'banido';
+            const banTitle    = isBanido ? 'Desbanir' : 'Banir';
+
+            // Linha de tabela (desktop)
+            const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="fw-semibold">${usuario.nome}</td>
-                <td>${usuario.email}</td>
+                <td class="text-muted">${usuario.email}</td>
                 <td>${nomePlano}</td>
-                <td>${dataAcesso}</td>
+                <td class="small">${dataAcesso}</td>
                 <td>${statusBadge}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="abrirModalMudarPlano(${usuario.id}, ${usuario.plano_id || 1})" title="Mudar Plano">
+                <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="abrirModalMudarPlano(${usuario.id}, ${usuario.plano_id || 1})" title="Mudar Plano">
                         <i class="fa-solid fa-gem"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="abrirModalBanir(${usuario.id}, '${usuario.status_conta}')" title="${usuario.status_conta === 'banido' ? 'Desbanir' : 'Banir'}">
+                    <button class="btn btn-sm btn-outline-danger" onclick="abrirModalBanir(${usuario.id}, '${usuario.status_conta}')" title="${banTitle}">
                         <i class="fa-solid fa-ban"></i>
                     </button>
                 </td>
             `;
             usuariosTbody.appendChild(row);
+
+            // Card (mobile)
+            if (usuariosCards) {
+                const card = document.createElement('div');
+                card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div class="overflow-hidden me-2">
+                            <div class="fw-semibold text-truncate">${usuario.nome}</div>
+                            <div class="text-muted small text-truncate">${usuario.email}</div>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="small">
+                            ${nomePlano}
+                            <div class="text-muted mt-1" style="font-size:0.72rem;">${dataAcesso}</div>
+                        </div>
+                        <div class="d-flex gap-1 ms-2 flex-shrink-0">
+                            <button class="btn btn-sm btn-outline-primary" onclick="abrirModalMudarPlano(${usuario.id}, ${usuario.plano_id || 1})" title="Mudar Plano">
+                                <i class="fa-solid fa-gem"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="abrirModalBanir(${usuario.id}, '${usuario.status_conta}')" title="${banTitle}">
+                                <i class="fa-solid fa-ban"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                usuariosCards.appendChild(card);
+            }
         });
 
         if (retorno.pagination && retorno.pagination.pages > 1) {
@@ -74,7 +106,6 @@ async function carregarUsuarios(pagina = 1) {
             paginationContainer.classList.remove('d-none');
         }
 
-        loadingState.classList.add('d-none');
         usuariosContainer.classList.remove('d-none');
 
     } catch (error) {
@@ -98,12 +129,13 @@ function renderizarPaginacao(paginacao) {
 
 function getStatusBadge(status) {
     const statusMap = {
-        'ativo': '<span class="badge bg-success">Ativo</span>',
-        'aprovado': '<span class="badge bg-success">Ativo</span>',
-        'pendente': '<span class="badge bg-warning text-dark">Pendente</span>',
-        'banido': '<span class="badge bg-danger">Banido</span>'
+        'ativo':       '<span class="badge bg-success">Ativo</span>',
+        'aprovado':    '<span class="badge bg-success">Ativo</span>',
+        'pendente':    '<span class="badge bg-warning text-dark">Pendente</span>',
+        'desativado':  '<span class="badge bg-secondary">Desativado</span>',
+        'banido':      '<span class="badge bg-danger">Banido</span>'
     };
-    return statusMap[status] || '<span class="badge bg-secondary">Desconhecido</span>';
+    return statusMap[status] || '<span class="badge bg-light text-dark border">Desconhecido</span>';
 }
 
 let modalPlanoInstance = null;
