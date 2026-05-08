@@ -47,23 +47,27 @@
         })();
     </script>
 </head>
-<body>
+<body class="bg-arctic-gray">
 
-    <div class="d-flex">
+    <div class="d-flex app-shell">
         <!-- Sidebar placeholder (será carregado via JS puro ou incluído) -->
         <div id="sidebar-container"></div>
 
-        <div class="main-content flex-grow-1 p-4 bg-light min-vh-100">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h2 class="fw-bold mb-0">Minha Equipe</h2>
-                        <p class="text-muted mb-0">Gerencie os membros da sua agência e seus níveis de acesso.</p>
+        <div class="main-content flex-grow-1 min-vh-100">
+            <div class="container-fluid py-4 px-3 px-lg-4">
+                <section class="page-header-card mb-4">
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 agency-team-header">
+                        <div>
+                            <h1 class="h3 fw-bold mb-1 text-navy-blue">Minha Equipe</h1>
+                            <p class="text-muted mb-0">Gerencie os membros da sua agência e seus níveis de acesso.</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary-custom d-none" id="btnNovoMembro" onclick="window.location.href='agency_member_create.html'">
+                                <i class="fas fa-plus me-2"></i>Novo Membro
+                            </button>
+                        </div>
                     </div>
-                    <button class="btn btn-primary d-none" id="btnNovoMembro" onclick="window.location.href='agency_member_create.html'">
-                        <i class="fas fa-plus me-2"></i>Novo Membro
-                    </button>
-                </div>
+                </section>
 
                 <!-- Loading State -->
                 <div id="loadingTeam" class="text-center py-5">
@@ -80,10 +84,18 @@
                 </div>
 
                 <!-- Team Grid -->
-                <div class="row g-4" id="teamContainer">
+                <div class="row g-3 g-md-4" id="teamContainer">
                     <!-- Cards de membros renderizados via JS -->
                 </div>
             </div>
+
+            <footer class="footer text-center mt-auto py-4 bg-white border-top">
+              <div class="container text-center">
+                <div class="text-muted small">
+                    &copy; 2026 ClientFlow. Todos os direitos reservados.
+                </div>
+              </div>
+            </footer>
         </div>
     </div>
     
