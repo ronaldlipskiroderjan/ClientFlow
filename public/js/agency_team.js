@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ====== DESATIVAR ======
     window.desativarMembro = async function(uaId) {
-        if (!confirm('Tem certeza? Este usuário perderá acesso imediato aos projetos da agência e sairá de todas as suas designações.')) {
+        if (!confirm('Tem certeza? Este usuário perderá acesso imediato aos projetos do prestador de serviço e sairá de todas as suas designações.')) {
             return;
         }
         

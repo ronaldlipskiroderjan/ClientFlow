@@ -270,7 +270,7 @@ async function abrirModalAgencia(usuarioId, nome) {
     agenciaAtualId   = usuarioId;
     agenciaAtualNome = nome;
 
-    document.getElementById('agenciaMembrosModalLabel').textContent = `Membros da Agência`;
+    document.getElementById('agenciaMembrosModalLabel').textContent = `Membros do Prestador de Serviço`;
     document.getElementById('agenciaNomeLabel').textContent         = nome;
     document.getElementById('membrosLoading').classList.remove('d-none');
     document.getElementById('membrosContent').classList.add('d-none');

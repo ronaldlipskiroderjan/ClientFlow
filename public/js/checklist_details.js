@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         lastDate = dateStr;
                     }
 
-                    const nameTag = !isMine ? `<small class="d-block text-muted mb-1 fw-bold" style="font-size:.65rem;">${msg.remetente_nome || "Agência"}</small>` : "";
+                    const nameTag = !isMine ? `<small class="d-block text-muted mb-1 fw-bold" style="font-size:.65rem;">${msg.remetente_nome || "Prestador de Serviço"}</small>` : "";
                     chatBox.innerHTML += `
                         <div class="d-flex flex-column mb-2 ${isMine ? "align-items-end" : "align-items-start"}">
                             ${nameTag}

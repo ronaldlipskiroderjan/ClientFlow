@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Se tem token na URL, processa o vinculo agora mesmo
             if (token) {
                 if (tipo !== 'client') {
-                    alert('Este link de formulário exige conta de cliente. Deslogue da conta de agência primeiro.');
+                    alert('Este link de formulário exige conta de cliente. Deslogue da conta de prestador de serviço primeiro.');
                     return;
                 }
                 const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });

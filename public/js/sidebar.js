@@ -295,13 +295,13 @@ class SidebarManager {
         if (role === "admin") return "Administrador";
         if (role === "agency" || role === "agency_member") {
             const roleMap = {
-                admin_agencia: "Owner Agência",
+                admin_agencia: "Owner Prestador",
                 gerente: "Gerente",
                 dev: "Especialista",
                 gestor_cliente: "Atendimento",
                 financeiro: "Financeiro"
             };
-            return roleMap[papel] || "Agência";
+            return roleMap[papel] || "Prestador";
         }
         return "Usuário";
     }
@@ -618,10 +618,10 @@ const ProfileModal = {
 
     getRoleLabel(tipo, papel) {
         if (tipo === "client") return "Cliente";
-        if (tipo === "agency") return "Agência — Proprietário";
+        if (tipo === "agency") return "Prestador de Serviço — Proprietário";
         if (tipo === "agency_member") {
             const map = {
-                admin_agencia: "Admin da Agência",
+                admin_agencia: "Admin do Prestador",
                 gerente: "Gerente",
                 dev: "Especialista",
                 gestor_cliente: "Atendimento",

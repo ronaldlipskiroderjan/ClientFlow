@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             progressChart = new Chart(ctxProgress, {
                 type: "doughnut",
                 data: {
-                    labels: total > 0 ? ["Finalizados", "Aguardando Cliente", "Revisão da Agência"] : ["Sem Dados"],
+                    labels: total > 0 ? ["Finalizados", "Aguardando Cliente", "Revisão do Prestador"] : ["Sem Dados"],
                     datasets: [{
                         data: total > 0 ? [finished, pending, review] : [1],
                         backgroundColor: total > 0 ? ["#10B981", "#F59E0B", "#6366f1"] : [theme.empty],

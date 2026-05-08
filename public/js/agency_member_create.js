@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (res && res.status === 'ok') {
             checklists = res.data;
             if (checklists.length === 0) {
-                containerProjetos.innerHTML = '<div class="text-muted"><small>A agência não possui projetos criados ainda.</small></div>';
+                containerProjetos.innerHTML = '<div class="text-muted"><small>O prestador de serviço não possui projetos criados ainda.</small></div>';
             } else {
                 containerProjetos.innerHTML = '';
                 checklists.forEach(c => {
