@@ -45,9 +45,12 @@ async function carregarUsuarios(pagina = 1) {
     const filtroPlano  = document.getElementById('filtro-plano').value;
 
     try {
-        const queryParams = new URLSearchParams({ page: paginaAtual, limit: 10, tipo: 'agency' });
+        const queryParams = new URLSearchParams({ page: paginaAtual, limit: 10, tipo: 'agency_member' });
         if (filtroStatus) queryParams.append('status', filtroStatus);
         if (filtroPlano)  queryParams.append('plano_id', filtroPlano);
+
+        const filtroTipoPrestador = document.getElementById('filtro-tipo-prestador')?.value || '';
+        if (filtroTipoPrestador) queryParams.append('tipo_prestador', filtroTipoPrestador);
 
         const retorno = await ApiClientFlow.get(`admin_usuarios_listar.php?${queryParams.toString()}`);
         if (retorno.status !== 'ok') throw new Error(retorno.mensagem || 'Erro ao carregar');
@@ -64,7 +67,11 @@ async function carregarUsuarios(pagina = 1) {
         if (usuariosCards) usuariosCards.innerHTML = '';
 
         lista.forEach(u => {
-            const nomeExibido  = u.nome_empresa || u.nome;
+            const isPJ         = !!(u.nome_empresa && u.nome_empresa.trim());
+            const nomeExibido  = isPJ ? u.nome_empresa : u.nome;
+            const tipoBadge    = isPJ
+                ? '<span class="badge bg-info-subtle text-info border border-info-subtle ms-1" style="font-size:0.65rem;">PJ</span>'
+                : '<span class="badge bg-purple-soft text-purple border border-purple-subtle ms-1" style="font-size:0.65rem;">PF</span>';
             const statusBadge  = getStatusBadge(u.status_conta);
             const nomePlano    = u.nome_plano
                 ? `<span class="badge bg-secondary">${u.nome_plano}</span>`
@@ -81,8 +88,8 @@ async function carregarUsuarios(pagina = 1) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
-                    <div class="fw-semibold">${nomeExibido}</div>
-                    ${u.nome_empresa ? `<small class="text-muted">${u.nome}</small>` : ''}
+                    <div class="fw-semibold d-flex align-items-center gap-1">${nomeExibido} ${tipoBadge}</div>
+                    ${isPJ ? `<small class="text-muted"><i class="fa-solid fa-user me-1 opacity-50"></i>${u.nome}</small>` : ''}
                 </td>
                 <td class="text-muted">${u.email}</td>
                 <td>${nomePlano}</td>
@@ -114,7 +121,8 @@ async function carregarUsuarios(pagina = 1) {
                 card.innerHTML = `
                     <div class="d-flex justify-content-between align-items-start mb-1">
                         <div class="overflow-hidden me-2">
-                            <div class="fw-semibold text-truncate">${nomeExibido}</div>
+                            <div class="fw-semibold text-truncate d-flex align-items-center gap-1">${nomeExibido} ${tipoBadge}</div>
+                            ${isPJ ? `<div class="text-muted small"><i class="fa-solid fa-user me-1 opacity-50"></i>${u.nome}</div>` : ''}
                             <div class="text-muted small text-truncate">${u.email}</div>
                         </div>
                         ${statusBadge}

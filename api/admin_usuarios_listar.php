@@ -46,6 +46,7 @@ $offset        = ($page - 1) * $limit;
 $status_filtro = isset($_GET['status'])   ? $_GET['status']        : '';
 $plano_filtro  = isset($_GET['plano_id']) ? (int)$_GET['plano_id'] : 0;
 $tipo_filtro   = isset($_GET['tipo'])     ? $_GET['tipo']          : '';
+$tipo_prestador = isset($_GET['tipo_prestador']) ? $_GET['tipo_prestador'] : ''; // 'pf', 'pj' ou ''
 
 $where_clauses = [];
 $params = [];
@@ -64,9 +65,19 @@ if ($plano_filtro > 0) {
 }
 
 if ($tipo_filtro !== '') {
+    // 'agency_member' é o tipo real no banco para proprietários de prestadores de serviço
+    // mas o sistema legado envia 'agency' — normalizar aqui
+    $tipo_db = ($tipo_filtro === 'agency') ? 'agency_member' : $tipo_filtro;
     $where_clauses[] = "u.tipo = ?";
-    $params[] = $tipo_filtro;
+    $params[] = $tipo_db;
     $types   .= "s";
+}
+
+// Filtro PF / PJ baseado em nome_empresa (PJ tem nome_empresa preenchido)
+if ($tipo_prestador === 'pj') {
+    $where_clauses[] = "(u.nome_empresa IS NOT NULL AND u.nome_empresa != '')";
+} elseif ($tipo_prestador === 'pf') {
+    $where_clauses[] = "(u.nome_empresa IS NULL OR u.nome_empresa = '')";
 }
 
 $where_sql = count($where_clauses) > 0 ? "WHERE " . implode(" AND ", $where_clauses) : "";

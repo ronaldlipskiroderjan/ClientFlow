@@ -1295,6 +1295,33 @@ a:hover {
   color: var(--navy-blue);
 }
 
+/* ── Badges PF / PJ no painel admin ── */
+.bg-purple-soft {
+  background-color: #f3e8ff;
+}
+.text-purple {
+  color: #7c3aed;
+}
+.border-purple-subtle {
+  border-color: #c4b5fd;
+}
+.bg-info-subtle {
+  background-color: #e0f2fe;
+}
+
+[data-theme="dark"] .bg-purple-soft {
+  background-color: rgba(124, 58, 237, 0.15);
+}
+[data-theme="dark"] .text-purple {
+  color: #a78bfa;
+}
+[data-theme="dark"] .bg-info-subtle {
+  background-color: rgba(14, 165, 233, 0.15);
+}
+[data-theme="dark"] .border-purple-subtle {
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;

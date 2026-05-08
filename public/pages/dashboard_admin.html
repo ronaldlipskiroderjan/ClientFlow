@@ -104,9 +104,14 @@
                                     <h5 class="fw-bold text-navy-blue mb-0">
                                         <i class="fa-solid fa-building me-2 text-primary"></i>Prestadores de Serviço
                                     </h5>
-                                    <small class="text-muted">Somente prestadores de serviço cadastrados na plataforma</small>
+                                    <small class="text-muted">Prestadores PF (autônomos) e PJ (empresas) cadastrados na plataforma</small>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2">
+                                    <select id="filtro-tipo-prestador" class="form-select form-select-sm" style="min-width: 130px;" onchange="carregarUsuarios(1)">
+                                        <option value="">PF e PJ</option>
+                                        <option value="pf">Somente PF</option>
+                                        <option value="pj">Somente PJ</option>
+                                    </select>
                                     <select id="filtro-status" class="form-select form-select-sm" style="min-width: 150px;" onchange="carregarUsuarios(1)">
                                         <option value="">Todos os Status</option>
                                         <option value="aprovado">Ativos</option>
