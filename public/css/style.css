@@ -1295,6 +1295,14 @@ a:hover {
   color: var(--navy-blue);
 }
 
+/* ── Utilitário: flex-nowrap responsivo (Bootstrap 5 não inclui) ── */
+@media (min-width: 768px) {
+  .flex-md-nowrap { flex-wrap: nowrap !important; }
+}
+@media (min-width: 576px) {
+  .flex-sm-nowrap { flex-wrap: nowrap !important; }
+}
+
 /* ── Badges PF / PJ no painel admin ── */
 .bg-purple-soft {
   background-color: #f3e8ff;
