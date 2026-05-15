@@ -199,6 +199,11 @@ class SidebarManager {
                                                 <label for="perfilTelefone" class="form-label fw-semibold">Telefone</label>
                                                 <input type="text" class="form-control" id="perfilTelefone" placeholder="(00) 00000-0000">
                                             </div>
+                                           <!-- <div class="mb-3">
+                                                <label for="perfilProvaAutoria" class="form-label fw-semibold">Nome da mãe</label>
+                                                <input type="text" class="form-control" id="perfilProvaAutoria" placeholder="Nome da mãe">
+                                                <div class="form-text">Nome da mãe.</div> -->
+                                            </div>
                                             <div id="alertPerfil" class="alert d-none" role="alert"></div>
                                             <button type="submit" class="btn btn-primary">
                                                 <i class="fas fa-save me-2"></i>Salvar Alterações
@@ -422,6 +427,7 @@ const ProfileModal = {
             document.getElementById("perfilNome").value     = usuario.nome || "";
             document.getElementById("perfilEmail").value    = usuario.email || "";
             document.getElementById("perfilTelefone").value = usuario.telefone || "";
+            document.getElementById("perfilProvaAutoria").value = usuario.prova_autoria || "";
 
             const displayName = usuario.nome_empresa || usuario.nome_responsavel || usuario.nome || "Usuário";
             const photoSrc    = this.resolvePhoto(usuario.foto_path, displayName);
@@ -509,10 +515,11 @@ const ProfileModal = {
         const btn     = document.querySelector("#formPerfil [type='submit']");
         const nome    = document.getElementById("perfilNome").value.trim();
         const telefone = document.getElementById("perfilTelefone").value.trim();
+        const prova_autoria = document.getElementById("perfilProvaAutoria").value.trim();
 
         this.setLoading(btn, true, "Salvando...");
         try {
-            const res = await API.post("perfil_atualizar.php", { nome, telefone });
+            const res = await API.post("perfil_atualizar.php", { nome, telefone, prova_autoria });
             if (res.status === "ok") {
                 this.showAlert("alertPerfil", "success", res.mensagem);
                 const nameEl = document.getElementById("sidebarUserName");

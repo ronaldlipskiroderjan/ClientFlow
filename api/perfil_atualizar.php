@@ -14,6 +14,7 @@ if (empty($usuario_id)) {
 
 $nome     = trim($_POST['nome'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
+$prova_autoria = trim($_POST['prova_autoria'] ?? '');
 
 if (empty($nome)) {
     $retorno["mensagem"] = "O nome é obrigatório.";
@@ -22,8 +23,8 @@ if (empty($nome)) {
     exit();
 }
 
-$stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, telefone = ? WHERE id = ?");
-$stmt->bind_param("ssi", $nome, $telefone, $usuario_id);
+$stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, telefone = ?, prova_autoria = ? WHERE id = ?");
+$stmt->bind_param("sssi", $nome, $telefone, $prova_autoria, $usuario_id);
 
 if ($stmt->execute()) {
     $_SESSION['usuario_nome'] = $nome;

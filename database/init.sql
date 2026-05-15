@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     data_nascimento DATE NULL,
     nome_empresa VARCHAR(150) NULL,
     nome_responsavel VARCHAR(150) NULL,
+    prova_autoria TEXT NULL,
     foto_path VARCHAR(255) NULL,
     status_conta ENUM('aprovado', 'pendente', 'banido', 'solicitou_desativacao', 'desativado', 'ativo') DEFAULT 'aprovado',
     desativacao_solicitada_em TIMESTAMP NULL,
@@ -53,6 +54,24 @@ CREATE TABLE IF NOT EXISTS usuarios (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (plano_id) REFERENCES planos(id) ON DELETE SET NULL
 );
+
+SET @column_exists := (
+    SELECT COUNT(*)
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'usuarios'
+      AND COLUMN_NAME = 'prova_autoria'
+);
+
+SET @ddl := IF(
+    @column_exists = 0,
+    'ALTER TABLE usuarios ADD COLUMN prova_autoria TEXT NULL AFTER nome_responsavel',
+    'SELECT 1'
+);
+
+PREPARE stmt_add_prova_autoria FROM @ddl;
+EXECUTE stmt_add_prova_autoria;
+DEALLOCATE PREPARE stmt_add_prova_autoria;
 
 CREATE TABLE IF NOT EXISTS usuarios_agencia (
     id INT AUTO_INCREMENT PRIMARY KEY,

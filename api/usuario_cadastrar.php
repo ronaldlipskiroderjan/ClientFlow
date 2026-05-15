@@ -16,6 +16,7 @@ $documento = trim($_POST['documento'] ?? '');
 $data_nascimento = trim($_POST['data_nascimento'] ?? '');
 $nome_empresa = trim($_POST['nome_empresa'] ?? '');
 $nome_responsavel = trim($_POST['nome_responsavel'] ?? '');
+$prova_autoria = trim($_POST['prova_autoria'] ?? '');
 $contato_juridico_nome = trim($_POST['contato_juridico_nome'] ?? '');
 $contato_juridico_email = trim($_POST['contato_juridico_email'] ?? '');
 $contato_juridico_telefone = trim($_POST['contato_juridico_telefone'] ?? '');
@@ -80,6 +81,13 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
+if ($prova_autoria === '') {
+    $retorno["mensagem"] = "Informe a prova de autoria.";
+    header("Content-type: application/json;charset:utf-8");
+    echo json_encode($retorno);
+    exit();
+}
+
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
 $data_nascimento = normalizar_data_para_iso($data_nascimento);
@@ -97,12 +105,12 @@ try {
     $tipo_db = ($tipo_normalizado === 'agency') ? 'agency_member' : $tipo_normalizado;
 
     $stmt = $conexao->prepare(
-        "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, status_conta)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado')"
+        "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, prova_autoria, status_conta)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado')"
     );
 
     $stmt->bind_param(
-        "sssssssss",
+        "ssssssssss",
         $nome,
         $email,
         $senha_hash,
@@ -111,7 +119,8 @@ try {
         $documento,
         $data_nascimento,
         $nome_empresa,
-        $nome_responsavel
+        $nome_responsavel,
+        $prova_autoria
     );
 
     if (!$stmt->execute()) {
