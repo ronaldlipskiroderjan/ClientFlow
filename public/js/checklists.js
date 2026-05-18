@@ -122,8 +122,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const retorno = await API.post("checklist_item_revisar.php", {
             item_id: itemId,
-            aprovar,
-            motivo_rejeicao: motivo
+            acao: aprovar ? "aprovar" : "reprovar",
+            motivo: motivo
         });
 
         if (!retorno || retorno.status !== "ok") {

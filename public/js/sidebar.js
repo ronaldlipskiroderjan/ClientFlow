@@ -199,6 +199,9 @@ class SidebarManager {
                                                 <label for="perfilTelefone" class="form-label fw-semibold">Telefone</label>
                                                 <input type="text" class="form-control" id="perfilTelefone" placeholder="(00) 00000-0000">
                                             </div>
+                                            <!-- <label for="perfilProvaAutoria" class="form-label fw-semibold">Nome da Mãe</label>
+                                            <input type="text" class="form-control" id="perfilProvaAutoria" placeholder="Alterar nome da mãe">
+                                            </div> -->
                                             <div id="alertPerfil" class="alert d-none" role="alert"></div>
                                             <button type="submit" class="btn btn-primary">
                                                 <i class="fas fa-save me-2"></i>Salvar Alterações
@@ -319,10 +322,7 @@ class SidebarManager {
             <a href="clients.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-users"></i><span>Clientes</span>
             </a>` : ""}
-            ${Auth.hasAccess("perm_financeiro") ? `
-            <a href="financeiro.html" class="sidebar-nav-link nav-link">
-                <i class="fas fa-file-invoice-dollar"></i><span>Contratos</span>
-            </a>` : ""}
+
             ${Auth.hasAccess("perm_gerenciar_membros") || papel === "admin_agencia" ? `
             <hr class="my-2">
             <a href="agency_team.html" class="sidebar-nav-link nav-link">
@@ -419,12 +419,13 @@ const ProfileModal = {
             const { usuario, agencia, papel } = res.data;
             const tipo = usuario.tipo;
 
-            document.getElementById("perfilNome").value     = usuario.nome || "";
-            document.getElementById("perfilEmail").value    = usuario.email || "";
+            document.getElementById("perfilNome").value = usuario.nome || "";
+            document.getElementById("perfilEmail").value = usuario.email || "";
             document.getElementById("perfilTelefone").value = usuario.telefone || "";
+            document.getElementById("perfilProvaAutoria").value = usuario.prova_autoria || "";
 
             const displayName = usuario.nome_empresa || usuario.nome_responsavel || usuario.nome || "Usuário";
-            const photoSrc    = this.resolvePhoto(usuario.foto_path, displayName);
+            const photoSrc = this.resolvePhoto(usuario.foto_path, displayName);
 
             const modalAvatarEl = document.getElementById("profileModalAvatar");
             if (modalAvatarEl) modalAvatarEl.src = photoSrc;
@@ -445,10 +446,10 @@ const ProfileModal = {
                 if (tipo === "agency" && agencia) {
                     tabEmpresaItem.style.display = "";
                     document.getElementById("agNomeEmpresa").value = agencia.nome_empresa || "";
-                    document.getElementById("agCnpj").value        = agencia.cnpj || "";
-                    document.getElementById("agTelefone").value    = agencia.telefone || "";
-                    document.getElementById("agSite").value        = agencia.site || "";
-                    document.getElementById("agDescricao").value   = agencia.descricao || "";
+                    document.getElementById("agCnpj").value = agencia.cnpj || "";
+                    document.getElementById("agTelefone").value = agencia.telefone || "";
+                    document.getElementById("agSite").value = agencia.site || "";
+                    document.getElementById("agDescricao").value = agencia.descricao || "";
                 } else {
                     tabEmpresaItem.style.display = "none";
                 }
@@ -479,7 +480,7 @@ const ProfileModal = {
 
         // Upload
         const alertEl = document.getElementById("alertFoto");
-        const btn     = document.getElementById("profilePhotoBtn");
+        const btn = document.getElementById("profilePhotoBtn");
         if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...'; }
         this.hideAlert("alertFoto");
 
@@ -506,13 +507,14 @@ const ProfileModal = {
     },
 
     async submitPerfil() {
-        const btn     = document.querySelector("#formPerfil [type='submit']");
-        const nome    = document.getElementById("perfilNome").value.trim();
+        const btn = document.querySelector("#formPerfil [type='submit']");
+        const nome = document.getElementById("perfilNome").value.trim();
         const telefone = document.getElementById("perfilTelefone").value.trim();
+        const prova_autoria = document.getElementById("perfilProvaAutoria").value.trim();
 
         this.setLoading(btn, true, "Salvando...");
         try {
-            const res = await API.post("perfil_atualizar.php", { nome, telefone });
+            const res = await API.post("perfil_atualizar.php", { nome, telefone, prova_autoria });
             if (res.status === "ok") {
                 this.showAlert("alertPerfil", "success", res.mensagem);
                 const nameEl = document.getElementById("sidebarUserName");
@@ -533,12 +535,12 @@ const ProfileModal = {
     },
 
     async submitEmpresa() {
-        const btn         = document.querySelector("#formEmpresa [type='submit']");
+        const btn = document.querySelector("#formEmpresa [type='submit']");
         const nome_empresa = document.getElementById("agNomeEmpresa").value.trim();
-        const cnpj        = document.getElementById("agCnpj").value.trim();
-        const telefone    = document.getElementById("agTelefone").value.trim();
-        const site        = document.getElementById("agSite").value.trim();
-        const descricao   = document.getElementById("agDescricao").value.trim();
+        const cnpj = document.getElementById("agCnpj").value.trim();
+        const telefone = document.getElementById("agTelefone").value.trim();
+        const site = document.getElementById("agSite").value.trim();
+        const descricao = document.getElementById("agDescricao").value.trim();
 
         this.setLoading(btn, true, "Salvando...");
         try {
@@ -555,9 +557,9 @@ const ProfileModal = {
     },
 
     async submitSenha() {
-        const btn            = document.querySelector("#formSenha [type='submit']");
-        const senha_atual    = document.getElementById("senhaAtual").value;
-        const nova_senha     = document.getElementById("novaSenha").value;
+        const btn = document.querySelector("#formSenha [type='submit']");
+        const senha_atual = document.getElementById("senhaAtual").value;
+        const nova_senha = document.getElementById("novaSenha").value;
         const confirmar_senha = document.getElementById("confirmarSenha").value;
 
         this.setLoading(btn, true, "Alterando...");
@@ -576,7 +578,7 @@ const ProfileModal = {
     },
 
     async submitExcluir() {
-        const btn             = document.querySelector("#formExcluir [type='submit']");
+        const btn = document.querySelector("#formExcluir [type='submit']");
         const senha_confirmar = document.getElementById("senhaExcluir").value;
 
         this.setLoading(btn, true, "Desativando...");

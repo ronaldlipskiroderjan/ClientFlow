@@ -627,10 +627,7 @@ body,
   text-shadow: 0 2px 10px rgba(0,0,0,0.45);
 }
 
-/* Garantir contraste em dark mode: reduz overlay quando tema escuro já escurece a imagem */
-[data-theme="dark"] .hero-section::before {
-  background: linear-gradient(180deg, rgba(7,11,23,0.62) 0%, rgba(7,11,23,0.52) 48%, rgba(7,11,23,0.7) 100%);
-}
+
 
 /* Contact section precisa permanecer escura no tema dark (evita herdar --navy-blue claro) */
 [data-theme="dark"] .bg-navy-blue {
@@ -920,7 +917,7 @@ p.form-control-plaintext {
 .theme-fab {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 24px;
   z-index: 1055;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
@@ -1764,6 +1761,8 @@ a:hover {
   .d-flex .btn-outline-custom {
     width: auto;
   }
+
+
 
   /* Floating chat widget: tela cheia em mobile */
   .floating-chat-widget {

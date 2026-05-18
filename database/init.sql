@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     data_nascimento DATE NULL,
     nome_empresa VARCHAR(150) NULL,
     nome_responsavel VARCHAR(150) NULL,
+    prova_autoria TEXT NULL,
     foto_path VARCHAR(255) NULL,
     status_conta ENUM('aprovado', 'pendente', 'banido', 'solicitou_desativacao', 'desativado', 'ativo') DEFAULT 'aprovado',
     desativacao_solicitada_em TIMESTAMP NULL,
@@ -53,6 +54,24 @@ CREATE TABLE IF NOT EXISTS usuarios (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (plano_id) REFERENCES planos(id) ON DELETE SET NULL
 );
+
+SET @column_exists := (
+    SELECT COUNT(*)
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'usuarios'
+      AND COLUMN_NAME = 'prova_autoria'
+);
+
+SET @ddl := IF(
+    @column_exists = 0,
+    'ALTER TABLE usuarios ADD COLUMN prova_autoria TEXT NULL AFTER nome_responsavel',
+    'SELECT 1'
+);
+
+PREPARE stmt_add_prova_autoria FROM @ddl;
+EXECUTE stmt_add_prova_autoria;
+DEALLOCATE PREPARE stmt_add_prova_autoria;
 
 CREATE TABLE IF NOT EXISTS usuarios_agencia (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -65,7 +84,6 @@ CREATE TABLE IF NOT EXISTS usuarios_agencia (
     perm_ver_projetos TINYINT(1) NOT NULL DEFAULT 1,
     perm_criar_projetos TINYINT(1) NOT NULL DEFAULT 0,
     perm_designar_projetos TINYINT(1) NOT NULL DEFAULT 0,
-    perm_financeiro TINYINT(1) NOT NULL DEFAULT 0,
     perm_gerenciar_membros TINYINT(1) NOT NULL DEFAULT 0,
     ativo TINYINT(1) NOT NULL DEFAULT 1,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -140,29 +158,6 @@ CREATE TABLE IF NOT EXISTS mensagens_checklist (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE CASCADE,
     FOREIGN KEY (remetente_usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS contratos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    agencia_id INT NOT NULL,
-    cliente_id INT NOT NULL,
-    checklist_id INT NULL,
-    titulo VARCHAR(200) NOT NULL,
-    descricao_servico TEXT NOT NULL,
-    valor_total DECIMAL(10,2) NOT NULL,
-    qtd_parcelas INT NOT NULL DEFAULT 1,
-    data_inicio DATE NOT NULL,
-    data_prazo DATE NOT NULL,
-    data_vencimento_pagamento DATE NOT NULL,
-    forma_pagamento VARCHAR(100) NULL,
-    status_pagamento ENUM('pendente', 'pago', 'atrasado', 'cancelado') DEFAULT 'pendente',
-    status_projeto ENUM('em_andamento', 'concluido', 'pausado', 'cancelado') DEFAULT 'em_andamento',
-    observacoes TEXT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
-    FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS templates_checklist (

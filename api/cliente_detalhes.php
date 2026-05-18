@@ -54,21 +54,9 @@ while ($p = $res_proj->fetch_assoc()) {
 }
 $stmt_proj->close();
 
-// Buscar Contratos
-$contratos = [];
-$stmt_cont = $conexao->prepare("SELECT id, titulo, valor_total, status_pagamento, status_projeto FROM contratos WHERE cliente_id = ?");
-$stmt_cont->bind_param("i", $cliente_id);
-$stmt_cont->execute();
-$res_cont = $stmt_cont->get_result();
-while ($c = $res_cont->fetch_assoc()) {
-    $contratos[] = $c;
-}
-$stmt_cont->close();
-
 $conexao->close();
 
 $cliente["projetos"] = $projetos;
-$cliente["contratos"] = $contratos;
 
 $retorno["status"] = "ok";
 $retorno["mensagem"] = "Detalhes recuperados com sucesso";

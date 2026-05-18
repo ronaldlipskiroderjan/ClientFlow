@@ -12,7 +12,7 @@ function carregar_vinculo_agencia_ativo($conexao, $usuario_id) {
         "SELECT id as ua_id, agencia_id, papel,
                 perm_ver_clientes, perm_criar_clientes,
                 perm_ver_projetos, perm_criar_projetos, perm_designar_projetos,
-                perm_financeiro, perm_gerenciar_membros, ativo
+                perm_gerenciar_membros, ativo
          FROM usuarios_agencia
          WHERE usuario_id = ? AND ativo = 1
          LIMIT 1"
@@ -42,7 +42,6 @@ function montar_permissoes_sessao($ua) {
         'perm_ver_projetos' => (bool)$ua['perm_ver_projetos'],
         'perm_criar_projetos' => (bool)$ua['perm_criar_projetos'],
         'perm_designar_projetos' => (bool)$ua['perm_designar_projetos'],
-        'perm_financeiro' => (bool)$ua['perm_financeiro'],
         'perm_gerenciar_membros' => (bool)$ua['perm_gerenciar_membros']
     ];
 }

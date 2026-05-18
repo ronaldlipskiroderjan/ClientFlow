@@ -38,7 +38,7 @@ $perm_criar_clientes = isset($_POST['perm_criar_clientes']) && $_POST['perm_cria
 $perm_ver_projetos = isset($_POST['perm_ver_projetos']) && $_POST['perm_ver_projetos'] === '1' ? 1 : 0;
 $perm_criar_projetos = isset($_POST['perm_criar_projetos']) && $_POST['perm_criar_projetos'] === '1' ? 1 : 0;
 $perm_designar_projetos = isset($_POST['perm_designar_projetos']) && $_POST['perm_designar_projetos'] === '1' ? 1 : 0;
-$perm_financeiro = isset($_POST['perm_financeiro']) && $_POST['perm_financeiro'] === '1' ? 1 : 0;
+
 $perm_gerenciar_membros = isset($_POST['perm_gerenciar_membros']) && $_POST['perm_gerenciar_membros'] === '1' ? 1 : 0;
 
 $projetos_str = $_POST['projetos_designados'] ?? '';
@@ -148,16 +148,16 @@ try {
             agencia_id, usuario_id, papel, telefone,
             perm_ver_clientes, perm_criar_clientes,
             perm_ver_projetos, perm_criar_projetos, perm_designar_projetos,
-            perm_financeiro, perm_gerenciar_membros
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            perm_gerenciar_membros
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     
     $stmt_membro->bind_param(
-        "iissiiiiiii", 
+        "iissiiiiii", 
         $agencia_id, $novo_usuario_id, $papel, $telefone,
         $perm_ver_clientes, $perm_criar_clientes, 
         $perm_ver_projetos, $perm_criar_projetos, $perm_designar_projetos,
-        $perm_financeiro, $perm_gerenciar_membros
+        $perm_gerenciar_membros
     );
     
     if (!$stmt_membro->execute()) {

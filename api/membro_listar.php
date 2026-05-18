@@ -20,7 +20,7 @@ if (empty($usuario_id) || empty($agencia_id)) {
 $stmt = $conexao->prepare(
     "SELECT ua.id AS ua_id, ua.papel, ua.perm_ver_clientes, ua.perm_criar_clientes, 
             ua.perm_ver_projetos, ua.perm_criar_projetos, ua.perm_designar_projetos, 
-            ua.perm_financeiro, ua.perm_gerenciar_membros, ua.ativo, ua.criado_em,
+            ua.perm_gerenciar_membros, ua.ativo, ua.criado_em,
             u.id AS usuario_id, u.nome, u.email, u.telefone
      FROM usuarios_agencia ua
      INNER JOIN usuarios u ON u.id = ua.usuario_id
@@ -52,7 +52,6 @@ while ($linha = $resultado->fetch_assoc()) {
             "ver_projetos" => (bool)$linha['perm_ver_projetos'],
             "criar_projetos" => (bool)$linha['perm_criar_projetos'],
             "designar_projetos" => (bool)$linha['perm_designar_projetos'],
-            "financeiro" => (bool)$linha['perm_financeiro'],
             "gerenciar_membros" => (bool)$linha['perm_gerenciar_membros']
         ]
     ];

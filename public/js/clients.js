@@ -98,7 +98,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('detalhe-cadastro').innerText = c.criado_em ? new Date(c.criado_em).toLocaleDateString() : '-';
             
             document.getElementById('badge-projetos').innerText = c.projetos.length;
-            document.getElementById('badge-contratos').innerText = c.contratos.length;
 
             const listaProjetos = document.getElementById('lista-projetos');
             const emptyProjetos = document.getElementById('empty-projetos');
@@ -122,30 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             }
 
-            const listaContratos = document.getElementById('lista-contratos');
-            const emptyContratos = document.getElementById('empty-contratos');
-            listaContratos.innerHTML = '';
-            if (c.contratos.length === 0) {
-                listaContratos.classList.add('d-none');
-                emptyContratos.classList.remove('d-none');
-            } else {
-                listaContratos.classList.remove('d-none');
-                emptyContratos.classList.add('d-none');
-                c.contratos.forEach(cont => {
-                    listaContratos.innerHTML += `
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">${cont.titulo}</h6>
-                                <span class="badge bg-${cont.status_pagamento === 'pago' ? 'success' : (cont.status_pagamento === 'atrasado' ? 'danger' : 'warning text-dark')}">${cont.status_pagamento}</span>
-                                <span class="badge bg-light text-dark border ms-1">${cont.status_projeto}</span>
-                            </div>
-                            <div class="text-end fw-bold text-success">
-                                R$ ${parseFloat(cont.valor_total).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
+
 
             document.getElementById('modal-cliente-loading').classList.add('d-none');
             document.getElementById('modal-cliente-content').classList.remove('d-none');

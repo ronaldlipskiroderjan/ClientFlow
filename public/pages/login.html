@@ -44,8 +44,11 @@
             <div class="mb-4">
                 <label for="password" class="form-label text-muted fw-semibold">Senha</label>
                 <input type="password" class="form-control form-control-lg bg-light border-0" id="password" name="password" placeholder="••••••••" required>
-                <div class="text-end mt-1">
-                    <button type="button" class="btn btn-link p-0 text-primary text-sm text-decoration-none" disabled aria-disabled="true">Esqueceu a senha?</button>
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="manterConectado" name="manterConectado">
+                    <label class="form-check-label text-muted" for="manterConectado">
+                        Manter conectado
+                    </label>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary-custom w-100 btn-lg mb-3">Entrar no painel</button>
