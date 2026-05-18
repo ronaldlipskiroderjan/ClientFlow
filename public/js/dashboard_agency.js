@@ -34,17 +34,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        const [resResumo, resClientes, resMembros, resContratos] = await Promise.allSettled([
+        const [resResumo, resClientes, resMembros] = await Promise.allSettled([
             API.get("dashboard_agencia_resumo.php"),
             API.get("cliente_listar.php"),
-            API.get("membro_listar.php"),
-            API.get("contrato_listar.php")
+            API.get("membro_listar.php")
         ]);
 
         const resumo = resResumo.status === "fulfilled" ? resResumo.value : { status: "nok" };
         const clientesRes = resClientes.status === "fulfilled" ? resClientes.value : { status: "nok" };
         const membrosRes = resMembros.status === "fulfilled" ? resMembros.value : { status: "nok" };
-        const contratosRes = resContratos.status === "fulfilled" ? resContratos.value : { status: "nok" };
+
 
         const dados = resumo.status === "ok" ? (resumo.data || {}) : {};
 
@@ -71,12 +70,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const review = resumoOnboarding.review;
 
         const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
-        
+
         const kpiClients = document.getElementById("kpi-clients");
         const kpiTeam = document.getElementById("kpi-team");
-        const kpiRevenue = document.getElementById("kpi-revenue");
-        const kpiOverdue = document.getElementById("kpi-overdue");
-        const financeSection = document.getElementById("financeSection");
+
 
         const clientes = clientesRes.status === "ok" ? (clientesRes.data || []) : [];
         const membros = membrosRes.status === "ok" ? (membrosRes.data || []) : [];
@@ -84,16 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (kpiClients) kpiClients.textContent = clientesRes.status === "ok" ? clientes.length : "--";
         if (kpiTeam) kpiTeam.textContent = membrosRes.status === "ok" ? membros.length : "--";
 
-        if (contratosRes.status === "ok") {
-            const contratos = contratosRes.data || [];
-            const faturamento = contratos.reduce((totalValor, contrato) => totalValor + Number(contrato.valor_total || 0), 0);
-            if (kpiRevenue) kpiRevenue.textContent = brl.format(faturamento);
-            if (kpiOverdue) kpiOverdue.textContent = contratosRes.kpis?.inadimplentes ?? 0;
-        } else {
-            if (kpiRevenue) kpiRevenue.textContent = "Sem acesso";
-            if (kpiOverdue) kpiOverdue.textContent = "--";
-            if (financeSection) financeSection.classList.add("d-none");
-        }
+
 
         // --- CHART THEME LOGIC ---
         const getChartThemeColors = () => {
@@ -117,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             progressChart = new Chart(ctxProgress, {
                 type: "doughnut",
                 data: {
-                    labels: total > 0 ? ["Finalizados", "Aguardando Cliente", "Revisão do Prestador"] : ["Sem Dados"],
+                    labels: total > 0 ? ["Finalizados", "Aguardando Cliente", "Em Revisão"] : ["Sem Dados"],
                     datasets: [{
                         data: total > 0 ? [finished, pending, review] : [1],
                         backgroundColor: total > 0 ? ["#10B981", "#F59E0B", "#6366f1"] : [theme.empty],
@@ -161,12 +149,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { 
-                                beginAtZero: true, 
+                            y: {
+                                beginAtZero: true,
                                 ticks: { stepSize: 1, color: theme.text },
                                 grid: { color: theme.grid }
                             },
-                            x: { 
+                            x: {
                                 grid: { display: false },
                                 ticks: { color: theme.text }
                             }
@@ -175,49 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             }
 
-            // 3. Finance Chart
-            const financeChartEl = document.getElementById("financeChart");
-            if (financeChartEl && contratosRes.status === "ok") {
-                const contratos = contratosRes.data || [];
-                const statusMap = {
-                    pago: { label: "Pago", color: "#10B981" },
-                    pendente: { label: "Pendente", color: "#F59E0B" },
-                    atrasado: { label: "Atrasado", color: "#EF4444" },
-                    cancelado: { label: "Cancelado", color: "#94A3B8" }
-                };
-                const valoresPorStatus = Object.keys(statusMap).map((key) =>
-                    contratos.reduce((acc, c) => acc + (c.status_pagamento === key ? Number(c.valor_total || 0) : 0), 0)
-                );
-                const hasData = valoresPorStatus.some((v) => v > 0);
-                if (financeChart) financeChart.destroy();
-                financeChart = new Chart(financeChartEl.getContext("2d"), {
-                    type: "doughnut",
-                    data: {
-                        labels: hasData ? Object.values(statusMap).map((s) => s.label) : ["Sem dados"],
-                        datasets: [{
-                            data: hasData ? valoresPorStatus : [1],
-                            backgroundColor: hasData ? Object.values(statusMap).map((s) => s.color) : [theme.empty],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { 
-                                position: "bottom", 
-                                labels: { usePointStyle: true, padding: 16, color: theme.text } 
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (ctx) => hasData ? `${ctx.label}: ${brl.format(ctx.parsed)}` : ctx.label
-                                }
-                            }
-                        },
-                        cutout: "68%"
-                    }
-                });
-            }
+
         };
 
         // Render initial charts

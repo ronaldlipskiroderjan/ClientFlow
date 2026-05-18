@@ -81,8 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const pVerProj = p.ver_projetos ? 'perm-active' : 'perm-inactive';
             const pCriarProj = p.criar_projetos ? 'perm-active' : 'perm-inactive';
             const pVerCli = p.ver_clientes ? 'perm-active' : 'perm-inactive';
-            const pFin = p.financeiro ? 'perm-active' : 'perm-inactive';
-            
+
             // Botões de ação (escondemos se for admin principal ou inativo, ou se usuário não puder)
             let actBtnHtml = '';
             if (m.papel !== 'admin_agencia') {
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="mb-1"><i class="fas fa-check-circle perm-icon ${pVerProj}"></i> Ver Projetos</div>
                             <div class="mb-1"><i class="fas fa-plus-circle perm-icon ${pCriarProj}"></i> Criar Formulários</div>
                             <div class="mb-1"><i class="fas fa-users perm-icon ${pVerCli}"></i> Ver Clientes Base</div>
-                            <div class="mb-1"><i class="fas fa-dollar-sign perm-icon ${pFin}"></i> Financeiro</div>
+
                         </div>
                     </div>
                     
@@ -171,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('edit_perm_ver_clientes').checked = p.ver_clientes;
         document.getElementById('edit_perm_criar_clientes').checked = p.criar_clientes;
         document.getElementById('edit_perm_designar_projetos').checked = p.designar_projetos;
-        document.getElementById('edit_perm_financeiro').checked = p.financeiro;
+
         document.getElementById('edit_perm_gerenciar_membros').checked = p.gerenciar_membros;
         
         document.getElementById('alertEditar').classList.add('d-none');
@@ -194,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('perm_ver_clientes', document.getElementById('edit_perm_ver_clientes').checked ? 1 : 0);
         formData.append('perm_criar_clientes', document.getElementById('edit_perm_criar_clientes').checked ? 1 : 0);
         formData.append('perm_designar_projetos', document.getElementById('edit_perm_designar_projetos').checked ? 1 : 0);
-        formData.append('perm_financeiro', document.getElementById('edit_perm_financeiro').checked ? 1 : 0);
+
         formData.append('perm_gerenciar_membros', document.getElementById('edit_perm_gerenciar_membros').checked ? 1 : 0);
         
         const res = await API.post('membro_atualizar.php', formData);

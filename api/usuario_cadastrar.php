@@ -16,21 +16,22 @@ $documento = trim($_POST['documento'] ?? '');
 $data_nascimento = trim($_POST['data_nascimento'] ?? '');
 $nome_empresa = trim($_POST['nome_empresa'] ?? '');
 $nome_responsavel = trim($_POST['nome_responsavel'] ?? '');
-$prova_autoria = trim($_POST['prova_autoria'] ?? '');
+//$prova_autoria = trim($_POST['prova_autoria'] ?? '');
 $contato_juridico_nome = trim($_POST['contato_juridico_nome'] ?? '');
 $contato_juridico_email = trim($_POST['contato_juridico_email'] ?? '');
 $contato_juridico_telefone = trim($_POST['contato_juridico_telefone'] ?? '');
 
-function normalizar_data_para_iso($valor) {
+function normalizar_data_para_iso($valor)
+{
     $valor = trim($valor);
     if ($valor === '') {
         return null;
     }
 
     if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $valor, $partes)) {
-        $dia = (int)$partes[1];
-        $mes = (int)$partes[2];
-        $ano = (int)$partes[3];
+        $dia = (int) $partes[1];
+        $mes = (int) $partes[2];
+        $ano = (int) $partes[3];
 
         if (!checkdate($mes, $dia, $ano)) {
             return false;
@@ -40,9 +41,9 @@ function normalizar_data_para_iso($valor) {
     }
 
     if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $valor, $partes)) {
-        $ano = (int)$partes[1];
-        $mes = (int)$partes[2];
-        $dia = (int)$partes[3];
+        $ano = (int) $partes[1];
+        $mes = (int) $partes[2];
+        $dia = (int) $partes[3];
 
         if (!checkdate($mes, $dia, $ano)) {
             return false;
@@ -81,11 +82,11 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
-if ($prova_autoria === '') {
+/*if ($prova_autoria === '') {
     $retorno["mensagem"] = "Informe a prova de autoria.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
-    exit();
+    exit();*/
 }
 
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
@@ -105,12 +106,12 @@ try {
     $tipo_db = ($tipo_normalizado === 'agency') ? 'agency_member' : $tipo_normalizado;
 
     $stmt = $conexao->prepare(
-        "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, prova_autoria, status_conta)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado')"
+        "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, /*prova_autoria,*/ status_conta)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, /*?,*/ 'aprovado')"
     );
 
     $stmt->bind_param(
-        "ssssssssss",
+        "sssssssss"/*s"*/,
         $nome,
         $email,
         $senha_hash,
@@ -120,7 +121,7 @@ try {
         $data_nascimento,
         $nome_empresa,
         $nome_responsavel,
-        $prova_autoria
+        /*$prova_autoria*/
     );
 
     if (!$stmt->execute()) {
@@ -130,7 +131,7 @@ try {
             throw new Exception("Erro ao cadastrar: " . $stmt->error);
         }
     }
-    
+
     $usuario_id = $conexao->insert_id;
     $stmt->close();
 
@@ -205,8 +206,8 @@ try {
                 agencia_id, usuario_id, papel, telefone,
                 perm_ver_clientes, perm_criar_clientes,
                 perm_ver_projetos, perm_criar_projetos, perm_designar_projetos,
-                perm_financeiro, perm_gerenciar_membros
-            ) VALUES (?, ?, 'admin_agencia', ?, 1, 1, 1, 1, 1, 1, 1)"
+                perm_gerenciar_membros
+            ) VALUES (?, ?, 'admin_agencia', ?, 1, 1, 1, 1, 1, 1)"
         );
         $stmt_membro->bind_param("iis", $agencia_id, $usuario_id, $telefone);
         if (!$stmt_membro->execute()) {

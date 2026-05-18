@@ -5,7 +5,7 @@ session_start();
 $retorno = ["status" => "nok", "mensagem" => "Usuário não autenticado", "data" => null];
 
 $usuario_id = $_SESSION['usuario_id'] ?? null;
-$tipo       = $_SESSION['usuario_tipo'] ?? null;
+$tipo = $_SESSION['usuario_tipo'] ?? null;
 $agencia_id = $_SESSION['agencia_id'] ?? null;
 
 if (empty($usuario_id)) {
@@ -15,7 +15,7 @@ if (empty($usuario_id)) {
 }
 
 $stmt = $conexao->prepare(
-    "SELECT id, nome, email, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, prova_autoria, foto_path, status_conta, desativacao_solicitada_em, criado_em
+    "SELECT id, nome, email, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, /*prova_autoria,*/ foto_path, status_conta, desativacao_solicitada_em, criado_em
      FROM usuarios WHERE id = ?"
 );
 $stmt->bind_param("i", $usuario_id);
@@ -49,9 +49,9 @@ if (in_array($tipo, ['agency', 'agency_member'], true) && !empty($agencia_id)) {
     $data["papel"] = $_SESSION['papel_agencia'] ?? null;
 }
 
-$retorno["status"]   = "ok";
+$retorno["status"] = "ok";
 $retorno["mensagem"] = "Perfil obtido com sucesso.";
-$retorno["data"]     = $data;
+$retorno["data"] = $data;
 
 $conexao->close();
 header("Content-type: application/json;charset:utf-8");

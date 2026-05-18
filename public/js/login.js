@@ -19,10 +19,20 @@ function ocultarPainelReativacao() {
 async function handleLoginSubmit(event) {
     event.preventDefault();
 
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const params   = new URLSearchParams(window.location.search);
-    const token    = params.get('token');
+    const email           = document.getElementById('email').value.trim();
+    const password        = document.getElementById('password').value;
+    const manterConectado = document.getElementById('manterConectado')?.checked;
+    const params          = new URLSearchParams(window.location.search);
+    const token           = params.get('token');
+
+    // Persiste (ou limpa) o e-mail de acordo com a preferência do usuário
+    if (manterConectado) {
+        localStorage.setItem('cf_remember_email', email);
+        localStorage.setItem('cf_remember_me', '1');
+    } else {
+        localStorage.removeItem('cf_remember_email');
+        localStorage.removeItem('cf_remember_me');
+    }
 
     try {
         const retorno = await ApiClientFlow.post('usuario_login.php', { email, senha: password });
@@ -66,6 +76,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+
+    // ─── Restaura "Manter conectado" ─────────────────────────────────────────
+    const savedEmail    = localStorage.getItem('cf_remember_email');
+    const savedRemember = localStorage.getItem('cf_remember_me') === '1';
+    const emailInput    = document.getElementById('email');
+    const checkRemember = document.getElementById('manterConectado');
+    if (savedRemember && savedEmail && emailInput) {
+        emailInput.value        = savedEmail;
+        if (checkRemember) checkRemember.checked = true;
+    }
 
     // ─── Auto-redirect se já estiver logado ──────────────────────────────────
     try {

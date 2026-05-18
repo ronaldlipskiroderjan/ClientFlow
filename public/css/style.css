@@ -917,7 +917,7 @@ p.form-control-plaintext {
 .theme-fab {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 24px;
   z-index: 1055;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }

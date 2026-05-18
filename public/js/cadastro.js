@@ -336,7 +336,7 @@ function buildRegisterData(tabId, raw) {
             birth_date: raw.birth_date,
             phone: raw.phone,
             email: raw.email,
-            proof_of_authorship: raw.prova_autoria,
+            //proof_of_authorship: raw.prova_autoria,
             password: raw.password,
             role: raw.role
         };
@@ -353,7 +353,7 @@ function buildRegisterData(tabId, raw) {
         cpf_cnpj: onlyDigits(raw.cpf_cnpj),
         phone: raw.phone,
         email: raw.email,
-        proof_of_authorship: raw.prova_autoria,
+        //proof_of_authorship: raw.prova_autoria,
         password: raw.password,
         role: raw.role
     };
@@ -458,7 +458,7 @@ async function handleRegisterSubmit(event) {
             data_nascimento: toISODateFromBR(userData.birth_date || ''),
             nome_empresa: userData.corporate_name || '',
             nome_responsavel: userData.responsible_name || '',
-            prova_autoria: userData.proof_of_authorship || '',
+            //prova_autoria: userData.proof_of_authorship || '',
             contato_juridico_nome: userData.legal_contact_name || '',
             contato_juridico_email: userData.legal_contact_email || '',
             contato_juridico_telefone: userData.legal_contact_phone || ''
@@ -569,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     data_nascimento: toISODateFromBR(userData.birth_date || ''),
                     nome_empresa: userData.corporate_name || '',
                     nome_responsavel: userData.responsible_name || '',
-                    prova_autoria: userData.proof_of_authorship || '',
+                    //prova_autoria: userData.proof_of_authorship || '',
                     contato_juridico_nome: userData.legal_contact_name || '',
                     contato_juridico_email: userData.legal_contact_email || '',
                     contato_juridico_telefone: userData.legal_contact_phone || ''

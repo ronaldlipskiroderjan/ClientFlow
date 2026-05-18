@@ -12,9 +12,9 @@ if (empty($usuario_id)) {
     exit();
 }
 
-$nome     = trim($_POST['nome'] ?? '');
+$nome = trim($_POST['nome'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
-$prova_autoria = trim($_POST['prova_autoria'] ?? '');
+//$prova_autoria = trim($_POST['prova_autoria'] ?? '');
 
 if (empty($nome)) {
     $retorno["mensagem"] = "O nome é obrigatório.";
@@ -23,12 +23,12 @@ if (empty($nome)) {
     exit();
 }
 
-$stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, telefone = ?, prova_autoria = ? WHERE id = ?");
-$stmt->bind_param("sssi", $nome, $telefone, $prova_autoria, $usuario_id);
+$stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, telefone = ?, /*prova_autoria = ?*/ WHERE id = ?");
+$stmt->bind_param("ssi"/*s*/ , $nome, $telefone, /*$prova_autoria,*/ $usuario_id);
 
 if ($stmt->execute()) {
     $_SESSION['usuario_nome'] = $nome;
-    $retorno["status"]   = "ok";
+    $retorno["status"] = "ok";
     $retorno["mensagem"] = "Perfil atualizado com sucesso!";
 } else {
     $retorno["mensagem"] = "Erro ao atualizar perfil.";

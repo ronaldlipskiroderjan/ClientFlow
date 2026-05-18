@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const p_ver_cli = document.getElementById('perm_ver_clientes');
         const p_criar_cli = document.getElementById('perm_criar_clientes');
         const p_des_proj = document.getElementById('perm_designar_projetos');
-        const p_fin = document.getElementById('perm_financeiro');
+
         const p_ger_mem = document.getElementById('perm_gerenciar_membros');
 
         // Reset
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         p_ver_cli.checked = false;
         p_criar_cli.checked = false;
         p_des_proj.checked = false;
-        p_fin.checked = false;
+
         p_ger_mem.checked = false;
 
         if (val === 'dev') {
@@ -42,14 +42,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             p_ver_cli.checked = true;
         } else if (val === 'financeiro') {
             p_ver_cli.checked = true;
-            p_fin.checked = true;
         } else if (val === 'gerente') {
             p_ver_proj.checked = true;
             p_criar_proj.checked = true;
             p_ver_cli.checked = true;
             p_criar_cli.checked = true;
             p_des_proj.checked = true;
-            p_fin.checked = true;
+
         }
     });
 
@@ -111,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('perm_ver_clientes', document.getElementById('perm_ver_clientes').checked ? 1 : 0);
         formData.append('perm_criar_clientes', document.getElementById('perm_criar_clientes').checked ? 1 : 0);
         formData.append('perm_designar_projetos', document.getElementById('perm_designar_projetos').checked ? 1 : 0);
-        formData.append('perm_financeiro', document.getElementById('perm_financeiro').checked ? 1 : 0);
+
         formData.append('perm_gerenciar_membros', document.getElementById('perm_gerenciar_membros').checked ? 1 : 0);
         
         if (projetos_selecionados.length > 0) {

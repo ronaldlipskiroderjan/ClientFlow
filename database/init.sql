@@ -84,7 +84,6 @@ CREATE TABLE IF NOT EXISTS usuarios_agencia (
     perm_ver_projetos TINYINT(1) NOT NULL DEFAULT 1,
     perm_criar_projetos TINYINT(1) NOT NULL DEFAULT 0,
     perm_designar_projetos TINYINT(1) NOT NULL DEFAULT 0,
-    perm_financeiro TINYINT(1) NOT NULL DEFAULT 0,
     perm_gerenciar_membros TINYINT(1) NOT NULL DEFAULT 0,
     ativo TINYINT(1) NOT NULL DEFAULT 1,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -159,29 +158,6 @@ CREATE TABLE IF NOT EXISTS mensagens_checklist (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE CASCADE,
     FOREIGN KEY (remetente_usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS contratos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    agencia_id INT NOT NULL,
-    cliente_id INT NOT NULL,
-    checklist_id INT NULL,
-    titulo VARCHAR(200) NOT NULL,
-    descricao_servico TEXT NOT NULL,
-    valor_total DECIMAL(10,2) NOT NULL,
-    qtd_parcelas INT NOT NULL DEFAULT 1,
-    data_inicio DATE NOT NULL,
-    data_prazo DATE NOT NULL,
-    data_vencimento_pagamento DATE NOT NULL,
-    forma_pagamento VARCHAR(100) NULL,
-    status_pagamento ENUM('pendente', 'pago', 'atrasado', 'cancelado') DEFAULT 'pendente',
-    status_projeto ENUM('em_andamento', 'concluido', 'pausado', 'cancelado') DEFAULT 'em_andamento',
-    observacoes TEXT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
-    FOREIGN KEY (checklist_id) REFERENCES checklists(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS templates_checklist (
