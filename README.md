@@ -81,4 +81,4 @@ ClientFlow/
 
 **Disciplina:** Experiência Criativa – Projetando Soluções Computacionais  
 **Curso:** Bacharelado em Engenharia de Software — PUCPR — 2025  
-**Orientadores:** Profª. Lisiane Reips · Prof. Giulio Domenico Bordin · Profª. Rosilene Fernandes
+**Orientadores:** Prof. Giulio Domenico Bordin
