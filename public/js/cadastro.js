@@ -260,7 +260,6 @@ function setupPasswordUX() {
         const checklist = form.querySelector(`[data-password-checklist="${passwordInput.id}"]`);
         const confirmInput = form.querySelector('input[name="confirm_password"]');
         const matchMessage = form.querySelector(`[data-password-match-message="${passwordInput.id}"]`);
-        const toggleButton = form.querySelector(`[data-password-toggle="${passwordInput.id}"]`);
         const checklistItems = checklist ? checklist.querySelectorAll('.password-checklist-item') : [];
 
         const refreshUI = () => {
@@ -311,18 +310,23 @@ function setupPasswordUX() {
             confirmInput.addEventListener('input', refreshUI);
         }
 
-        if (toggleButton) {
+        refreshUI();
+    });
+
+    document.querySelectorAll('[data-password-toggle]').forEach(toggleButton => {
+        const targetId = toggleButton.getAttribute('data-password-toggle');
+        const targetInput = document.getElementById(targetId);
+        
+        if (targetInput) {
             toggleButton.addEventListener('click', () => {
-                const isHidden = passwordInput.type === 'password';
-                passwordInput.type = isHidden ? 'text' : 'password';
+                const isHidden = targetInput.type === 'password';
+                targetInput.type = isHidden ? 'text' : 'password';
                 toggleButton.innerHTML = isHidden
                     ? '<i class="fa-solid fa-eye-slash"></i>'
                     : '<i class="fa-solid fa-eye"></i>';
                 toggleButton.setAttribute('aria-label', isHidden ? 'Ocultar senha' : 'Mostrar senha');
             });
         }
-
-        refreshUI();
     });
 }
 

@@ -218,6 +218,13 @@ try {
         "papel" => $papel
     ];
 
+} catch (mysqli_sql_exception $e) {
+    $conexao->rollback();
+    if ($e->getCode() == 1062) {
+        $retorno["mensagem"] = "Este e-mail já está cadastrado no sistema. Utilize outro e-mail para este colaborador.";
+    } else {
+        $retorno["mensagem"] = $e->getMessage();
+    }
 } catch (Exception $e) {
     $conexao->rollback();
     $retorno["mensagem"] = $e->getMessage();

@@ -121,6 +121,13 @@ try {
         "email" => $email,
         "empresa" => $empresa
     ];
+} catch (mysqli_sql_exception $e) {
+    $conexao->rollback();
+    if ($e->getCode() == 1062) {
+        $retorno["mensagem"] = "O e-mail ou documento do cliente já está cadastrado ou vinculado a esta agência.";
+    } else {
+        $retorno["mensagem"] = $e->getMessage();
+    }
 } catch (Exception $e) {
     $conexao->rollback();
     $retorno["mensagem"] = $e->getMessage();

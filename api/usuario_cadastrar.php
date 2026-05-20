@@ -125,7 +125,7 @@ try {
     );
 
     if (!$stmt->execute()) {
-        $err_no  = $stmt->errno;
+        $err_no = $stmt->errno;
         $err_msg = $stmt->error;
         $stmt->close();
         if ($err_no === 1062) {
@@ -228,6 +228,13 @@ try {
         "tipo" => $tipo_normalizado // Retorna tipo normalizado (freelancer convertido para agency)
     ];
 
+} catch (mysqli_sql_exception $e) {
+    $conexao->rollback();
+    if ($e->getCode() == 1062) {
+        $retorno["mensagem"] = "Este e-mail já está cadastrado. Utilize outro ou faça login na sua conta existente.";
+    } else {
+        $retorno["mensagem"] = $e->getMessage();
+    }
 } catch (Exception $e) {
     $conexao->rollback();
     $retorno["mensagem"] = $e->getMessage();

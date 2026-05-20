@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!checklistId) { window.location.href = "dashboard_client.html"; return; }
 
+    // Inicializa a sidebar padrão
+    if (window.SidebarManager) {
+        await SidebarManager.init();
+    }
+
     const itemsContainer = document.getElementById("items-container");
     const emptyState     = document.getElementById("empty-state");
     const navTitle       = document.getElementById("nav-project-title");
@@ -493,23 +498,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (sessao.status !== "ok") { window.location.href = "login.html"; return; }
         if (!sessao.data || sessao.data.tipo !== "client") { window.location.href = "dashboard_agency.html"; return; }
 
-        if (window.ClientFlowIdentity) {
-            window.ClientFlowIdentity.apply(sessao.data, { avatarBackground: "E63946" });
-        }
-
         await carregarItens();
         initChat(sessao.data.id);
-
-        const logoutLink = document.querySelector(".js-logout-link");
-        if (logoutLink) {
-            logoutLink.addEventListener("click", async e => {
-                e.preventDefault();
-                await ApiClientFlow.post("usuario_logoff.php");
-                window.location.href = "../../index.html";
-            });
-        }
     } catch (err) {
         console.error("Checklist Details error:", err);
-        // window.location.href = "login.html";
+        window.location.href = "login.html";
     }
 });
