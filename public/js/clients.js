@@ -2,9 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await SidebarManager.init();
     
     if (!Auth.hasAccess('perm_ver_clientes') && !Auth.hasAccess('perm_criar_clientes')) {
-         alert('Você não tem permissão para visualizar clientes.');
-         window.location.href = "dashboard_agency.html";
-         return;
+        Toast.error('Você não tem permissão para visualizar clientes.');
+        window.location.href = "dashboard_agency.html";
+        return;
     }
     
     const btnNovo = document.getElementById("btnNovoCliente");
@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
         } catch (error) {
             modalDetalhes.hide();
-            alert('Erro ao carregar detalhes do cliente: ' + error.message);
+            Toast.error('Erro ao carregar detalhes do cliente: ' + error.message);
         }
     }
 
@@ -147,18 +147,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const clienteId = button.getAttribute("data-id");
                 if (!clienteId) return;
 
-                const confirma = window.confirm("Deseja realmente excluir este cliente?");
-                if (!confirma) return;
-
                 try {
                     const retorno = await API.post("cliente_excluir.php", { cliente_id: clienteId });
                     if (retorno.status !== "ok") {
-                        alert(retorno.mensagem || "Não foi possível excluir o cliente.");
+                        Toast.error(retorno.mensagem || "Não foi possível excluir o cliente.");
                         return;
                     }
+                    Toast.success('Cliente excluído com sucesso.');
                     await carregarClientes();
                 } catch (error) {
-                    alert("Erro ao conectar com o servidor.");
+                    Toast.error("Erro ao conectar com o servidor.");
                 }
             });
         });

@@ -95,13 +95,14 @@ CREATE TABLE IF NOT EXISTS usuarios_agencia (
 CREATE TABLE IF NOT EXISTS clientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     agencia_id INT NOT NULL,
-    usuario_id INT UNIQUE NULL,
+    usuario_id INT NULL,
     nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(100) NOT NULL,
     telefone VARCHAR(20) NULL,
     senha VARCHAR(255) NOT NULL,
     empresa VARCHAR(100) NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_cliente_agencia_email (agencia_id, email),
     FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE
 );
 
@@ -111,12 +112,28 @@ CREATE TABLE IF NOT EXISTS checklists (
     cliente_id INT NULL,
     titulo VARCHAR(150) NOT NULL,
     descricao TEXT NULL,
-    link_hash VARCHAR(64) UNIQUE NOT NULL, 
+    link_hash VARCHAR(64) UNIQUE NOT NULL,
     status ENUM('Aberto', 'Encerrado') DEFAULT 'Aberto',
+    data_vencimento DATE NULL,
+    frequencia_cobranca_dias INT NULL,
+    ultima_cobranca DATE NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (agencia_id) REFERENCES agencias(id) ON DELETE CASCADE,
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL
 );
+
+-- Migrações seguras: adiciona colunas de vencimento se ainda não existirem (para BDs já criados)
+SET @col1 := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'checklists' AND COLUMN_NAME = 'data_vencimento');
+SET @ddl1 := IF(@col1 = 0, 'ALTER TABLE checklists ADD COLUMN data_vencimento DATE NULL AFTER status', 'SELECT 1');
+PREPARE s1 FROM @ddl1; EXECUTE s1; DEALLOCATE PREPARE s1;
+
+SET @col2 := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'checklists' AND COLUMN_NAME = 'frequencia_cobranca_dias');
+SET @ddl2 := IF(@col2 = 0, 'ALTER TABLE checklists ADD COLUMN frequencia_cobranca_dias INT NULL AFTER data_vencimento', 'SELECT 1');
+PREPARE s2 FROM @ddl2; EXECUTE s2; DEALLOCATE PREPARE s2;
+
+SET @col3 := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'checklists' AND COLUMN_NAME = 'ultima_cobranca');
+SET @ddl3 := IF(@col3 = 0, 'ALTER TABLE checklists ADD COLUMN ultima_cobranca DATE NULL AFTER frequencia_cobranca_dias', 'SELECT 1');
+PREPARE s3 FROM @ddl3; EXECUTE s3; DEALLOCATE PREPARE s3;
 
 CREATE TABLE IF NOT EXISTS projetos_membros (
     id INT AUTO_INCREMENT PRIMARY KEY,

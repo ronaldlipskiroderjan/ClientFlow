@@ -365,48 +365,48 @@ function validateFormByTab(tabId, raw, form) {
 
     const passwordError = validatePasswordStrength(raw.password);
     if (passwordError) {
-        alert(passwordError);
+        Toast.warning(passwordError);
         return false;
     }
 
     if (confirmPassword && raw.password !== confirmPassword.value) {
-        alert('A confirmação de senha precisa ser igual à senha informada.');
+        Toast.warning('A confirmação de senha precisa ser igual à senha informada.');
         return false;
     }
 
     const termsAccepted = form ? form.querySelector('input[name="accept_terms"]') : null;
     if (!termsAccepted || !termsAccepted.checked) {
-        alert('Você precisa aceitar os Termos de Uso e a Política de Privacidade para concluir o cadastro.');
+        Toast.warning('Você precisa aceitar os Termos de Uso e a Política de Privacidade para concluir o cadastro.');
         return false;
     }
 
     if (isPersonTab && !isValidCPF(raw.cpf)) {
-        alert('CPF invalido. Verifique e tente novamente.');
+        Toast.warning('CPF inválido. Verifique e tente novamente.');
         return false;
     }
 
     if (!isValidPhone(raw.phone)) {
-        alert('Telefone invalido. Use DDD + numero (10 ou 11 digitos).');
+        Toast.warning('Telefone inválido. Use DDD + número (10 ou 11 dígitos).');
         return false;
     }
 
     if (isPersonTab && !isAdultBirthDate(raw.birth_date)) {
-        alert('Data de nascimento invalida. O cadastro PF exige idade minima de 18 anos.');
+        Toast.warning('Data de nascimento inválida. O cadastro PF exige idade mínima de 18 anos.');
         return false;
     }
 
     if (tabId === 'pj' && !isValidCNPJ(raw.cpf_cnpj)) {
-        alert('CNPJ invalido. Verifique e tente novamente.');
+        Toast.warning('CNPJ inválido. Verifique e tente novamente.');
         return false;
     }
 
     if (tabId === 'pj' && raw.role === 'agency' && !String(raw.legal_contact_name || '').trim()) {
-        alert('Informe o nome do contato juridico da agencia.');
+        Toast.warning('Informe o nome do contato jurídico da agência.');
         return false;
     }
 
     if (!raw.role || !['client', 'agency'].includes(raw.role)) {
-        alert('Perfil de cadastro invalido.');
+        Toast.error('Perfil de cadastro inválido.');
         return false;
     }
 
@@ -465,7 +465,7 @@ async function handleRegisterSubmit(event) {
         });
 
         if (retorno.status !== 'ok') {
-            alert(retorno.mensagem || 'Erro ao criar conta.');
+            Toast.error(retorno.mensagem || 'Erro ao criar conta.');
             return;
         }
 
@@ -476,7 +476,7 @@ async function handleRegisterSubmit(event) {
             });
 
             if (loginRetorno.status !== 'ok') {
-                alert(loginRetorno.mensagem || 'Cadastro realizado, mas falhou o login automatico.');
+                Toast.warning(loginRetorno.mensagem || 'Cadastro realizado, mas falhou o login automático.');
                 window.location.href = 'login.html' + (token ? ('?token=' + encodeURIComponent(token)) : '');
                 return;
             }
@@ -484,16 +484,16 @@ async function handleRegisterSubmit(event) {
             if (token) {
                 const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
                 if (vinculo.status !== 'ok') {
-                    alert(vinculo.mensagem || 'Cadastro realizado, mas nao foi possivel vincular o formulario.');
+                    Toast.warning(vinculo.mensagem || 'Cadastro realizado, mas não foi possível vincular o formulário.');
                     return;
                 }
             }
         }
 
-        alert('Cadastro realizado com sucesso.');
+        Toast.success('Cadastro realizado com sucesso!');
         window.location.href = getRedirectByRole(userData.role);
     } catch (error) {
-        alert('Erro ao conectar com o servidor. Tente novamente.');
+        Toast.error('Erro ao conectar com o servidor. Tente novamente.');
     }
 }
 
@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (res.status !== 'ok') {
-                    alert(res.mensagem || 'Erro ao criar conta.');
+                    Toast.error(res.mensagem || 'Erro ao criar conta.');
                     btn.disabled = false;
                     btn.textContent = originalText;
                     return;
@@ -592,16 +592,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (token) {
                         const vinculo = await API.post('checklist_vincular_cliente.php', { token });
                         if (vinculo.status !== 'ok') {
-                            alert('Conta criada, mas houve um erro ao vincular o projeto: ' + vinculo.mensagem);
+                            Toast.warning('Conta criada, mas houve um erro ao vincular o projeto: ' + vinculo.mensagem);
                         }
                     }
                     window.location.href = getRedirectByRole(userData.role);
                 } else {
-                    alert('Conta criada com sucesso! Por favor, faça login.');
+                    Toast.success('Conta criada! Por favor, faça login.');
                     window.location.href = 'login.html' + (token ? `?token=${encodeURIComponent(token)}` : '');
                 }
             } catch (error) {
-                alert('Erro na conexão com o servidor.');
+                Toast.error('Erro na conexão com o servidor.');
                 btn.disabled = false;
                 btn.textContent = originalText;
             }

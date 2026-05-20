@@ -133,11 +133,12 @@ try {
     $stmt->bind_param("ssss", $nome, $email, $senha_hash, $telefone);
 
     if (!$stmt->execute()) {
-        if ($conexao->errno == 1062) {
-            throw new Exception("Este e-mail já está cadastrado no sistema.");
-        } else {
-            throw new Exception("Erro ao cadastrar usuário: " . $stmt->error);
+        $err_no  = $stmt->errno;
+        $stmt->close();
+        if ($err_no === 1062) {
+            throw new Exception("Este e-mail já está cadastrado no sistema. Utilize outro e-mail para este colaborador.");
         }
+        throw new Exception("Erro interno ao cadastrar colaborador. Por favor, tente novamente.");
     }
     
     $novo_usuario_id = $conexao->insert_id;

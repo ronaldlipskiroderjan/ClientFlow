@@ -16,7 +16,7 @@ class PlanosManager {
 
         } catch (error) {
             console.error('Erro ao inicializar gerenciador de planos:', error);
-            alert('Erro ao carregar página de planos. Tente novamente.');
+            Toast.error('Erro ao carregar página de planos. Tente novamente.');
         }
     }
 
@@ -47,7 +47,7 @@ class PlanosManager {
 
         } catch (error) {
             console.error('Erro ao carregar planos:', error);
-            alert('Erro ao carregar informações de planos.');
+            Toast.error('Erro ao carregar informações de planos.');
         }
     }
 
@@ -216,7 +216,7 @@ class PlanosManager {
 
     static async executarUpgrade() {
         if (!this.planoSelecionado) {
-            alert('Nenhum plano selecionado.');
+            Toast.warning('Nenhum plano selecionado.');
             return;
         }
 
@@ -234,20 +234,20 @@ class PlanosManager {
             btnConfirm.innerHTML = textoBkp;
 
             if (retorno.status !== 'ok') {
-                alert(retorno.mensagem || 'Erro ao alterar plano');
+                Toast.error(retorno.mensagem || 'Erro ao alterar plano');
                 return;
             }
 
             // Mostrar avisos se houver
             if (retorno.data.avisos && retorno.data.avisos.length > 0) {
-                alert(retorno.data.avisos.join('\n'));
+                retorno.data.avisos.forEach(aviso => Toast.warning(aviso));
             }
 
             // Fechar modal e recarregar
             const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpgradeModal'));
             modal.hide();
 
-            alert('Plano alterado com sucesso! Sua sessao permanece ativa.');
+            Toast.success('Plano alterado com sucesso! Sua sessão permanece ativa.');
             this.planoSelecionado = null;
 
             // Recarregar dados de planos
@@ -255,7 +255,7 @@ class PlanosManager {
 
         } catch (error) {
             console.error('Erro ao fazer upgrade:', error);
-            alert('Erro ao processar upgrade. Tente novamente.');
+            Toast.error('Erro ao processar upgrade. Tente novamente.');
         }
     }
 }

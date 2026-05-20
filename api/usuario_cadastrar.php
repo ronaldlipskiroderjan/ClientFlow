@@ -86,8 +86,8 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $retorno["mensagem"] = "Informe a prova de autoria.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
-    exit();*/
-}
+    exit();
+}*/
 
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
@@ -111,7 +111,7 @@ try {
     );
 
     $stmt->bind_param(
-        "sssssssss"/*s"*/,
+        "sssssssss"/*s"*/ ,
         $nome,
         $email,
         $senha_hash,
@@ -125,11 +125,13 @@ try {
     );
 
     if (!$stmt->execute()) {
-        if ($conexao->errno == 1062) {
-            throw new Exception("Este e-mail já está cadastrado.");
-        } else {
-            throw new Exception("Erro ao cadastrar: " . $stmt->error);
+        $err_no  = $stmt->errno;
+        $err_msg = $stmt->error;
+        $stmt->close();
+        if ($err_no === 1062) {
+            throw new Exception("Este e-mail já está cadastrado. Utilize outro e-mail ou faça login na sua conta existente.");
         }
+        throw new Exception("Erro interno ao cadastrar. Por favor, tente novamente.");
     }
 
     $usuario_id = $conexao->insert_id;

@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Validar permissões para esta tela
     if (!Auth.hasAccess('perm_gerenciar_membros')) {
-        alert('Você não tem permissão para acessar esta área.');
+        Toast.error('Você não tem permissão para acessar esta área.');
         window.location.href = 'dashboard_agency.html';
         return;
     }
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } else {
             console.error("Erro ao carregar membros", response);
-            alert("Não foi possível carregar a equipe.");
+            Toast.error("Não foi possível carregar a equipe.");
         }
     }
 
@@ -211,25 +211,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ====== DESATIVAR ======
     window.desativarMembro = async function(uaId) {
-        if (!confirm('Tem certeza? Este usuário perderá acesso imediato aos projetos do prestador de serviço e sairá de todas as suas designações.')) {
-            return;
-        }
-        
         const formData = new URLSearchParams();
         formData.append('ua_id', uaId);
         
         const res = await API.post('membro_excluir.php', formData);
         if (res && res.status === 'ok') {
+            Toast.success('Membro desativado com sucesso.');
             carregarMembros();
         } else {
-            alert(res ? res.mensagem : 'Erro ao desativar.');
+            Toast.error(res ? res.mensagem : 'Erro ao desativar.');
         }
     };
 
     // ====== DESIGNAR PROJETOS ======
     window.abrirModalDesignar = function(uaId) {
         if (!Auth.hasAccess('perm_designar_projetos')) {
-            alert("Acesso negado.");
+            Toast.error('Acesso negado.');
             return;
         }
         
@@ -307,8 +304,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     window.removerDesignacao = async function(uaId, chkId) {
-        if (!confirm('Remover o acesso deste membro a este projeto?')) return;
-        
         const formData = new URLSearchParams();
         formData.append('ua_id', uaId);
         formData.append('checklist_id', chkId);
@@ -316,11 +311,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const res = await API.post('projeto_designar.php', formData);
         if (res && res.status === 'ok') {
+            Toast.success('Acesso ao projeto removido.');
             await carregarMembros();
             const membroAtualizado = membrosAgencia.find(m => m.id == uaId);
             renderizarProjetosAtribuidos(membroAtualizado);
         } else {
-            alert(res ? res.mensagem : 'Erro.');
+            Toast.error(res ? res.mensagem : 'Erro ao remover designação.');
         }
     };
 
