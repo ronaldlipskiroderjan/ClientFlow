@@ -1,6 +1,6 @@
-﻿# ClientFlow
+# ClientFlow
 
-Micro-SaaS B2B de coleta estruturada de materiais com autentica├º├úo completa e v├¡nculo seguro de conta. Ag├¬ncias e prestadores de servi├ºo criam checklists din├ómicos, geram links de acesso ├║nicos e acompanham o status de cada entrega em tempo real ÔÇö eliminando a depend├¬ncia de WhatsApp, e-mail e pastas compartilhadas.
+Micro-SaaS B2B de coleta estruturada de materiais com autenticação completa e vínculo seguro de conta. Agências e prestadores de serviço criam checklists dinâmicos, geram links de acesso únicos e acompanham o status de cada entrega em tempo real — eliminando a dependência de WhatsApp, e-mail e pastas compartilhadas.
 
 ---
 
@@ -14,7 +14,7 @@ Micro-SaaS B2B de coleta estruturada de materiais com autentica├º├úo compl
 | Camada | Tecnologia |
 |---|---|
 | Frontend | HTML5, CSS3, JavaScript (Vanilla) |
-| Estiliza├º├úo | Bootstrap 5.3.2, Font Awesome 6.4.2, Google Fonts (Inter) |
+| Estilização | Bootstrap 5.3.2, Font Awesome 6.4.2, Google Fonts (Inter) |
 | Backend | PHP 8+ (API REST) |
 | Banco de Dados | MySQL 8+ |
 
@@ -22,32 +22,32 @@ Micro-SaaS B2B de coleta estruturada de materiais com autentica├º├úo compl
 
 ## Funcionalidades
 
-### Prestador de Servi├ºo
+### Prestador de Serviço
 - Cadastro com CPF (PF) ou CNPJ (PJ)
-- Cria├º├úo de checklists com itens tipados (texto, URL, arquivo, imagem, cor)
-- Gera├º├úo de link ├║nico de coleta vincul├ível a um cliente
-- Templates reutiliz├íveis de checklist
+- Criação de checklists com itens tipados (texto, URL, arquivo, imagem, cor)
+- Geração de link único de coleta vinculável a um cliente
+- Templates reutilizáveis de checklist
 - Monitoramento de status de envios em tempo real
-- Aprova├º├úo e reprova├º├úo de entregas com justificativa
+- Aprovação e reprovação de entregas com justificativa
 - Mensagens por checklist
-- Gerenciamento de equipe com controle de permiss├Áes por papel
+- Gerenciamento de equipe com controle de permissões por papel
 - Upgrade de plano de assinatura
 
 ### Cliente Final
-- V├¡nculo de checklist via link ├║nico
+- Vínculo de checklist via link único
 - Upload de arquivos e respostas por item
 - Acompanhamento de status de cada entrega
-- Mensagens diretas com a ag├¬ncia
+- Mensagens diretas com a agência
 
 ### Colaborador
-- Acesso ao painel operacional conforme permiss├Áes configuradas
-- Pap├®is dispon├¡veis: `admin_agencia`, `gerente`, `dev`, `gestor_cliente`, `financeiro`
-- Cria├º├úo de checklists, gest├úo de templates e revis├úo de entregas
+- Acesso ao painel operacional conforme permissões configuradas
+- Papéis disponíveis: `admin_agencia`, `gerente`, `dev`, `gestor_cliente`, `financeiro`
+- Criação de checklists, gestão de templates e revisão de entregas
 
 ### Administrador do Sistema
-- Listagem e filtragem de todos os usu├írios da plataforma
-- Altera├º├úo de status de conta (aprovado, banido, desativado)
-- Atualiza├º├úo de plano de qualquer ag├¬ncia
+- Listagem e filtragem de todos os usuários da plataforma
+- Alteração de status de conta (aprovado, banido, desativado)
+- Atualização de plano de qualquer agência
 
 ---
 
@@ -55,14 +55,14 @@ Micro-SaaS B2B de coleta estruturada de materiais com autentica├º├úo compl
 
 ```
 ClientFlow/
-Ôö£ÔöÇÔöÇ api/              # Endpoints PHP (API REST)
-Ôö£ÔöÇÔöÇ public/
-Ôöé   Ôö£ÔöÇÔöÇ pages/        # P├íginas HTML
-Ôöé   Ôö£ÔöÇÔöÇ js/           # Scripts JavaScript
-Ôöé   ÔööÔöÇÔöÇ css/          # Estilos
-Ôö£ÔöÇÔöÇ database/
-Ôöé   ÔööÔöÇÔöÇ init.sql      # Script de cria├º├úo do banco
-ÔööÔöÇÔöÇ index.html        # Landing page p├║blica
+├── api/              # Endpoints PHP (API REST)
+├── public/
+│   ├── pages/        # Páginas HTML
+│   ├── js/           # Scripts JavaScript
+│   └── css/          # Estilos
+├── database/
+│   └── init.sql      # Script de criação do banco
+└── index.html        # Landing page pública
 ```
 
 ---
@@ -73,12 +73,12 @@ ClientFlow/
 |---|
 | Bernardo Roche Moreira |
 | Christopher Paterno Alves de Souza |
-| Gustavo Isdra Corr├¬a |
+| Gustavo Isdra Corrêa |
 | Ronald Lipski Roderjan |
 | Vantuil Plaster Junior |
 
 ---
 
-**Disciplina:** Experi├¬ncia Criativa ÔÇô Projetando Solu├º├Áes Computacionais  
-**Curso:** Bacharelado em Engenharia de Software ÔÇö PUCPR ÔÇö 2025  
+**Disciplina:** Experiência Criativa – Projetando Soluções Computacionais  
+**Curso:** Bacharelado em Engenharia de Software — PUCPR — 2025  
 **Orientadores:** Prof. Giulio Domenico Bordin
