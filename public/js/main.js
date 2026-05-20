@@ -181,9 +181,106 @@ function setupChatToggle() {
     });
 }
 
-function showToast(message, type = 'success') {
-    console.log('[Toast ' + type.toUpperCase() + '] ' + message);
-}
+// ══════════════════════════════════════════════════════════════
+//  TOAST — Sistema global de notificações não-bloqueantes
+// ══════════════════════════════════════════════════════════════
+(function () {
+    const DURATION = 4000;
+
+    const TYPES = {
+        success: { icon: 'fa-circle-check',      color: '#10b981', bg: '#f0fdf4', border: '#bbf7d0', textColor: '#065f46' },
+        error:   { icon: 'fa-circle-xmark',      color: '#ef4444', bg: '#fef2f2', border: '#fecaca', textColor: '#991b1b' },
+        warning: { icon: 'fa-triangle-exclamation', color: '#f59e0b', bg: '#fffbeb', border: '#fde68a', textColor: '#92400e' },
+        info:    { icon: 'fa-circle-info',        color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe', textColor: '#1e40af' },
+    };
+
+    const DARK_TYPES = {
+        success: { bg: '#052e16', border: '#166534', textColor: '#bbf7d0' },
+        error:   { bg: '#450a0a', border: '#991b1b', textColor: '#fecaca' },
+        warning: { bg: '#451a03', border: '#92400e', textColor: '#fde68a' },
+        info:    { bg: '#0c1a3a', border: '#1e40af', textColor: '#bfdbfe' },
+    };
+
+    function getContainer() {
+        let c = document.getElementById('cf-toast-container');
+        if (!c) {
+            c = document.createElement('div');
+            c.id = 'cf-toast-container';
+            c.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;max-width:360px;width:calc(100% - 48px);pointer-events:none;';
+            document.body.appendChild(c);
+        }
+        return c;
+    }
+
+    function isDark() {
+        return document.documentElement.getAttribute('data-theme') === 'dark';
+    }
+
+    window.showToast = function (message, type = 'info') {
+        const cfg  = TYPES[type]  || TYPES.info;
+        const dark = isDark() ? (DARK_TYPES[type] || {}) : {};
+        const bg     = dark.bg      || cfg.bg;
+        const border = dark.border  || cfg.border;
+        const txtCol = dark.textColor || cfg.textColor;
+
+        const toast = document.createElement('div');
+        toast.style.cssText = [
+            `background:${bg}`,
+            `border:1px solid ${border}`,
+            `border-left:4px solid ${cfg.color}`,
+            'border-radius:10px',
+            'padding:14px 16px 10px',
+            'box-shadow:0 8px 24px rgba(0,0,0,.12)',
+            'pointer-events:all',
+            'opacity:0',
+            'transform:translateX(20px)',
+            'transition:opacity .22s ease,transform .22s ease',
+            'position:relative',
+            'overflow:hidden',
+        ].join(';');
+
+        toast.innerHTML = `
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+                <i class="fa-solid ${cfg.icon}" style="color:${cfg.color};font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+                <span style="font-size:13.5px;font-weight:500;line-height:1.45;color:${txtCol};flex:1;">${message}</span>
+                <button onclick="this.closest('[data-cf-toast]').remove()" style="border:none;background:none;padding:0;cursor:pointer;color:${cfg.color};opacity:.6;font-size:14px;line-height:1;flex-shrink:0;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div style="position:absolute;bottom:0;left:0;height:3px;background:${cfg.color};opacity:.35;width:100%;transform-origin:left;animation:cf-toast-progress ${DURATION}ms linear forwards;border-radius:0 0 10px 10px;"></div>
+        `;
+        toast.setAttribute('data-cf-toast', '');
+
+        getContainer().appendChild(toast);
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(0)';
+        });
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            setTimeout(() => toast.remove(), 250);
+        }, DURATION);
+    };
+
+    // Atalhos semânticos
+    window.Toast = {
+        success: (msg) => showToast(msg, 'success'),
+        error:   (msg) => showToast(msg, 'error'),
+        warning: (msg) => showToast(msg, 'warning'),
+        info:    (msg) => showToast(msg, 'info'),
+        show:    (msg, type) => showToast(msg, type),
+    };
+
+    // Injetar keyframe da barra de progresso
+    if (!document.getElementById('cf-toast-style')) {
+        const s = document.createElement('style');
+        s.id = 'cf-toast-style';
+        s.textContent = '@keyframes cf-toast-progress{from{transform:scaleX(1)}to{transform:scaleX(0)}}';
+        document.head.appendChild(s);
+    }
+})();
 
 function getClientFlowDisplayName(userData) {
     if (!userData) {

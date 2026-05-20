@@ -209,11 +209,11 @@ async function salvarNovoPlano() {
 
     try {
         const retorno = await ApiClientFlow.post('admin_usuario_atualizar_plano.php', { usuario_id: id, plano_id: planoId });
-        if (retorno.status !== 'ok') { alert(retorno.mensagem || 'Erro ao alterar plano'); return; }
+        if (retorno.status !== 'ok') { Toast.error(retorno.mensagem || 'Erro ao alterar plano'); return; }
         if (modalPlanoInstance) modalPlanoInstance.hide();
         carregarUsuarios(paginaAtual);
     } catch (e) {
-        alert('Erro ao conectar com o servidor');
+        Toast.error('Erro ao conectar com o servidor');
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-save me-2"></i>Salvar';
@@ -258,7 +258,7 @@ async function confirmarStatus(id, novoStatus, callbackAposAcao) {
 
     try {
         const retorno = await ApiClientFlow.post('admin_usuario_atualizar_status.php', { usuario_id: id, status: novoStatus });
-        if (retorno.status !== 'ok') { alert(retorno.mensagem || 'Erro ao alterar status'); return; }
+        if (retorno.status !== 'ok') { Toast.error(retorno.mensagem || 'Erro ao alterar status'); return; }
         if (modalDesatInstance) modalDesatInstance.hide();
         if (typeof callbackAposAcao === 'function') {
             callbackAposAcao();
@@ -266,7 +266,7 @@ async function confirmarStatus(id, novoStatus, callbackAposAcao) {
             carregarUsuarios(paginaAtual);
         }
     } catch (e) {
-        alert('Erro ao conectar com o servidor');
+        Toast.error('Erro ao conectar com o servidor');
     } finally {
         btn.disabled = false;
     }

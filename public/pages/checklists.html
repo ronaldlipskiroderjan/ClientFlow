@@ -48,6 +48,17 @@
                     </div>
                 </section>
 
+                <!-- Barra de busca -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="input-group" style="max-width:360px;">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fa-solid fa-magnifying-glass text-muted" style="font-size:13px;"></i>
+                        </span>
+                        <input type="text" id="searchProjects" class="form-control border-start-0 ps-0"
+                               placeholder="Buscar por nome ou cliente..." autocomplete="off">
+                    </div>
+                </div>
+
                 <div class="surface-panel p-0 overflow-hidden">
                     <!-- Desktop: Tabela -->
                     <div class="d-none d-md-block table-responsive">
@@ -115,6 +126,32 @@
                                 disabled>Confirmar Vínculo</button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Reprovação — z-index alto para sobrepor reviewModal -->
+    <div class="modal fade" id="modalReprovar" tabindex="-1" aria-hidden="true" style="z-index:1075;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-rotate-left text-danger"></i> Reprovar Item
+                    </h5>
+                    <button type="button" class="btn-close" id="btnCancelarReprovar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Informe o motivo da reprovação. O cliente verá esta mensagem e poderá reenviar o material.</p>
+                    <textarea id="inputMotivoReprovar" class="form-control" rows="3"
+                              placeholder="Ex: A imagem está em baixa resolução. Por favor, envie em pelo menos 300 DPI."
+                              required></textarea>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" id="btnCancelarReprovar">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarReprovar">
+                        <i class="fa-solid fa-rotate-left me-1"></i>Reprovar e Devolver
+                    </button>
                 </div>
             </div>
         </div>

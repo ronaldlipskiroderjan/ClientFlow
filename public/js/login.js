@@ -25,7 +25,6 @@ async function handleLoginSubmit(event) {
     const params          = new URLSearchParams(window.location.search);
     const token           = params.get('token');
 
-    // Persiste (ou limpa) o e-mail de acordo com a preferência do usuário
     if (manterConectado) {
         localStorage.setItem('cf_remember_email', email);
         localStorage.setItem('cf_remember_me', '1');
@@ -43,31 +42,31 @@ async function handleLoginSubmit(event) {
         }
 
         if (retorno.status !== 'ok') {
-            alert(retorno.mensagem || 'E-mail ou senha incorretos.');
+            Toast.error(retorno.mensagem || 'E-mail ou senha incorretos.');
             return;
         }
 
         const tipo = retorno.data?.tipo;
         if (!tipo) {
-            alert('Não foi possível identificar o perfil do usuário.');
+            Toast.error('Não foi possível identificar o perfil do usuário.');
             return;
         }
 
         if (token) {
             if (tipo !== 'client') {
-                alert('Este link de formulário exige login de cliente.');
+                Toast.warning('Este link de formulário exige login de cliente.');
                 return;
             }
             const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
             if (vinculo.status !== 'ok') {
-                alert(vinculo.mensagem || 'Não foi possível vincular o formulário.');
+                Toast.error(vinculo.mensagem || 'Não foi possível vincular o formulário.');
                 return;
             }
         }
 
         window.location.href = getDashboardByRole(tipo);
     } catch (error) {
-        alert('Erro ao conectar com o servidor. Tente novamente.');
+        Toast.error('Erro ao conectar com o servidor. Tente novamente.');
     }
 }
 
@@ -77,52 +76,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
-    // ─── Restaura "Manter conectado" ─────────────────────────────────────────
     const savedEmail    = localStorage.getItem('cf_remember_email');
     const savedRemember = localStorage.getItem('cf_remember_me') === '1';
     const emailInput    = document.getElementById('email');
     const checkRemember = document.getElementById('manterConectado');
     if (savedRemember && savedEmail && emailInput) {
-        emailInput.value        = savedEmail;
+        emailInput.value = savedEmail;
         if (checkRemember) checkRemember.checked = true;
     }
 
-    // ─── Auto-redirect se já estiver logado ──────────────────────────────────
     try {
         const sessao = await ApiClientFlow.get('valida_sessao_logado.php');
         if (sessao.status === 'ok' && sessao.data && sessao.data.tipo) {
             const tipo = sessao.data.tipo;
 
-            // Se tem token na URL, processa o vinculo agora mesmo
             if (token) {
                 if (tipo !== 'client') {
-                    alert('Este link de formulário exige conta de cliente. Deslogue da conta de prestador de serviço primeiro.');
+                    Toast.warning('Este link exige conta de cliente. Deslogue da conta de prestador de serviço primeiro.');
                     return;
                 }
                 const vinculo = await ApiClientFlow.post('checklist_vincular_cliente.php', { token });
                 if (vinculo.status !== 'ok') {
-                    alert(vinculo.mensagem || 'Não foi possível vincular o formulário.');
+                    Toast.error(vinculo.mensagem || 'Não foi possível vincular o formulário.');
                 }
             }
 
-            // Já está logado: tchau login page!
             window.location.href = getDashboardByRole(tipo);
             return;
         }
     } catch (e) {
-        // Se der erro na checagem, segue normalmente carregando a tela de login
+        // Segue carregando a tela de login normalmente
     }
-
-
 
     if (token) {
         document.querySelectorAll('a[href="cadastro.html"]').forEach(a => {
             a.href = `cadastro.html?token=${encodeURIComponent(token)}`;
         });
-        
+
         const titleEl = document.querySelector('.text-center.mb-4 h2');
         const descEl = document.querySelector('.text-center.mb-4 p.text-muted');
-        
+
         if (titleEl) titleEl.textContent = 'Vincular Projeto';
         if (descEl) descEl.innerHTML = 'Faça login para vincular o projeto à sua conta, ou <a href="cadastro.html?token=' + encodeURIComponent(token) + '" class="text-primary fw-semibold">cadastre-se</a>.';
     }

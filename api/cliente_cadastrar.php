@@ -100,7 +100,12 @@ try {
     );
     $stmt_cliente->bind_param("iisssss", $agencia_id, $cli_usuario_id, $nome, $email, $telefone, $senha_hash, $empresa);
     if (!$stmt_cliente->execute()) {
-        throw new Exception("Erro ao vincular cliente à agência. Talvez ele já esteja vinculado.");
+        $err_no = $stmt_cliente->errno;
+        $stmt_cliente->close();
+        if ($err_no === 1062) {
+            throw new Exception("Este cliente já está vinculado à sua agência.");
+        }
+        throw new Exception("Erro interno ao vincular cliente. Por favor, tente novamente.");
     }
     $cliente_id = $conexao->insert_id;
     $stmt_cliente->close();
@@ -118,12 +123,7 @@ try {
     ];
 } catch (Exception $e) {
     $conexao->rollback();
-
-    if ($conexao->errno == 1062) {
-        $retorno["mensagem"] = "Este e-mail/cliente já está cadastrado ou vinculado.";
-    } else {
-        $retorno["mensagem"] = $e->getMessage() ?: "Erro ao cadastrar cliente.";
-    }
+    $retorno["mensagem"] = $e->getMessage();
 }
 
 $conexao->close();

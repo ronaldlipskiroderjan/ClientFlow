@@ -1,4 +1,4 @@
-﻿async function handleAdminLoginSubmit(event) {
+async function handleAdminLoginSubmit(event) {
     event.preventDefault();
 
     const emailInput = document.getElementById('email');
@@ -14,19 +14,19 @@
         });
 
         if (retorno.status !== 'ok') {
-            alert(retorno.mensagem || 'E-mail ou senha incorretos.');
+            Toast.error(retorno.mensagem || 'E-mail ou senha incorretos.');
             return;
         }
 
         const tipo = retorno.data && retorno.data.tipo ? retorno.data.tipo : null;
         if (tipo !== 'admin') {
-            alert('Use uma conta de administrador para acessar este painel.');
+            Toast.error('Use uma conta de administrador para acessar este painel.');
             return;
         }
 
         window.location.href = 'dashboard_admin.html';
     } catch (error) {
-        alert('Erro ao conectar com o servidor. Tente novamente.');
+        Toast.error('Erro ao conectar com o servidor. Tente novamente.');
     }
 }
 
