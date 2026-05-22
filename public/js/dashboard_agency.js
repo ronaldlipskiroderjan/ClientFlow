@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        // Verifica sessão ANTES de montar o sidebar para evitar flash indevido
         const sessao = await Auth.validateSession();
 
         if (!sessao) {
@@ -8,13 +7,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Admin tem sua própria dashboard — redireciona sem inicializar a página de agência
         if (sessao.tipo === "admin") {
             window.location.href = "dashboard_admin.html";
             return;
         }
 
-        // Clientes não têm acesso à dashboard de agência
         if (sessao.tipo === "client") {
             window.location.href = "login.html";
             return;
@@ -83,7 +80,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
-        // --- CHART THEME LOGIC ---
         const getChartThemeColors = () => {
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             return {
@@ -99,7 +95,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const theme = getChartThemeColors();
             const total = resumoOnboarding.total;
 
-            // 1. Progress Chart
             const ctxProgress = document.getElementById("progressChart").getContext("2d");
             if (progressChart) progressChart.destroy();
             progressChart = new Chart(ctxProgress, {
@@ -126,7 +121,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            // 2. Clients Chart
             const clientsChartEl = document.getElementById("clientsChart");
             if (clientsChartEl) {
                 const { labels, values } = buildMonthlySeries(clientes, "criado_em", 6);
@@ -166,10 +160,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         };
 
-        // Render initial charts
         renderCharts();
 
-        // Listen for theme changes to update charts
         window.addEventListener('clientflow:themechange', () => {
             renderCharts();
         });

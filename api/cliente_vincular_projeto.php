@@ -34,7 +34,6 @@ if (empty($agencia_id)) {
     exit();
 }
 
-// Aceita CPF, CNPJ ou documento
 $cpf_cnpj = preg_replace('/[^0-9]/', '', $_POST['cpf'] ?? ($_POST['cnpj'] ?? ($_POST['documento'] ?? '')));
 $checklist_id = intval($_POST['checklist_id'] ?? 0);
 
@@ -45,7 +44,6 @@ if (empty($cpf_cnpj) || $checklist_id <= 0) {
     exit();
 }
 
-// Validar formato: CPF (11) ou CNPJ (14)
 if (strlen($cpf_cnpj) !== 11 && strlen($cpf_cnpj) !== 14) {
     $retorno["mensagem"] = "CPF ou CNPJ inválido. Deve ter 11 ou 14 dígitos.";
     header("Content-type: application/json;charset:utf-8");
@@ -53,7 +51,6 @@ if (strlen($cpf_cnpj) !== 11 && strlen($cpf_cnpj) !== 14) {
     exit();
 }
 
-// 1. Validar checklist
 $stmt_chk = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
 $stmt_chk->bind_param("ii", $checklist_id, $agencia_id);
 $stmt_chk->execute();
@@ -69,14 +66,12 @@ $stmt_chk->close();
 $conexao->begin_transaction();
 
 try {
-    // 2. Achar o usuario pelo CPF/CNPJ/documento
     $stmt_usr = $conexao->prepare("SELECT id, nome, email, senha_hash, nome_empresa, documento FROM usuarios WHERE documento = ? AND tipo = 'client' LIMIT 1");
     $stmt_usr->bind_param("s", $cpf_cnpj);
     $stmt_usr->execute();
     $res_usr = $stmt_usr->get_result();
 
     if ($res_usr->num_rows === 0) {
-        // Tenta procurar pelo nome da empresa ou outro critério se for CNPJ
         $msg = strlen($cpf_cnpj) === 14 ? "Cliente (CNPJ) não encontrado no sistema." : "Cliente (CPF) não encontrado no sistema.";
         throw new Exception($msg);
     }
@@ -86,7 +81,6 @@ try {
 
     $cliente_id_final = 0;
 
-    // 3. Verifica ou Cria registro na tabela Clientes
     $stmt_cli = $conexao->prepare("SELECT id FROM clientes WHERE usuario_id = ? AND agencia_id = ? LIMIT 1");
     $stmt_cli->bind_param("ii", $cliente_usuario_id, $agencia_id);
     $stmt_cli->execute();
@@ -105,7 +99,6 @@ try {
     }
     $stmt_cli->close();
 
-    // 4. Update Checklist
     $stmt_upd = $conexao->prepare("UPDATE checklists SET cliente_id = ? WHERE id = ?");
     $stmt_upd->bind_param("ii", $cliente_id_final, $checklist_id);
     if (!$stmt_upd->execute()) {

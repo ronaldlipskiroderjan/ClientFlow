@@ -1,5 +1,4 @@
 <?php
-// Executado via cron. Deleta contas desativadas há mais de 180 dias.
 if (php_sapi_name() !== 'cli') {
     http_response_code(403);
     exit('Acesso negado.');

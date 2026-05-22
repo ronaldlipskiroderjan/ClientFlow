@@ -60,7 +60,6 @@ while ($linha = $resultado->fetch_assoc()) {
 $stmt->close();
 
 if (count($membros) > 0) {
-    // Buscar membros atribuidos a projetos
     $stmt_proj = $conexao->prepare(
         "SELECT pm.usuario_agencia_id, c.id AS checklist_id, c.titulo 
          FROM projetos_membros pm 

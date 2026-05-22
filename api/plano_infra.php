@@ -61,7 +61,7 @@ function cf_bootstrap_planos(mysqli $conexao, int $agencia_id): void {
     $planos_default = [
         ["individual", "Plano individual - apenas um acesso", 0.00, 0.00, 1, 10, 5],
         ["basico", "Plano basico para pequenos negocios", 49.00, 490.00, 3, 25, 20],
-        ["profissional", "Plano profissional para agencias em crescimento", 99.00, 990.00, 10, 100, 100],
+        ["profissional", "Plano para agencias em crescimento", 99.00, 990.00, 10, 100, 100],
         ["enterprise", "Plano enterprise - sem limites", 299.00, 2990.00, 999999, 999999, 1000],
     ];
 

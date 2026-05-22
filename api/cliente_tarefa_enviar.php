@@ -262,7 +262,6 @@ if ($tipo_item === 'file' || $tipo_item === 'image') {
 
     $resposta_texto = $valor;
 
-    // Gera um histórico em arquivo por cliente/checklist/item mesmo para respostas textuais.
     $text_file = $client_dir . '/resposta_' . date('Ymd_His') . '.txt';
     file_put_contents($text_file, $valor);
 }

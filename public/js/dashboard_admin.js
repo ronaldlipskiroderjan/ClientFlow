@@ -6,7 +6,6 @@ let agenciaAtualId      = null;
 let agenciaAtualNome    = '';
 let tabAtiva            = 'clientes';
 
-// ─── KPIs ─────────────────────────────────────────────────────────────────────
 
 async function carregarResumoAdmin() {
     try {
@@ -22,7 +21,6 @@ async function carregarResumoAdmin() {
     }
 }
 
-// ─── Prestadores de Serviço (tabela principal) ────────────────────────────────
 
 async function carregarUsuarios(pagina = 1) {
     paginaAtual = pagina;
@@ -84,7 +82,6 @@ async function carregarUsuarios(pagina = 1) {
             const btnDesatIcon   = estaDesativado ? 'fa-check-circle'      : 'fa-ban';
             const btnDesatTitle  = estaDesativado ? 'Ativar conta'         : 'Desativar conta';
 
-            // Linha de tabela (desktop)
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
@@ -114,7 +111,6 @@ async function carregarUsuarios(pagina = 1) {
                 </td>`;
             usuariosTbody.appendChild(row);
 
-            // Card (mobile)
             if (usuariosCards) {
                 const card = document.createElement('div');
                 card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
@@ -190,7 +186,6 @@ function getStatusBadge(status) {
     return map[status] || '<span class="badge bg-light text-dark border">Desconhecido</span>';
 }
 
-// ─── Modal: Mudar Plano ───────────────────────────────────────────────────────
 
 function abrirModalMudarPlano(id, planoAtualId) {
     document.getElementById('modal-plano-usuario-id').value = id;
@@ -220,7 +215,6 @@ async function salvarNovoPlano() {
     }
 }
 
-// ─── Modal: Desativar / Ativar conta ─────────────────────────────────────────
 
 function abrirModalDesativar(id, statusAtual, callbackAposAcao) {
     document.getElementById('modal-desat-usuario-id').value = id;
@@ -272,7 +266,6 @@ async function confirmarStatus(id, novoStatus, callbackAposAcao) {
     }
 }
 
-// ─── Modal: Membros da Agência ────────────────────────────────────────────────
 
 async function abrirModalAgencia(usuarioId, nome) {
     agenciaAtualId   = usuarioId;
@@ -444,7 +437,6 @@ function renderMembrosColaboradores(colaboradores) {
     });
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
     const sessao = await Auth.validateSession();

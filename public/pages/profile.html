@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | ClientFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="../css/style.css" rel="stylesheet">
+    <script>
+        (function () {
+            var t = localStorage.getItem('clientflow-theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+</head>
+
+<body class="bg-arctic-gray">
+    <div class="d-flex app-shell">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content flex-grow-1 min-vh-100" id="profilePage">
+            <div class="container-fluid py-4 px-3 px-lg-4">
+                <section class="page-header-card mb-4">
+                    <h1 class="h3 fw-bold mb-1 text-navy-blue">Meu Perfil</h1>
+                    <p class="text-muted mb-0">Gerencie seus dados, segurança e configurações de conta.</p>
+                </section>
+
+                <section class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header border-bottom py-3 bg-white">
+                        <div class="d-flex align-items-center gap-3">
+                            <img id="profileModalAvatar" src="" alt="Avatar" class="rounded-3" style="width:48px;height:48px;object-fit:cover;">
+                            <div>
+                                <h2 class="h5 fw-bold mb-0">Configurações do Perfil</h2>
+                                <small class="text-muted" id="profileModalRole"></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <ul class="nav nav-tabs profile-modal-tabs px-4 pt-3" id="profileTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-perfil-btn" data-bs-toggle="tab" data-bs-target="#tabPerfil" type="button" role="tab">
+                                    <i class="fas fa-user me-2"></i>Meu Perfil
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" id="tabEmpresaItem" style="display:none">
+                                <button class="nav-link" id="tab-empresa-btn" data-bs-toggle="tab" data-bs-target="#tabEmpresa" type="button" role="tab">
+                                    <i class="fas fa-building me-2"></i>Dados da Empresa
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-senha-btn" data-bs-toggle="tab" data-bs-target="#tabSenha" type="button" role="tab">
+                                    <i class="fas fa-lock me-2"></i>Segurança
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link profile-tab-danger" id="tab-excluir-btn" data-bs-toggle="tab" data-bs-target="#tabExcluir" type="button" role="tab">
+                                    <i class="fas fa-user-slash me-2"></i>Desativar Conta
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-4" id="profileTabsContent">
+                            <div class="tab-pane fade show active" id="tabPerfil" role="tabpanel">
+                                <form id="formPerfil" novalidate>
+                                    <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
+                                        <div class="profile-photo-wrap" id="profilePhotoWrap" title="Clique para trocar a foto">
+                                            <img id="profilePhotoPreview" src="" alt="Foto de perfil" class="profile-photo-img">
+                                            <div class="profile-photo-overlay">
+                                                <i class="fas fa-camera"></i>
+                                            </div>
+                                            <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/webp,image/gif" class="d-none">
+                                        </div>
+                                        <div>
+                                            <p class="fw-semibold mb-1">Foto de Perfil</p>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="profilePhotoBtn">
+                                                <i class="fas fa-upload me-1"></i>Escolher foto
+                                            </button>
+                                            <div id="alertFoto" class="alert alert-sm d-none mt-2 mb-0 py-2 px-3 small" role="alert"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="perfilNome" class="form-label fw-semibold">Nome</label>
+                                        <input type="text" class="form-control" id="perfilNome" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="perfilEmail" class="form-label fw-semibold">E-mail</label>
+                                        <input type="email" class="form-control" id="perfilEmail" readonly>
+                                        <div class="form-text">O e-mail não pode ser alterado.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="perfilTelefone" class="form-label fw-semibold">Telefone</label>
+                                        <input type="text" class="form-control" id="perfilTelefone" placeholder="(00) 00000-0000">
+                                    </div>
+                                    <div id="alertPerfil" class="alert d-none" role="alert"></div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="tabEmpresa" role="tabpanel">
+                                <form id="formEmpresa" novalidate>
+                                    <div class="mb-3">
+                                        <label for="agNomeEmpresa" class="form-label fw-semibold">Nome da Empresa</label>
+                                        <input type="text" class="form-control" id="agNomeEmpresa" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="agCnpj" class="form-label fw-semibold">CNPJ</label>
+                                        <input type="text" class="form-control" id="agCnpj" placeholder="00.000.000/0000-00">
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label for="agTelefone" class="form-label fw-semibold">Telefone da Empresa</label>
+                                            <input type="text" class="form-control" id="agTelefone" placeholder="(00) 0000-0000">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="agSite" class="form-label fw-semibold">Site</label>
+                                            <input type="text" class="form-control" id="agSite" placeholder="https://...">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="agDescricao" class="form-label fw-semibold">Descrição</label>
+                                        <textarea class="form-control" id="agDescricao" rows="3" placeholder="Descreva sua empresa..."></textarea>
+                                    </div>
+                                    <div id="alertEmpresa" class="alert d-none" role="alert"></div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar Dados da Empresa
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="tabSenha" role="tabpanel">
+                                <form id="formSenha" novalidate>
+                                    <div class="mb-3">
+                                        <label for="senhaAtual" class="form-label fw-semibold">Senha Atual</label>
+                                        <input type="password" class="form-control" id="senhaAtual" autocomplete="current-password">
+                                        <div id="senhaAtualStatus" class="form-text small d-none mt-2"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="novaSenha" class="form-label fw-semibold">Nova Senha</label>
+                                        <input type="password" class="form-control" id="novaSenha" autocomplete="new-password">
+                                        <div class="password-checklist d-none mt-3" data-password-checklist="novaSenha">
+                                            <div class="password-checklist-header small fw-bold text-muted mb-2">Sua senha precisa ter:</div>
+                                            <div class="password-checklist-item" data-rule="length"><i class="fa-solid fa-circle-check"></i><span>Mínimo de 8 caracteres</span></div>
+                                            <div class="password-checklist-item" data-rule="uppercase"><i class="fa-solid fa-circle-check"></i><span>1 letra maiúscula</span></div>
+                                            <div class="password-checklist-item" data-rule="lowercase"><i class="fa-solid fa-circle-check"></i><span>1 letra minúscula</span></div>
+                                            <div class="password-checklist-item" data-rule="number"><i class="fa-solid fa-circle-check"></i><span>1 número</span></div>
+                                            <div class="password-checklist-item" data-rule="special"><i class="fa-solid fa-circle-check"></i><span>1 caractere especial</span></div>
+                                            <div class="password-checklist-item" data-rule="no-repeat"><i class="fa-solid fa-circle-check"></i><span>Sem repetição em sequência</span></div>
+                                            <div class="password-checklist-item" data-rule="no-sequence"><i class="fa-solid fa-circle-check"></i><span>Sem sequências óbvias</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirmarSenha" class="form-label fw-semibold">Confirmar Nova Senha</label>
+                                        <input type="password" class="form-control" id="confirmarSenha" autocomplete="new-password">
+                                        <div id="confirmarSenhaStatus" class="form-text small d-none mt-2">As senhas não coincidem.</div>
+                                    </div>
+                                    <div id="alertSenha" class="alert d-none" role="alert"></div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-lock me-2"></i>Alterar Senha
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="tabExcluir" role="tabpanel">
+                                <div class="alert alert-danger d-flex gap-2 align-items-start mb-4">
+                                    <i class="fas fa-exclamation-triangle mt-1 flex-shrink-0"></i>
+                                    <div><strong>Atenção!</strong> Ao desativar sua conta você será desconectado imediatamente. Você terá 180 dias para reativá-la, após esse prazo a conta será desativada permanentemente.</div>
+                                </div>
+                                <form id="formExcluir" novalidate>
+                                    <div class="mb-3">
+                                        <label for="senhaExcluir" class="form-label fw-semibold">Digite sua senha para confirmar</label>
+                                        <input type="password" class="form-control" id="senhaExcluir" autocomplete="current-password">
+                                    </div>
+                                    <div id="alertExcluir" class="alert d-none" role="alert"></div>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-user-slash me-2"></i>Desativar Conta
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <footer class="footer text-center mt-auto py-4 bg-white border-top">
+                <div class="container text-center">
+                    <div class="text-muted small">&copy; 2026 ClientFlow Agency. Todos os direitos reservados.</div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/profile.js"></script>
+</body>
+
+</html>

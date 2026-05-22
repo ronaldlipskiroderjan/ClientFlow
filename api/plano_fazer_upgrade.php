@@ -20,7 +20,6 @@ if (empty($usuario_id) || empty($agencia_id)) {
     exit();
 }
 
-// Apenas admin da agência pode fazer upgrade
 if ($papel_agencia !== 'admin_agencia') {
     $retorno["mensagem"] = "Você não tem permissão para fazer upgrade de plano.";
     header("Content-type: application/json;charset:utf-8");
@@ -49,7 +48,6 @@ try {
 $conexao->begin_transaction();
 
 try {
-    // Buscar ID do novo plano
     $stmt_novo_plano = $conexao->prepare(
         "SELECT id, nome, limite_colaboradores, limite_projetos, limite_armazenamento_gb 
          FROM tipos_planos WHERE nome = ? AND ativo = 1"
@@ -70,7 +68,6 @@ try {
     $novo_plano = $res_novo_plano->fetch_assoc();
     $stmt_novo_plano->close();
     
-    // Atualizar assinatura atual para o novo plano
     $stmt_update = $conexao->prepare(
         "UPDATE assinaturas_planos 
          SET tipo_plano_id = ?, data_renovacao = DATE_ADD(CURDATE(), INTERVAL 1 MONTH), atualizado_em = NOW()
@@ -89,7 +86,6 @@ try {
     
     $stmt_update->close();
     
-    // Validar se há violação de limites (avisar, mas não bloquear)
     $stmt_validate = $conexao->prepare(
         "SELECT 
             (SELECT COUNT(DISTINCT usuario_id) FROM usuarios_agencia WHERE agencia_id = ? AND ativo = 1) as total_colaboradores,
@@ -118,7 +114,6 @@ try {
         $stmt_validate->close();
     }
     
-    // Atualizar uso de recursos
     $stmt_uso = $conexao->prepare(
         "UPDATE uso_recursos_agencia 
          SET data_calculo = NOW()

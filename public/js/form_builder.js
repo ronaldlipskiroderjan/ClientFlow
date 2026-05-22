@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════
-//  CATEGORIAS — Base profissional de itens de checklist
-// ═══════════════════════════════════════════════════════════
 const CATEGORIAS = [
     {
         id: 'identidade_visual',
@@ -94,14 +91,8 @@ const CATEGORIAS = [
 ];
 
 
-// ═══════════════════════════════════════════════════════════
-//  ESTADO — itens selecionados
-// ═══════════════════════════════════════════════════════════
-let selectedItems = []; // { catId, catNome, catCor, nome, descricao, tipo, allowed_extensions }
+let selectedItems = [];
 
-// ═══════════════════════════════════════════════════════════
-//  RENDERIZAÇÃO DO ACCORDION
-// ═══════════════════════════════════════════════════════════
 function renderAccordion() {
     const container = document.getElementById('categoriesAccordion');
     if (!container) return;
@@ -129,7 +120,6 @@ function renderAccordion() {
             const checkId = `chk-${cat.id}-${idx}`;
             const configId = `cfg-${cat.id}-${idx}`;
 
-            // ─ Row (label) ─
             const row = document.createElement('label');
             row.className = 'item-row d-flex';
             row.htmlFor = checkId;
@@ -145,7 +135,6 @@ function renderAccordion() {
             });
             body.appendChild(row);
 
-            // ─ Config panel (hidden by default) ─
             const configDiv = document.createElement('div');
             configDiv.className = 'item-config';
             configDiv.id = configId;
@@ -167,7 +156,6 @@ function toggleCategory(catId) {
     const body = document.getElementById(`body-${catId}`);
     if (!header || !body) return;
     const isOpen = body.classList.contains('open');
-    // fechar todos
     document.querySelectorAll('.cat-body.open').forEach(b => b.classList.remove('open'));
     document.querySelectorAll('.cat-header.open').forEach(h => h.classList.remove('open'));
     if (!isOpen) {
@@ -176,12 +164,6 @@ function toggleCategory(catId) {
     }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  GERENCIAMENTO DE SELEÇÃO
-// ═══════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════
-//  CONFIG PANEL — expande abaixo do item ao marcar checkbox
-// ═══════════════════════════════════════════════════════════
 function buildConfigPanel(item) {
     const tipo = item.tipo || 'text';
     const TIPO_LABELS = {
@@ -195,7 +177,6 @@ function buildConfigPanel(item) {
         color_palette: 'fa-palette'
     };
 
-    // Controles adicionais configuráveis pelo gestor
     let controls = '';
 
     if (tipo === 'color_palette') {
@@ -244,7 +225,6 @@ function buildConfigPanel(item) {
         });
 
         if (!hasMatch && defaultVal) {
-            // Se for uma lista de formatos, normaliza para o primeiro individual
             const firstExt = defaultVal.split(',')[0].trim().toLowerCase();
             let hasFirstExtMatch = false;
             extOptions.forEach(opt => {
@@ -379,7 +359,6 @@ function renderSelectedPanel() {
     countEl.textContent = selectedItems.length;
     clearBtn.classList.toggle('d-none', selectedItems.length === 0);
 
-    // remover cards existentes (manter empty state no DOM)
     list.querySelectorAll('.selected-card').forEach(el => el.remove());
 
     if (selectedItems.length === 0) {
@@ -408,11 +387,7 @@ function renderSelectedPanel() {
     });
 }
 
-// ═══════════════════════════════════════════════════════════
-//  COLETA DE ITENS PARA A API (compatível com o backend)
-// ═══════════════════════════════════════════════════════════
 function coletarItensFormulario() {
-    // Sincronizar todos os config panels com o state antes de coletar
     CATEGORIAS.forEach(cat => {
         cat.itens.forEach((item, idx) => {
             syncConfigToState(cat.id, item.nome, `cfg-${cat.id}-${idx}`);
@@ -433,9 +408,6 @@ function coletarItensFormulario() {
     }));
 }
 
-// ═══════════════════════════════════════════════════════════
-//  UTILITÁRIOS
-// ═══════════════════════════════════════════════════════════
 function getAppBasePath() {
     const marker = "/public/";
     const idx = window.location.pathname.toLowerCase().indexOf(marker);
@@ -461,9 +433,6 @@ function atualizarHintTemplate(mensagem = "", tipo = "info") {
     templateHint.textContent = mensagem;
 }
 
-// ═══════════════════════════════════════════════════════════
-//  TEMPLATES
-// ═══════════════════════════════════════════════════════════
 async function listarTemplates() {
     const templateSelect = document.getElementById("templateSelect");
     const loadTemplateBtn = document.getElementById("loadTemplateBtn");
@@ -542,9 +511,6 @@ async function criarChecklistPorTemplate() {
     }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", async () => {
     await SidebarManager.init();
     const sessao = await Auth.validateSession();
@@ -555,17 +521,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Montar accordion
     renderAccordion();
     renderSelectedPanel();
 
-    // Abrir primeira categoria por padrão
     toggleCategory(CATEGORIAS[0].id);
 
-    // Limpar tudo
     document.getElementById("clearAllBtn")?.addEventListener("click", clearAll);
 
-    // Templates
     const canUseTemplates = sessao.tipo !== "client" && Auth.hasAccess("perm_criar_projetos");
     if (!canUseTemplates) {
         document.getElementById("templateManagerCard")?.classList.add("d-none");
@@ -583,7 +545,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await listarTemplates();
     }
 
-    // Submit
     const form = document.getElementById("formBuilderForm");
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -618,7 +579,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         montarLinkCliente(token);
     });
 
-    // Copiar link
     const copyLinkBtn = document.getElementById("copyLinkBtn");
     const linkInput = document.getElementById("projectLinkInput");
     copyLinkBtn?.addEventListener("click", async () => {

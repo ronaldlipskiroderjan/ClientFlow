@@ -51,7 +51,6 @@ async function carregarUsuarios(pagina = 1) {
             const isBanido    = usuario.status_conta === 'banido';
             const banTitle    = isBanido ? 'Desbanir' : 'Banir';
 
-            // Linha de tabela (desktop)
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="fw-semibold">${usuario.nome}</td>
@@ -70,7 +69,6 @@ async function carregarUsuarios(pagina = 1) {
             `;
             usuariosTbody.appendChild(row);
 
-            // Card (mobile)
             if (usuariosCards) {
                 const card = document.createElement('div');
                 card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';

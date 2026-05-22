@@ -181,9 +181,6 @@ function setupChatToggle() {
     });
 }
 
-// ══════════════════════════════════════════════════════════════
-//  TOAST — Sistema global de notificações não-bloqueantes
-// ══════════════════════════════════════════════════════════════
 (function () {
     const DURATION = 4000;
 
@@ -264,7 +261,6 @@ function setupChatToggle() {
         }, DURATION);
     };
 
-    // Atalhos semânticos
     window.Toast = {
         success: (msg) => showToast(msg, 'success'),
         error:   (msg) => showToast(msg, 'error'),
@@ -273,7 +269,6 @@ function setupChatToggle() {
         show:    (msg, type) => showToast(msg, type),
     };
 
-    // Injetar keyframe da barra de progresso
     if (!document.getElementById('cf-toast-style')) {
         const s = document.createElement('style');
         s.id = 'cf-toast-style';

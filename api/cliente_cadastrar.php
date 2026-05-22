@@ -45,7 +45,7 @@ $email = trim($_POST['email'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $senha = $_POST['senha'] ?? '';
 $empresa = trim($_POST['empresa'] ?? '');
-$documento = preg_replace('/[^0-9]/', '', $_POST['cpf'] ?? ''); // Opcional no form antigo, mas importante agora! Se o form enviar, nós salvamos.
+$documento = preg_replace('/[^0-9]/', '', $_POST['cpf'] ?? '');
 
 if (empty($nome) || empty($email) || empty($senha)) {
     $retorno["mensagem"] = "Preencha nome, e-mail e senha.";
@@ -64,7 +64,6 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $conexao->begin_transaction();
 
 try {
-    // 1. Verifica se já existe um usuário com esse email (podem ter se cadastrado já na plataforma mas nao estao na agencia)
     $stmt_usr_check = $conexao->prepare("SELECT id, senha_hash FROM usuarios WHERE email = ? LIMIT 1");
     $stmt_usr_check->bind_param("s", $email);
     $stmt_usr_check->execute();
@@ -93,7 +92,6 @@ try {
     }
     $stmt_usr_check->close();
 
-    // 2. Vincula o cliente à agência/workspace da conta atual.
     $stmt_cliente = $conexao->prepare(
         "INSERT INTO clientes (agencia_id, usuario_id, nome, email, telefone, senha, empresa)
          VALUES (?, ?, ?, ?, ?, ?, ?)"

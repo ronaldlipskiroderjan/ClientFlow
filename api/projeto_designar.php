@@ -28,7 +28,7 @@ if (empty($permissoes['perm_designar_projetos'])) {
 
 $ua_id_alvo = intval($_POST['ua_id'] ?? 0);
 $checklist_id = intval($_POST['checklist_id'] ?? 0);
-$acao = trim($_POST['acao'] ?? 'vincular'); // 'vincular' ou 'remover'
+$acao = trim($_POST['acao'] ?? 'vincular');
 
 if ($ua_id_alvo <= 0 || $checklist_id <= 0) {
     $retorno["mensagem"] = "Dados informados inválidos.";
@@ -37,7 +37,6 @@ if ($ua_id_alvo <= 0 || $checklist_id <= 0) {
     exit();
 }
 
-// 1. Validar se o checklist alvo pertence a agência
 $stmt_chk = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
 $stmt_chk->bind_param("ii", $checklist_id, $agencia_id);
 $stmt_chk->execute();
@@ -50,7 +49,6 @@ if ($stmt_chk->get_result()->num_rows !== 1) {
 }
 $stmt_chk->close();
 
-// 2. Validar se o membro alvo pertence a agência
 $stmt_mbr = $conexao->prepare("SELECT id FROM usuarios_agencia WHERE id = ? AND agencia_id = ?");
 $stmt_mbr->bind_param("ii", $ua_id_alvo, $agencia_id);
 $stmt_mbr->execute();

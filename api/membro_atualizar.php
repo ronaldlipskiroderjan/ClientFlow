@@ -41,7 +41,6 @@ if ($ua_id_alvo == $_SESSION['ua_id']) {
     exit();
 }
 
-// Verifica se o alvo pertence a mesma agencia
 $stmt_check = $conexao->prepare("SELECT id, papel FROM usuarios_agencia WHERE id = ? AND agencia_id = ?");
 $stmt_check->bind_param("ii", $ua_id_alvo, $agencia_id);
 $stmt_check->execute();

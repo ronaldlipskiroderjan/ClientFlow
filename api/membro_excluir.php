@@ -63,8 +63,6 @@ if ($alvo['papel'] === 'admin_agencia') {
     exit();
 }
 
-// Em vez de deletar o usuario, apenas desativa o vinculo na agência (ativo = 0)
-// e tambem limpa suas designações de projetos
 $conexao->begin_transaction();
 
 try {

@@ -25,7 +25,6 @@ if ($usuario_tipo !== "client") {
     exit();
 }
 
-// Join clientes to match ALL client profiles tied to this user account
 $stmt = $conexao->prepare(
     "SELECT
         c.id,

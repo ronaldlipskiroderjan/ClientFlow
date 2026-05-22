@@ -1,17 +1,14 @@
 class PlanosManager {
     static async init() {
         try {
-            // Validar sessão
             const user = await Auth.validateSession();
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Carregar planos
             await this.carregarPlanos();
 
-            // Bind events
             this.bindEvents();
 
         } catch (error) {
@@ -30,17 +27,14 @@ class PlanosManager {
 
             const { plano_atual, planos_disponiveis, uso_recursos } = retorno.data || {};
 
-            // Renderizar plano atual
             if (plano_atual) {
                 this.renderizarPlanoAtual(plano_atual);
             }
 
-            // Renderizar uso de recursos
             if (uso_recursos) {
                 this.renderizarUsoRecursos(uso_recursos, plano_atual);
             }
 
-            // Renderizar planos disponíveis
             if (planos_disponiveis && Array.isArray(planos_disponiveis)) {
                 this.renderizarPlanosDisponiveis(planos_disponiveis, plano_atual);
             }
@@ -238,19 +232,16 @@ class PlanosManager {
                 return;
             }
 
-            // Mostrar avisos se houver
             if (retorno.data.avisos && retorno.data.avisos.length > 0) {
                 retorno.data.avisos.forEach(aviso => Toast.warning(aviso));
             }
 
-            // Fechar modal e recarregar
             const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpgradeModal'));
             modal.hide();
 
             Toast.success('Plano alterado com sucesso! Sua sessão permanece ativa.');
             this.planoSelecionado = null;
 
-            // Recarregar dados de planos
             await this.carregarPlanos();
 
         } catch (error) {

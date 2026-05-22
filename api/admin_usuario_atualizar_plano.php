@@ -31,7 +31,6 @@ $stmt = $conexao->prepare("UPDATE usuarios SET plano_id = ? WHERE id = ?");
 $stmt->bind_param("ii", $plano_id, $usuario_id);
 
 if ($stmt->execute()) {
-    // Buscar se é uma agência ou membro de agência para atualizar a assinatura da agência inteira
     $stmt_check = $conexao->prepare("SELECT tipo FROM usuarios WHERE id = ?");
     $stmt_check->bind_param("i", $usuario_id);
     $stmt_check->execute();
@@ -40,7 +39,6 @@ if ($stmt->execute()) {
     $stmt_check->close();
 
     if ($u_data && in_array($u_data['tipo'], ['agency', 'agency_member'])) {
-        // Encontrar a agencia desse usuário
         $stmt_ag = $conexao->prepare("SELECT agencia_id FROM usuarios_agencia WHERE usuario_id = ? LIMIT 1");
         $stmt_ag->bind_param("i", $usuario_id);
         $stmt_ag->execute();
@@ -52,7 +50,6 @@ if ($stmt->execute()) {
             $agencia_id = $ag_data['agencia_id'];
             $tipo_plano_id = $plano_id;
             
-            // Atualizar ou inserir na assinaturas_planos
             $stmt_ass = $conexao->prepare("
                 INSERT INTO assinaturas_planos (agencia_id, tipo_plano_id, data_inicio, status, tipo_renovacao) 
                 VALUES (?, ?, CURDATE(), 'ativa', 'mensal')

@@ -42,9 +42,7 @@ if (empty($agencia_id)) {
     exit();
 }
 
-// Agency member
 if ($usuario_tipo === 'agency_member' && $papel_agencia === 'dev') {
-    // Devs só podem ver clientes que têm ao menos 1 projeto designado a eles
     $stmt = $conexao->prepare(
         "SELECT DISTINCT cl.id, cl.usuario_id, cl.nome, cl.email, cl.empresa, cl.criado_em
          FROM clientes cl
@@ -55,7 +53,6 @@ if ($usuario_tipo === 'agency_member' && $papel_agencia === 'dev') {
     );
     $stmt->bind_param("ii", $agencia_id, $ua_id);
 } else {
-    // Demais papeis com permissão veem todos os clientes da agencia
     $stmt = $conexao->prepare(
         "SELECT id, usuario_id, nome, email, empresa, criado_em
          FROM clientes

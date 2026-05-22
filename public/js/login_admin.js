@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     } catch (e) {
-        // prossegue normalmente
     }
 
     if (!loginForm) {

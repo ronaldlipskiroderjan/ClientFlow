@@ -16,7 +16,6 @@ $documento = trim($_POST['documento'] ?? '');
 $data_nascimento = trim($_POST['data_nascimento'] ?? '');
 $nome_empresa = trim($_POST['nome_empresa'] ?? '');
 $nome_responsavel = trim($_POST['nome_responsavel'] ?? '');
-//$prova_autoria = trim($_POST['prova_autoria'] ?? '');
 $contato_juridico_nome = trim($_POST['contato_juridico_nome'] ?? '');
 $contato_juridico_email = trim($_POST['contato_juridico_email'] ?? '');
 $contato_juridico_telefone = trim($_POST['contato_juridico_telefone'] ?? '');
@@ -55,7 +54,6 @@ function normalizar_data_para_iso($valor)
     return false;
 }
 
-// Tipos permitidos na api (freelancer será tratado como agency)
 $tipos_permitidos = ["client", "agency", "admin"];
 
 if (empty($nome) || empty($email) || empty($senha) || empty($tipo)) {
@@ -65,7 +63,6 @@ if (empty($nome) || empty($email) || empty($senha) || empty($tipo)) {
     exit();
 }
 
-// Normalizar tipo: freelancer é tratado como agency
 $tipo_normalizado = ($tipo === 'freelancer') ? 'agency' : $tipo;
 
 if (!in_array($tipo_normalizado, $tipos_permitidos, true)) {
@@ -77,13 +74,6 @@ if (!in_array($tipo_normalizado, $tipos_permitidos, true)) {
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $retorno["mensagem"] = "E-mail inválido.";
-    header("Content-type: application/json;charset:utf-8");
-    echo json_encode($retorno);
-    exit();
-}
-
-if ($prova_autoria === '') {
-    $retorno["mensagem"] = "Informe a prova de autoria.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
@@ -102,16 +92,15 @@ if ($data_nascimento === false) {
 $conexao->begin_transaction();
 
 try {
-    // Se for agency, o tipo na tabela usuarios sera agency_member (para o proprio login)
     $tipo_db = ($tipo_normalizado === 'agency') ? 'agency_member' : $tipo_normalizado;
 
     $stmt = $conexao->prepare(
-        "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, /*prova_autoria,*/ status_conta)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, /*?,*/ 'aprovado')"
+        "INSERT INTO usuarios (nome, email, senha_hash, tipo, telefone, documento, data_nascimento, nome_empresa, nome_responsavel, status_conta)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado')"
     );
 
     $stmt->bind_param(
-        "ssssssssss" ,
+        "sssssssss" ,
         $nome,
         $email,
         $senha_hash,
@@ -120,8 +109,7 @@ try {
         $documento,
         $data_nascimento,
         $nome_empresa,
-        $nome_responsavel,
-        //$prova_autoria
+        $nome_responsavel
     );
 
     if (!$stmt->execute()) {
@@ -137,7 +125,6 @@ try {
     $usuario_id = $conexao->insert_id;
     $stmt->close();
 
-    // Prestador de servico pode ser PF (CPF) ou PJ (CNPJ)
     if ($tipo_normalizado === 'agency') {
         $documento_numerico = preg_replace('/\D/', '', $documento);
         $eh_pf = strlen($documento_numerico) === 11;
@@ -177,7 +164,6 @@ try {
         $agencia_id = $conexao->insert_id;
         $stmt_agencia->close();
 
-        // Todas as novas agencias comecam como 'individual' (1 colaborador)
         $stmt_plano = $conexao->prepare(
             "INSERT INTO assinaturas_planos (agencia_id, tipo_plano_id, data_inicio, tipo_renovacao, status)
              SELECT ?, id, CURDATE(), 'mensal', 'ativa'
@@ -189,7 +175,6 @@ try {
         }
         $stmt_plano->close();
 
-        // Inicializar registro de uso de recursos
         $total_colaboradores = 1;
         $total_projetos = 0;
         $stmt_uso = $conexao->prepare(
@@ -202,7 +187,6 @@ try {
         }
         $stmt_uso->close();
 
-        // Criar vínculo do usuário como admin da agência
         $stmt_membro = $conexao->prepare(
             "INSERT INTO usuarios_agencia (
                 agencia_id, usuario_id, papel, telefone,
@@ -225,7 +209,7 @@ try {
     $retorno["data"] = [
         "id" => $usuario_id,
         "nome" => $nome,
-        "tipo" => $tipo_normalizado // Retorna tipo normalizado (freelancer convertido para agency)
+        "tipo" => $tipo_normalizado
     ];
 
 } catch (mysqli_sql_exception $e) {

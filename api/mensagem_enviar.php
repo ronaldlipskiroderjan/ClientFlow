@@ -32,7 +32,6 @@ if (empty($checklist_id) || empty($mensagem)) {
     exit();
 }
 
-// Check authorization
 $pode_acessar = false;
 
 if ($usuario_tipo === 'client') {
@@ -90,7 +89,6 @@ if (!$pode_acessar) {
     exit();
 }
 
-// Insert message
 $stmt = $conexao->prepare("
     INSERT INTO mensagens_checklist (checklist_id, remetente_usuario_id, mensagem)
     VALUES (?, ?, ?)

@@ -90,7 +90,6 @@ try {
         $empresa = "";
         
         if ($agencia_id === null) {
-             // Provavelmente um freelancer. Assumimos inserção null na tabela.
             $stmt_insert_cliente = $conexao->prepare(
                 "INSERT INTO clientes (usuario_id, nome, email, senha, empresa)
                  VALUES (?, ?, ?, ?, ?)"

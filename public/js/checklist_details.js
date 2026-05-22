@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!checklistId) { window.location.href = "dashboard_client.html"; return; }
 
-    // Inicializa a sidebar padrão
     if (window.SidebarManager) {
         await SidebarManager.init();
     }
@@ -13,7 +12,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const emptyState     = document.getElementById("empty-state");
     const navTitle       = document.getElementById("nav-project-title");
 
-    // ─── Status config ────────────────────────────────────────────────────────
     const statusMap = {
         pending:  { badge: "bg-warning text-dark", icon: "fa-clock",                label: "Pendente" },
         review:   { badge: "bg-primary",            icon: "fa-eye",                  label: "Em Revisão" },
@@ -21,7 +19,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         rejected: { badge: "bg-danger",             icon: "fa-triangle-exclamation", label: "Reprovado – Reenviar" },
     };
 
-    // ─── Tipo icons ────────────────────────────────────────────────────────────
     const typeIcons = {
         file: 'fa-file-arrow-up', image: 'fa-image',
         text: 'fa-font', long_text: 'fa-align-left', url: 'fa-link',
@@ -40,7 +37,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             .join(',');
     }
 
-    // ─── Constraint pills ──────────────────────────────────────────────────────
     function buildConstraintPills(t) {
 
         const pills = [];
@@ -51,7 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         return pills.join('');
     }
 
-    // ─── Item card renderer ───────────────────────────────────────────────────
     function criarCardItem(tarefa) {
         const s      = statusMap[tarefa.status] || statusMap.pending;
         const accept = buildAccept(tarefa);
@@ -60,7 +55,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const icon   = typeIcons[tarefa.type] || 'fa-circle-dot';
         const label  = typeLabels[tarefa.type] || tarefa.type;
 
-        // ── Input area ──
         let inputArea = '';
         if (locked) {
             const value = tarefa.value || '';
@@ -237,7 +231,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         return div;
     }
 
-    // ─── Char counter ──────────────────────────────────────────────────────────
     function initCharCounters(root) {
         root.querySelectorAll('.js-char-input').forEach(inp => {
             const counter = inp.closest('form')?.querySelector('.char-now');
@@ -252,7 +245,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // ─── Upload zones ──────────────────────────────────────────────────────────
     function initUploadZones(root) {
         root.querySelectorAll('.upload-zone').forEach(zone => {
             const fileInput  = zone.querySelector('.upload-zone-input');
@@ -263,7 +255,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const submitBtn  = zone.closest('form')?.querySelector('.btn-task-submit');
             const allowedExt = (zone.dataset.extensions || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 
-            // Valida extensão do arquivo
             function validateExt(file) {
                 if (!allowedExt.length) return true;
                 const ext = file.name.split('.').pop().toLowerCase();
@@ -285,7 +276,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (submitBtn) submitBtn.classList.add('d-none');
             };
 
-            // Click on zone → trigger file input
             zone.addEventListener('click', e => {
                 if (!e.target.closest('.upload-preview-remove')) fileInput?.click();
             });
@@ -298,7 +288,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             prevRemove?.addEventListener('click', e => { e.stopPropagation(); clearPreview(); });
 
-            // Drag and drop
             zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('upload-zone-drag'); });
             zone.addEventListener('dragleave', () => zone.classList.remove('upload-zone-drag'));
             zone.addEventListener('drop', e => {
@@ -344,7 +333,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // ─── Submit handler ────────────────────────────────────────────────────────
     async function bindForms() {
         initCharCounters(document);
         initUploadZones(document);
@@ -390,7 +378,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // ─── Load items ────────────────────────────────────────────────────────────
     async function carregarItens() {
         itemsContainer.innerHTML = "";
         const retorno = await ApiClientFlow.get(`cliente_tarefas_listar.php?checklist_id=${checklistId}`);
@@ -404,7 +391,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await bindForms();
     }
 
-    // ─── Chat widget ───────────────────────────────────────────────────────────
     function initChat(sessaoUserId) {
         const widgetEl  = document.getElementById("floatingChatWidget");
         const chatBox   = document.getElementById("widgetChatBox");
@@ -492,7 +478,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // ─── Init ──────────────────────────────────────────────────────────────────
     try {
         const sessao = await ApiClientFlow.get("valida_sessao_logado.php");
         if (sessao.status !== "ok") { window.location.href = "login.html"; return; }

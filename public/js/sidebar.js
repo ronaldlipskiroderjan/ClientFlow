@@ -2,7 +2,6 @@ class SidebarManager {
     static async init() {
         this.mountLayout();
 
-        // Bind theme toggle now that the sidebar DOM exists
         if (window.ClientFlowTheme) {
             window.ClientFlowTheme.bindToggles();
         }
@@ -25,7 +24,6 @@ class SidebarManager {
             userRoleEl.textContent = this.getRoleLabel(role, papel);
         }
         if (userAvatarEl) {
-            // Usa foto real se existir, senão gera avatar com iniciais
             const fotoPath = user ? user.foto_path : null;
             userAvatarEl.src = fotoPath
                 ? "../../" + fotoPath
@@ -141,146 +139,42 @@ class SidebarManager {
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                             </div>
                             <div class="modal-body p-0">
-                                <ul class="nav nav-tabs profile-modal-tabs px-4 pt-3" id="profileTabs" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="tab-perfil-btn" data-bs-toggle="tab" data-bs-target="#tabPerfil" type="button" role="tab">
-                                            <i class="fas fa-user me-2"></i>Meu Perfil
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation" id="tabEmpresaItem" style="display:none">
-                                        <button class="nav-link" id="tab-empresa-btn" data-bs-toggle="tab" data-bs-target="#tabEmpresa" type="button" role="tab">
-                                            <i class="fas fa-building me-2"></i>Dados da Empresa
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-senha-btn" data-bs-toggle="tab" data-bs-target="#tabSenha" type="button" role="tab">
-                                            <i class="fas fa-lock me-2"></i>Segurança
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link profile-tab-danger" id="tab-excluir-btn" data-bs-toggle="tab" data-bs-target="#tabExcluir" type="button" role="tab">
-                                            <i class="fas fa-user-slash me-2"></i>Desativar Conta
-                                        </button>
-                                    </li>
-                                </ul>
-
-                                <div class="tab-content p-4" id="profileTabsContent">
-                                    <!-- Tab: Meu Perfil -->
-                                    <div class="tab-pane fade show active" id="tabPerfil" role="tabpanel">
-                                        <form id="formPerfil" novalidate>
-                                            <!-- Foto de perfil -->
-                                            <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
-                                                <div class="profile-photo-wrap" id="profilePhotoWrap" title="Clique para trocar a foto">
-                                                    <img id="profilePhotoPreview" src="" alt="Foto de perfil" class="profile-photo-img">
-                                                    <div class="profile-photo-overlay">
-                                                        <i class="fas fa-camera"></i>
-                                                    </div>
-                                                    <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/webp,image/gif" class="d-none">
+                                <div class="p-4">
+                                    <form id="formPerfil" novalidate>
+                                        <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
+                                            <div class="profile-photo-wrap" id="profilePhotoWrap" title="Clique para trocar a foto">
+                                                <img id="profilePhotoPreview" src="" alt="Foto de perfil" class="profile-photo-img">
+                                                <div class="profile-photo-overlay">
+                                                    <i class="fas fa-camera"></i>
                                                 </div>
-                                                <div>
-                                                    <p class="fw-semibold mb-1">Foto de Perfil</p>
-                                                    <p class="text-muted small mb-2">JPG, PNG, WEBP ou GIF · Máx. 5 MB</p>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="profilePhotoBtn">
-                                                        <i class="fas fa-upload me-1"></i>Escolher foto
-                                                    </button>
-                                                    <div id="alertFoto" class="alert alert-sm d-none mt-2 mb-0 py-2 px-3 small" role="alert"></div>
-                                                </div>
+                                                <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/webp,image/gif" class="d-none">
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="perfilNome" class="form-label fw-semibold">Nome</label>
-                                                <input type="text" class="form-control" id="perfilNome" required>
+                                            <div>
+                                                <p class="fw-semibold mb-1">Foto de Perfil</p>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" id="profilePhotoBtn">
+                                                    <i class="fas fa-upload me-1"></i>Escolher foto
+                                                </button>
+                                                <div id="alertFoto" class="alert alert-sm d-none mt-2 mb-0 py-2 px-3 small" role="alert"></div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="perfilEmail" class="form-label fw-semibold">E-mail</label>
-                                                <input type="email" class="form-control" id="perfilEmail" readonly>
-                                                <div class="form-text">O e-mail não pode ser alterado.</div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="perfilTelefone" class="form-label fw-semibold">Telefone</label>
-                                                <input type="text" class="form-control" id="perfilTelefone" placeholder="(00) 00000-0000">
-                                            </div>
-                                            <label for="perfilProvaAutoria" class="form-label fw-semibold">Nome da Mãe</label>
-                                            <input type="text" class="form-control" id="perfilProvaAutoria" placeholder="Alterar nome da mãe">
-                                            </div>
-                                            <div id="alertPerfil" class="alert d-none" role="alert"></div>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save me-2"></i>Salvar Alterações
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Tab: Dados da Empresa (somente proprietário agency) -->
-                                    <div class="tab-pane fade" id="tabEmpresa" role="tabpanel">
-                                        <form id="formEmpresa" novalidate>
-                                            <div class="mb-3">
-                                                <label for="agNomeEmpresa" class="form-label fw-semibold">Nome da Empresa</label>
-                                                <input type="text" class="form-control" id="agNomeEmpresa" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="agCnpj" class="form-label fw-semibold">CNPJ</label>
-                                                <input type="text" class="form-control" id="agCnpj" placeholder="00.000.000/0000-00">
-                                            </div>
-                                            <div class="row g-3 mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="agTelefone" class="form-label fw-semibold">Telefone da Empresa</label>
-                                                    <input type="text" class="form-control" id="agTelefone" placeholder="(00) 0000-0000">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="agSite" class="form-label fw-semibold">Site</label>
-                                                    <input type="text" class="form-control" id="agSite" placeholder="https://...">
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="agDescricao" class="form-label fw-semibold">Descrição</label>
-                                                <textarea class="form-control" id="agDescricao" rows="3" placeholder="Descreva sua empresa..."></textarea>
-                                            </div>
-                                            <div id="alertEmpresa" class="alert d-none" role="alert"></div>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save me-2"></i>Salvar Dados da Empresa
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Tab: Segurança -->
-                                    <div class="tab-pane fade" id="tabSenha" role="tabpanel">
-                                        <form id="formSenha" novalidate>
-                                            <div class="mb-3">
-                                                <label for="senhaAtual" class="form-label fw-semibold">Senha Atual</label>
-                                                <input type="password" class="form-control" id="senhaAtual" autocomplete="current-password">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="novaSenha" class="form-label fw-semibold">Nova Senha</label>
-                                                <input type="password" class="form-control" id="novaSenha" autocomplete="new-password">
-                                                <div class="form-text">Mínimo de 8 caracteres.</div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="confirmarSenha" class="form-label fw-semibold">Confirmar Nova Senha</label>
-                                                <input type="password" class="form-control" id="confirmarSenha" autocomplete="new-password">
-                                            </div>
-                                            <div id="alertSenha" class="alert d-none" role="alert"></div>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-lock me-2"></i>Alterar Senha
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Tab: Excluir Conta -->
-                                    <div class="tab-pane fade" id="tabExcluir" role="tabpanel">
-                                        <div class="alert alert-danger d-flex gap-2 align-items-start mb-4">
-                                            <i class="fas fa-exclamation-triangle mt-1 flex-shrink-0"></i>
-                                            <div><strong>Atenção!</strong> Ao desativar sua conta você será desconectado imediatamente. Você terá 180 dias para reativá-la — após esse prazo a conta será desativada permanentemente.</div>
                                         </div>
-                                        <form id="formExcluir" novalidate>
-                                            <div class="mb-3">
-                                                <label for="senhaExcluir" class="form-label fw-semibold">Digite sua senha para confirmar</label>
-                                                <input type="password" class="form-control" id="senhaExcluir" autocomplete="current-password">
-                                            </div>
-                                            <div id="alertExcluir" class="alert d-none" role="alert"></div>
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="fas fa-user-slash me-2"></i>Desativar Conta
-                                            </button>
-                                        </form>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label for="perfilNome" class="form-label fw-semibold">Nome</label>
+                                            <input type="text" class="form-control" id="perfilNome" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="perfilEmail" class="form-label fw-semibold">E-mail</label>
+                                            <input type="email" class="form-control" id="perfilEmail" readonly>
+                                            <div class="form-text">O e-mail não pode ser alterado.</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="perfilTelefone" class="form-label fw-semibold">Telefone</label>
+                                            <input type="text" class="form-control" id="perfilTelefone" placeholder="(00) 00000-0000">
+                                        </div>
+                                        <div id="alertPerfil" class="alert d-none" role="alert"></div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Salvar Alterações
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -311,6 +205,7 @@ class SidebarManager {
 
     static getAgencyNav(papel) {
         return `
+
             <a href="dashboard_agency.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-home"></i><span>Dashboard</span>
             </a>
@@ -331,11 +226,17 @@ class SidebarManager {
             <a href="planos.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-layer-group"></i><span>Planos e Upgrade</span>
             </a>` : ""}
+            <a href="profile.html" class="sidebar-nav-link nav-link">
+                <i class="fas fa-user-circle"></i><span>Configurações de Perfil</span>
+            </a>
         `;
     }
 
     static getClientNav() {
         return `
+            <a href="profile.html" class="sidebar-nav-link nav-link">
+                <i class="fas fa-user-circle"></i><span>Meu Perfil</span>
+            </a>
             <a href="dashboard_client.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-folder-open"></i><span>Meus Projetos</span>
             </a>
@@ -344,6 +245,9 @@ class SidebarManager {
 
     static getAdminNav() {
         return `
+            <a href="profile.html" class="sidebar-nav-link nav-link">
+                <i class="fas fa-user-circle"></i><span>Meu Perfil</span>
+            </a>
             <a href="dashboard_admin.html" class="sidebar-nav-link nav-link">
                 <i class="fas fa-gauge-high"></i><span>Painel Admin</span>
             </a>
@@ -383,7 +287,6 @@ const ProfileModal = {
         this._bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modalEl.addEventListener("show.bs.modal", () => this.loadProfile());
 
-        // Foto de perfil — clique no wrap ou no botão
         const photoInput = document.getElementById("profilePhotoInput");
         document.getElementById("profilePhotoWrap")?.addEventListener("click", () => photoInput?.click());
         document.getElementById("profilePhotoBtn")?.addEventListener("click", () => photoInput?.click());
@@ -422,7 +325,6 @@ const ProfileModal = {
             document.getElementById("perfilNome").value = usuario.nome || "";
             document.getElementById("perfilEmail").value = usuario.email || "";
             document.getElementById("perfilTelefone").value = usuario.telefone || "";
-            document.getElementById("perfilProvaAutoria").value = usuario.prova_autoria || "";
 
             const displayName = usuario.nome_empresa || usuario.nome_responsavel || usuario.nome || "Usuário";
             const photoSrc = this.resolvePhoto(usuario.foto_path, displayName);
@@ -433,14 +335,12 @@ const ProfileModal = {
             const previewEl = document.getElementById("profilePhotoPreview");
             if (previewEl) previewEl.src = photoSrc;
 
-            // Atualiza avatar da topbar com a foto real
             const topAvatar = document.getElementById("userAvatar");
             if (topAvatar) topAvatar.src = photoSrc;
 
             const roleEl = document.getElementById("profileModalRole");
             if (roleEl) roleEl.textContent = this.getRoleLabel(tipo, papel);
 
-            // Aba empresa: somente proprietário da agência (tipo agency)
             const tabEmpresaItem = document.getElementById("tabEmpresaItem");
             if (tabEmpresaItem) {
                 if (tipo === "agency" && agencia) {
@@ -455,7 +355,6 @@ const ProfileModal = {
                 }
             }
 
-            // Volta para aba Meu Perfil ao abrir
             const perfilTabBtn = document.getElementById("tab-perfil-btn");
             if (perfilTabBtn) bootstrap.Tab.getOrCreateInstance(perfilTabBtn).show();
 
@@ -470,7 +369,6 @@ const ProfileModal = {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Preview imediato
         const reader = new FileReader();
         reader.onload = (ev) => {
             const previewEl = document.getElementById("profilePhotoPreview");
@@ -478,7 +376,6 @@ const ProfileModal = {
         };
         reader.readAsDataURL(file);
 
-        // Upload
         const alertEl = document.getElementById("alertFoto");
         const btn = document.getElementById("profilePhotoBtn");
         if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...'; }
@@ -502,7 +399,6 @@ const ProfileModal = {
         }
 
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload me-1"></i>Escolher foto'; }
-        // Limpa o input para permitir re-selecionar o mesmo arquivo
         e.target.value = "";
     },
 
@@ -510,16 +406,14 @@ const ProfileModal = {
         const btn = document.querySelector("#formPerfil [type='submit']");
         const nome = document.getElementById("perfilNome").value.trim();
         const telefone = document.getElementById("perfilTelefone").value.trim();
-        const prova_autoria = document.getElementById("perfilProvaAutoria").value.trim();
 
         this.setLoading(btn, true, "Salvando...");
         try {
-            const res = await API.post("perfil_atualizar.php", { nome, telefone, prova_autoria });
+            const res = await API.post("perfil_atualizar.php", { nome, telefone });
             if (res.status === "ok") {
                 this.showAlert("alertPerfil", "success", res.mensagem);
                 const nameEl = document.getElementById("sidebarUserName");
                 if (nameEl) nameEl.textContent = nome;
-                // Só atualiza o avatar gerado se não houver foto real
                 const topAvatar = document.getElementById("userAvatar");
                 const hasRealPhoto = topAvatar && !topAvatar.src.includes("ui-avatars.com");
                 if (topAvatar && !hasRealPhoto) {
@@ -623,7 +517,7 @@ const ProfileModal = {
         if (tipo === "agency") return "Prestador de Serviço — Proprietário";
         if (tipo === "agency_member") {
             const map = {
-                admin_agencia: "Admin do Prestador",
+                admin_agencia: "Administrador",
                 gerente: "Gerente",
                 dev: "Especialista",
                 gestor_cliente: "Atendimento",

@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializar o Sidebar
     await SidebarManager.init();
 
-    // Validar permissões para esta tela
     if (!Auth.hasAccess('perm_gerenciar_membros')) {
         Toast.error('Você não tem permissão para acessar esta área.');
         window.location.href = 'dashboard_agency.html';
@@ -11,13 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('btnNovoMembro').classList.remove('d-none');
 
-    // Variáveis globais para os modais
     let modalEditar = new bootstrap.Modal(document.getElementById('modalEditarPermissoes'));
     let modalDesignar = new bootstrap.Modal(document.getElementById('modalDesignarProjeto'));
     let membrosAgencia = [];
     let checklistsAgencia = [];
 
-    // ====== LOADER & INIT ======
     async function init() {
         await carregarMembros();
         await carregarChecklists();
@@ -50,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function carregarChecklists() {
-        // Aproveitar a API existente que lista os projetos da agencia (todos)
         if (Auth.hasAccess('perm_designar_projetos')) {
             const res = await API.get('checklist_listar_agencia.php');
             if (res && res.status === 'ok') {
@@ -68,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ====== RENDER =======
     function renderizarMembros(membros) {
         const container = document.getElementById('teamContainer');
         container.innerHTML = '';
@@ -82,7 +76,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const pCriarProj = p.criar_projetos ? 'perm-active' : 'perm-inactive';
             const pVerCli = p.ver_clientes ? 'perm-active' : 'perm-inactive';
 
-            // Botões de ação (escondemos se for admin principal ou inativo, ou se usuário não puder)
             let actBtnHtml = '';
             if (m.papel !== 'admin_agencia') {
                 if (m.ativo) {
@@ -155,7 +148,6 @@ document.addEventListener('DOMContentLoaded', async () => {
          return roles[role] || role;
     }
 
-    // ====== EDITAR ======
     window.abrirModalEditar = function(uaId) {
         const membro = membrosAgencia.find(m => m.id === uaId);
         if (!membro) return;
@@ -202,14 +194,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (res && res.status === 'ok') {
             modalEditar.hide();
-            carregarMembros(); // recarrega a grid
+            carregarMembros();
         } else {
             alertBox.textContent = res ? res.mensagem : 'Erro na requisição.';
             alertBox.classList.remove('d-none');
         }
     });
 
-    // ====== DESATIVAR ======
     window.desativarMembro = async function(uaId) {
         const formData = new URLSearchParams();
         formData.append('ua_id', uaId);
@@ -223,7 +214,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // ====== DESIGNAR PROJETOS ======
     window.abrirModalDesignar = function(uaId) {
         if (!Auth.hasAccess('perm_designar_projetos')) {
             Toast.error('Acesso negado.');
@@ -286,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await API.post('projeto_designar.php', formData);
         
         if (res && res.status === 'ok') {
-            await carregarMembros(); // update state
+            await carregarMembros();
             const membroAtualizado = membrosAgencia.find(m => m.id == uaId);
             renderizarProjetosAtribuidos(membroAtualizado);
             
@@ -320,6 +310,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Go
     init();
 });

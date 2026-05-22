@@ -56,10 +56,8 @@ const ApiClientFlow = {
     }
 };
 
-// Map ApiClientFlow to API globally for the new modules
 window.API = ApiClientFlow;
 
-// Modulo de Auth
 const Auth = {
     userSess: null,
 
@@ -83,7 +81,7 @@ const Auth = {
     },
 
     getTipo() {
-        return this.get('tipo'); // client, freelancer, agency_member, admin
+        return this.get('tipo');
     },
 
     hasAccess(permKey) {
@@ -105,6 +103,5 @@ const Auth = {
     }
 }
 
-// ensure validation on load
 Auth.validateSession();
 window.Auth = Auth;

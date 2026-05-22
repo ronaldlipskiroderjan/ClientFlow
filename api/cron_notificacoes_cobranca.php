@@ -1,14 +1,11 @@
 <?php
-// Script para rodar via cron
-// http://localhost/ClientFlow/api/cron_notificacoes_cobranca.php
 
 include_once("db_conexao.php");
-require '../vendor/autoload.php'; // Usa o PHPMailer via composer
+require '../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Para testes locais, deixaremos este script aberto para ser acessado via navegador.
 
 $query = "
     SELECT c.id, c.titulo, c.link_hash, c.data_vencimento, c.frequencia_cobranca_dias, c.ultima_cobranca,
@@ -41,7 +38,6 @@ if ($result && $result->num_rows > 0) {
 
         $mail = new PHPMailer(true);
         try {
-            // Configurações do Servidor SMTP
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
@@ -50,14 +46,11 @@ if ($result && $result->num_rows > 0) {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
-            // utf-8 encoding
             $mail->CharSet = 'UTF-8';
 
-            // Remetente e Destinatário
             $mail->setFrom('clientflow.aviso@gmail.com', 'ClientFlow Lembretes');
             $mail->addAddress($cliente_email, $cliente_nome);
 
-            // Conteúdo do E-mail
             $mail->isHTML(true);
             $mail->Subject = "Lembrete: Pendências no Projeto {$titulo}";
 
@@ -85,7 +78,6 @@ if ($result && $result->num_rows > 0) {
 
             $mail->send();
 
-            // Atualiza data da última cobrança
             $stmt_upd = $conexao->prepare("UPDATE checklists SET ultima_cobranca = NOW() WHERE id = ?");
             $stmt_upd->bind_param("i", $checklist_id);
             $stmt_upd->execute();

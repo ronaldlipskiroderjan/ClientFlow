@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include_once("db_conexao.php");
 session_start();
 

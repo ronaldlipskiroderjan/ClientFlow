@@ -105,7 +105,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     } catch (e) {
-        // Segue carregando a tela de login normalmente
     }
 
     if (token) {

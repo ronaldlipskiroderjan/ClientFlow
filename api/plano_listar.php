@@ -22,7 +22,6 @@ if (empty($usuario_id) || empty($agencia_id)) {
 try {
     cf_bootstrap_planos($conexao, (int) $agencia_id);
 
-    // Buscar plano atual
     $stmt_atual = $conexao->prepare(
         "SELECT tp.id, tp.nome, tp.descricao, tp.preco_mensal, tp.preco_anual, 
                 tp.limite_colaboradores, tp.limite_projetos, tp.limite_armazenamento_gb,
@@ -47,7 +46,6 @@ try {
     }
     $stmt_atual->close();
     
-    // Buscar todos os planos disponíveis
     $stmt_planos = $conexao->prepare(
         "SELECT id, nome, descricao, preco_mensal, preco_anual, 
                 limite_colaboradores, limite_projetos, limite_armazenamento_gb
@@ -69,7 +67,6 @@ try {
     }
     $stmt_planos->close();
     
-    // Buscar uso atual de recursos
     $stmt_uso = $conexao->prepare(
         "SELECT total_colaboradores, total_projetos, armazenamento_usado_mb
          FROM uso_recursos_agencia

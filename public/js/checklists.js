@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const reviewModalEl = document.getElementById("reviewModal");
     const reviewModal  = reviewModalEl ? new bootstrap.Modal(reviewModalEl) : null;
 
-    // Modal Vincular CPF/CNPJ
     const modalVinculoEl    = document.getElementById('modalVincularCPF');
     const modalVinculo      = modalVinculoEl ? new bootstrap.Modal(modalVinculoEl) : null;
     const formVinculo       = document.getElementById('formVincularCPF');
@@ -29,7 +28,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const feedbackCPF       = document.getElementById('feedbackClienteCPF');
     const inputVinculoCPF   = document.getElementById('vinculo_cpf');
 
-    // ── Busca local ──────────────────────────────────────────────────────────
     const searchInput = document.getElementById('searchProjects');
     let todosChecklists = [];
 
@@ -46,7 +44,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // ── Formatar CPF/CNPJ ───────────────────────────────────────────────────
     inputVinculoCPF.addEventListener('input', (e) => {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length <= 11) {
@@ -119,7 +116,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         btnConfirmarVinculo.textContent = 'Confirmar Vínculo';
     });
 
-    // ── Modal de reprovação estilizado ──────────────────────────────────────
     let motivoReprovarResolve = null;
     const modalReprovarEl = document.getElementById('modalReprovar');
     const modalReprovar   = modalReprovarEl ? new bootstrap.Modal(modalReprovarEl) : null;
@@ -130,7 +126,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('inputMotivoReprovar').value = '';
             modalReprovar?.show();
 
-            // Eleva o backdrop do modalReprovar acima do reviewModal
             modalReprovarEl.addEventListener('shown.bs.modal', () => {
                 const backdrops = document.querySelectorAll('.modal-backdrop');
                 if (backdrops.length > 0) {
@@ -154,7 +149,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         motivoReprovarResolve = null;
     });
 
-    // ── Revisão de itens ────────────────────────────────────────────────────
     async function revisarItem(itemId, aprovar) {
         let motivo = "";
         if (!aprovar) {
@@ -256,7 +250,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         reviewModal.show();
     }
 
-    // ── Deletar checklist ───────────────────────────────────────────────────
     async function deletarChecklist(id, titulo) {
         const retorno = await API.post("checklist_deletar.php", { checklist_id: id });
         if (retorno && retorno.status === "ok") {
@@ -267,7 +260,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // ── Renderizar lista filtrada ─────────────────────────────────────────
     function renderChecklists(lista) {
         const cardContainer = document.getElementById('checklistsCardContainer');
         const vazioMsg = 'Nenhum projeto encontrado.';
@@ -300,7 +292,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? `<button class="btn btn-sm btn-outline-danger js-delete-card" title="Excluir"><i class="fas fa-trash-alt"></i></button>`
                 : '';
 
-            // Linha desktop
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td class="ps-4">
@@ -335,7 +326,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             tableBody.appendChild(tr);
 
-            // Card mobile
             if (cardContainer) {
                 const card = document.createElement('div');
                 card.className = 'card mb-2 border-0 shadow-sm rounded-3 p-3';
@@ -376,7 +366,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // ── Carregar todos os checklists ─────────────────────────────────────
     async function carregarListaChecklists() {
         const retorno = await API.get("checklist_listar_agencia.php");
         if (retorno.status !== "ok") {
@@ -386,7 +375,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         todosChecklists = retorno.data || [];
 
-        // Manter filtro de busca ativo ao recarregar
         const q = searchInput?.value.trim().toLowerCase() || '';
         const filtrados = q
             ? todosChecklists.filter(c =>
@@ -397,7 +385,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderChecklists(filtrados);
     }
 
-    // ── Chat Widget ──────────────────────────────────────────────────────
     let activeChatChecklistId = null;
     let chatRefreshInterval   = null;
     const widgetEl = document.getElementById('floatingChatWidget');

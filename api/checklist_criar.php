@@ -98,7 +98,6 @@ function normalize_extensions($value) {
 $conexao->begin_transaction();
 
 try {
-    // ── 1. Criar o checklist ──────────────────────────────────────────────────
     $stmt_checklist = $conexao->prepare(
         "INSERT INTO checklists (agencia_id, titulo, descricao, link_hash, status, data_vencimento, frequencia_cobranca_dias)
          VALUES (?, ?, ?, ?, 'pending', ?, ?)"
@@ -108,7 +107,6 @@ try {
     $checklist_id = $conexao->insert_id;
     $stmt_checklist->close();
 
-    // ── 2. Inserir itens ──────────────────────────────────────────────────────
     $stmt_item = $conexao->prepare(
         "INSERT INTO itens_checklist (
             checklist_id, nome_item, descricao_item, formato_esperado,
@@ -145,12 +143,10 @@ try {
     }
     $stmt_item->close();
 
-    // ── 3. Buscar ou criar o cliente pelo e-mail ──────────────────────────────
-    $cliente_nome  = $email_cliente; // Fallback; atualizado se o usuário existir
+    $cliente_nome  = $email_cliente;
     $cliente_id    = null;
     $usuario_encontrado = null;
 
-    // Verificar se já existe um usuário com este e-mail
     $stmt_usr = $conexao->prepare("SELECT id, nome FROM usuarios WHERE email = ? LIMIT 1");
     $stmt_usr->bind_param("s", $email_cliente);
     $stmt_usr->execute();
@@ -161,7 +157,6 @@ try {
     }
     $stmt_usr->close();
 
-    // Verificar se já existe na tabela clientes para esta agência
     $stmt_cli = $conexao->prepare(
         "SELECT id FROM clientes WHERE email = ? AND agencia_id = ? LIMIT 1"
     );
@@ -172,7 +167,6 @@ try {
     if ($res_cli->num_rows === 1) {
         $cliente_id = intval($res_cli->fetch_assoc()['id']);
     } else {
-        // Criar entrada na tabela clientes (o usuário pode ainda não ter conta)
         $usuario_id_cliente = $usuario_encontrado ? intval($usuario_encontrado['id']) : null;
         $senha_placeholder  = '';
         $empresa_placeholder = '';
@@ -195,7 +189,6 @@ try {
     }
     $stmt_cli->close();
 
-    // ── 4. Vincular cliente ao checklist ──────────────────────────────────────
     $stmt_vinc = $conexao->prepare("UPDATE checklists SET cliente_id = ? WHERE id = ?");
     $stmt_vinc->bind_param("ii", $cliente_id, $checklist_id);
     $stmt_vinc->execute();
@@ -203,12 +196,10 @@ try {
 
     $conexao->commit();
 
-    // ── 5. Enviar e-mail de boas-vindas ───────────────────────────────────────
     $link_acesso  = "http://localhost/ClientFlow/public/pages/cadastro.html?token=" . $link_hash;
     $vencimento_fmt = $data_vencimento ? date("d/m/Y", strtotime($data_vencimento)) : null;
     $freq_txt = $frequencia_cobranca_dias ? "a cada {$frequencia_cobranca_dias} dia(s)" : null;
 
-    // Montar lista de itens solicitados para o e-mail
     $itens_html = '';
     foreach ($itens as $item) {
         $nome_it = htmlspecialchars(trim($item['nome'] ?? ''), ENT_QUOTES);
@@ -290,7 +281,6 @@ try {
         $mail->AltBody = "Olá! Você foi convidado para o projeto \"{$titulo}\". Acesse: {$link_acesso}";
         $mail->send();
     } catch (Exception $e) {
-        // E-mail falhou, mas não cancela o checklist — apenas loga
         error_log("Falha ao enviar e-mail de boas-vindas para {$email_cliente}: " . $mail->ErrorInfo);
     }
 

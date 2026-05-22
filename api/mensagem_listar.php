@@ -31,11 +31,9 @@ if (empty($checklist_id)) {
     exit();
 }
 
-// Check authorization
 $pode_acessar = false;
 
 if ($usuario_tipo === 'client') {
-    // client must be linked to the checklist via cliente_id -> client table -> usuario_id
     $stmt = $conexao->prepare("
         SELECT c.id FROM checklists ch
         JOIN clientes c ON ch.cliente_id = c.id
@@ -90,7 +88,6 @@ if (!$pode_acessar) {
     exit();
 }
 
-// Fetch messages
 $stmt = $conexao->prepare("
     SELECT m.id, m.mensagem, m.criado_em, m.remetente_usuario_id, u.nome as remetente_nome, u.tipo as remetente_tipo
     FROM mensagens_checklist m

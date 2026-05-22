@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let checklists = [];
 
-    // Pre-sets de perfis
     roleSelect.addEventListener('change', (e) => {
         const val = e.target.value;
         const p_ver_proj = document.getElementById('perm_ver_projetos');
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const p_ger_mem = document.getElementById('perm_gerenciar_membros');
 
-        // Reset
         p_ver_proj.checked = false;
         p_criar_proj.checked = false;
         p_ver_cli.checked = false;
@@ -52,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Load available projects
     async function loadProjetos() {
         if (!Auth.hasAccess('perm_designar_projetos')) {
             containerProjetos.innerHTML = '<div class="alert alert-warning">Você não pode atribuir projetos pois não tem permissão.</div>';

@@ -32,7 +32,6 @@ if (!in_array($ext, $allowed_exts, true)) {
     exit();
 }
 
-// Limite 5 MB
 if ($size > 5 * 1024 * 1024) {
     $retorno["mensagem"] = "A foto deve ter no máximo 5 MB.";
     header("Content-type: application/json;charset:utf-8");
@@ -40,7 +39,6 @@ if ($size > 5 * 1024 * 1024) {
     exit();
 }
 
-// Valida que é realmente uma imagem
 $image_info = @getimagesize($tmp_name);
 if ($image_info === false) {
     $retorno["mensagem"] = "O arquivo enviado não é uma imagem válida.";
@@ -55,7 +53,6 @@ if (!is_dir($base_dir)) {
 }
 chmod($base_dir, 0775);
 
-// Remove foto antiga do disco, se existir
 $stmt_old = $conexao->prepare("SELECT foto_path FROM usuarios WHERE id = ?");
 $stmt_old->bind_param("i", $usuario_id);
 $stmt_old->execute();
@@ -91,7 +88,6 @@ if ($stmt->execute()) {
     $retorno["mensagem"] = "Foto atualizada com sucesso!";
     $retorno["data"]     = ["foto_url" => "../../" . $db_path];
 } else {
-    // Remove arquivo salvo se o banco falhou
     @unlink($final_path);
     $retorno["mensagem"] = "Erro ao atualizar foto no banco de dados.";
 }

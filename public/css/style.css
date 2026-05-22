@@ -2095,13 +2095,15 @@ a:hover {
   color: #ffffff;
 }
 
-[data-theme="dark"] #profileModal .form-control[readonly] {
+[data-theme="dark"] #profileModal .form-control[readonly],
+[data-theme="dark"] #profilePage .form-control[readonly] {
   background-color: var(--dk-elevated) !important;
   color: #ffffff !important;
   border-color: var(--dk-border) !important;
 }
 
-[data-theme="dark"] #profileModal .form-text {
+[data-theme="dark"] #profileModal .form-text,
+[data-theme="dark"] #profilePage .form-text {
   color: #ffffff;
 }
 
@@ -2129,7 +2131,8 @@ a:hover {
 /* ── Profile Modal — mobile ── */
 @media (max-width: 576px) {
   /* Foto de perfil e texto empilham em mobile muito pequeno */
-  #profileModal .d-flex.align-items-center.gap-4.mb-4 {
+  #profileModal .d-flex.align-items-center.gap-4.mb-4,
+  #profilePage .d-flex.align-items-center.gap-4.mb-4 {
     flex-direction: column;
     align-items: flex-start !important;
     gap: 1rem !important;

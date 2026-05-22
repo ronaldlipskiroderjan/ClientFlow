@@ -19,7 +19,6 @@ if ($usuario_id <= 0) {
     exit();
 }
 
-// Encontra a agência pelo usuário (papel admin_agencia)
 $stmt = $conexao->prepare(
     "SELECT ua.agencia_id, a.nome_empresa
      FROM usuarios_agencia ua
@@ -40,7 +39,6 @@ if (!$agencia) {
 
 $agencia_id = $agencia['agencia_id'];
 
-// Clientes da agência
 $stmt_c = $conexao->prepare(
     "SELECT c.id, c.nome, c.email, c.empresa, c.usuario_id, c.criado_em,
             u.status_conta
@@ -54,7 +52,6 @@ $stmt_c->execute();
 $clientes = $stmt_c->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt_c->close();
 
-// Colaboradores da agência (excluindo o próprio dono)
 $stmt_m = $conexao->prepare(
     "SELECT u.id AS usuario_id, u.nome, u.email, u.status_conta, ua.papel, ua.criado_em
      FROM usuarios_agencia ua

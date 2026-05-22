@@ -51,7 +51,6 @@ if (empty($cpf_cnpj) || (strlen($cpf_cnpj) !== 11 && strlen($cpf_cnpj) !== 14)) 
     exit();
 }
 
-// Busca o usuário pelo documento (que seja do tipo client)
 $stmt = $conexao->prepare("SELECT id, nome, email, nome_empresa FROM usuarios WHERE documento = ? AND tipo = 'client' LIMIT 1");
 $stmt->bind_param("s", $cpf_cnpj);
 $stmt->execute();
@@ -72,7 +71,6 @@ $stmt->close();
 $ja_cliente = false;
 $cliente_id = 0;
 
-// Verifica se já está vinculado no workspace atual
 $stmt_cli = $conexao->prepare("SELECT id FROM clientes WHERE usuario_id = ? AND agencia_id = ? LIMIT 1");
 $stmt_cli->bind_param("ii", $cliente_usuario_id, $agencia_id);
 $stmt_cli->execute();

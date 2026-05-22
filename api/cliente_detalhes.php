@@ -27,7 +27,6 @@ if ($cliente_id <= 0) {
     exit();
 }
 
-// Verifica se o cliente pertence à agência atual
 $stmt = $conexao->prepare("SELECT id, nome, email, telefone, empresa, criado_em FROM clientes WHERE id = ? AND agencia_id = ?");
 $stmt->bind_param("ii", $cliente_id, $agencia_id);
 $stmt->execute();
@@ -43,7 +42,6 @@ if ($res_cliente->num_rows === 0) {
 $cliente = $res_cliente->fetch_assoc();
 $stmt->close();
 
-// Buscar Projetos (Checklists)
 $projetos = [];
 $stmt_proj = $conexao->prepare("SELECT id, titulo, status, criado_em FROM checklists WHERE cliente_id = ?");
 $stmt_proj->bind_param("i", $cliente_id);

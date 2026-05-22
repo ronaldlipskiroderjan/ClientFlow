@@ -168,13 +168,11 @@ try {
     $novo_ua_id = $conexao->insert_id;
     $stmt_membro->close();
 
-    // Designa os projetos se fornecidos e se admin tiver permissao de designar
     if (!empty($projetos_array) && !empty($permissoes['perm_designar_projetos'])) {
         $stmt_proj = $conexao->prepare("INSERT IGNORE INTO projetos_membros (checklist_id, usuario_agencia_id) VALUES (?, ?)");
         foreach ($projetos_array as $chk_id) {
             $c_id = intval(trim($chk_id));
             if ($c_id > 0) {
-                // Idealmente validar se o checklist_id pertence a agencia_id
                 $stmt_chk = $conexao->prepare("SELECT id FROM checklists WHERE id = ? AND agencia_id = ?");
                 $stmt_chk->bind_param("ii", $c_id, $agencia_id);
                 $stmt_chk->execute();

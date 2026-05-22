@@ -14,7 +14,6 @@ if (empty($usuario_id)) {
     exit();
 }
 
-// Somente o tipo 'agency' (proprietário) pode editar dados da empresa
 if ($tipo !== 'agency') {
     $retorno["mensagem"] = "Sem permissão para editar dados da empresa.";
     header("Content-type: application/json;charset:utf-8");

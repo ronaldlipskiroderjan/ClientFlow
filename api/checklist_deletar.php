@@ -29,7 +29,6 @@ if ($checklist_id <= 0) {
     exit();
 }
 
-// Verifica que o checklist pertence à agência logada
 $stmt = $conexao->prepare("SELECT id, titulo FROM checklists WHERE id = ? AND agencia_id = ? LIMIT 1");
 $stmt->bind_param("ii", $checklist_id, $agencia_id);
 $stmt->execute();
@@ -45,7 +44,6 @@ if ($res->num_rows === 0) {
 $checklist = $res->fetch_assoc();
 $stmt->close();
 
-// Deleta (ON DELETE CASCADE cuida dos itens e vínculos)
 $del = $conexao->prepare("DELETE FROM checklists WHERE id = ? AND agencia_id = ?");
 $del->bind_param("ii", $checklist_id, $agencia_id);
 
