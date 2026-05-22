@@ -82,12 +82,12 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
-/*if ($prova_autoria === '') {
+if ($prova_autoria === '') {
     $retorno["mensagem"] = "Informe a prova de autoria.";
     header("Content-type: application/json;charset:utf-8");
     echo json_encode($retorno);
     exit();
-}*/
+}
 
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
@@ -111,7 +111,7 @@ try {
     );
 
     $stmt->bind_param(
-        "sssssssss"/*s"*/ ,
+        "ssssssssss" ,
         $nome,
         $email,
         $senha_hash,
@@ -121,7 +121,7 @@ try {
         $data_nascimento,
         $nome_empresa,
         $nome_responsavel,
-        /*$prova_autoria*/
+        //$prova_autoria
     );
 
     if (!$stmt->execute()) {

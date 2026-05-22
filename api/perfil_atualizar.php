@@ -23,8 +23,8 @@ if (empty($nome)) {
     exit();
 }
 
-$stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, telefone = ?, /*prova_autoria = ?*/ WHERE id = ?");
-$stmt->bind_param("ssi"/*s*/ , $nome, $telefone, /*$prova_autoria,*/ $usuario_id);
+$stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, telefone = ?, /*prova_autoria = ?,*/ WHERE id = ?");
+$stmt->bind_param("ssi" /*s*/, $nome, $telefone, /*$prova_autoria,*/ $usuario_id);
 
 if ($stmt->execute()) {
     $_SESSION['usuario_nome'] = $nome;

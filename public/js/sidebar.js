@@ -199,9 +199,9 @@ class SidebarManager {
                                                 <label for="perfilTelefone" class="form-label fw-semibold">Telefone</label>
                                                 <input type="text" class="form-control" id="perfilTelefone" placeholder="(00) 00000-0000">
                                             </div>
-                                            <!-- <label for="perfilProvaAutoria" class="form-label fw-semibold">Nome da Mãe</label>
+                                            <label for="perfilProvaAutoria" class="form-label fw-semibold">Nome da Mãe</label>
                                             <input type="text" class="form-control" id="perfilProvaAutoria" placeholder="Alterar nome da mãe">
-                                            </div> -->
+                                            </div>
                                             <div id="alertPerfil" class="alert d-none" role="alert"></div>
                                             <button type="submit" class="btn btn-primary">
                                                 <i class="fas fa-save me-2"></i>Salvar Alterações
